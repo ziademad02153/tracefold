@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.venv/
+__pycache__/
+.env
+*.db
+*.log
+
+.env.*
+*.pem
+*.key
+*.db-*
+.pytest_cache/
