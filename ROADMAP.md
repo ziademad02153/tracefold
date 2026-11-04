@@ -1,6 +1,10 @@
 # Tracefold | Engineering audit and delivery plan
 
-## Current verdict
+## Current delivery update — 4 November 2026
+
+M2/M3/M4 are implemented and locally validated on the supported Python profile. [M4.md](M4.md) records the working repository generation/approval/execution/replay workflow and evidence. [REPOSITORY_TESTING_ROADMAP.md](REPOSITORY_TESTING_ROADMAP.md) is the active roadmap; [ARCHITECTURE_REVIEW_M4.md](ARCHITECTURE_REVIEW_M4.md) records the self-review and open limits. Company acceptance is still pending the real repository and reference commands. No language or feature expansion is in the active scope.
+
+## Historical initial audit (superseded capability baseline)
 
 Tracefold is a public GitHub PR importer with durable snapshots and a separate demo. The product premise is to give developers reproducible review evidence and save review time. The current real workflow offers little beyond GitHub apart from a retained snapshot. A GitHub repository with no PRs has no actionable review path today. The demo check results are fixtures and cannot validate a real repository. A shared team deployment is out of scope for the current unauthenticated build.
 

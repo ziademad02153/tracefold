@@ -2,8 +2,9 @@ import {useEffect,useState} from 'react'
 import {api} from './api'
 import {ProjectNavigation,ProjectTestNavigation} from './ProjectHome'
 import type {Discovery,ExecutionProfile,ProviderView} from './executionTypes'
+import {RepositorySuiteFlow} from './RepositorySuiteFlow'
 
-export function RepositoryExecution({repo,profileId,views,focusRunId}:{repo?:string;profileId?:string;views:Record<string,ProviderView>;focusRunId?:string}){
+export function RepositoryExecution({repo,profileId,views,focusRunId,focusSuiteId}:{repo?:string;profileId?:string;views:Record<string,ProviderView>;focusRunId?:string;focusSuiteId?:string}){
   const [providers,setProviders]=useState<{id:string;version:string}[]>([])
   const [provider,setProvider]=useState('')
   const [ref,setRef]=useState('main')
@@ -16,6 +17,7 @@ export function RepositoryExecution({repo,profileId,views,focusRunId}:{repo?:str
   const [loading,setLoading]=useState(true)
   const [error,setError]=useState('')
   useEffect(()=>{
+    if(focusRunId==='generate'&&profile?.environment){const timer=setTimeout(()=>document.getElementById('repository-generation')?.scrollIntoView({block:'start'}),50);return()=>clearTimeout(timer)}
     if(!focusRunId||!profile?.runs.some(run=>run.id===focusRunId))return
     const timer=setTimeout(()=>document.getElementById('run-'+focusRunId)?.scrollIntoView({block:'start'}),0)
     return()=>clearTimeout(timer)
@@ -32,7 +34,7 @@ export function RepositoryExecution({repo,profileId,views,focusRunId}:{repo?:str
     void load();return()=>{active=false}
   },[repo,profileId])
   useEffect(()=>{
-    if(!profileId||!profile||!['running','preparing'].includes(profile.state))return
+    if(!profileId||!profile||!['running','preparing','generating'].includes(profile.state))return
     let active=true
     const timer=setInterval(()=>{void api<ExecutionProfile>('executions/profiles/'+profileId).then(item=>{if(active)setProfile(item)}).catch(()=>{if(active)setError('Could not refresh the saved operation. Reload this page to reconnect.')})},2500)
     return()=>{active=false;clearInterval(timer)}
@@ -43,10 +45,10 @@ export function RepositoryExecution({repo,profileId,views,focusRunId}:{repo?:str
   const Editor=view?.Editor
   const latest=profile?.runs.at(-1)
   const labels:Record<string,string>={total:'tests',passed:'passed',failed:'failed',error:'execution errors',skipped:'skipped',xfailed:'expected failures',xpassed:'unexpected passes',not_run:'not run'}
-  const running=!!busy||!!profile&&['running','preparing'].includes(profile.state)
+  const running=!!busy||!!profile&&['running','preparing','generating'].includes(profile.state)
   return <div className="repository-execution">
-    <p className="page-help">Run this repository's existing tests in an approved environment. No AI generation is required. Results apply to the recorded revision and supported execution profile.</p>
-    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={profile?.runs.length?'runs':'tests'}/>{!profile&&<ProjectTestNavigation repo={activeRepo} active="existing"/>}</>}
+    <p className="page-help">Run existing tests, generate additional tests inside the same project environment, review the code and keep the evidence. Results apply to the recorded revision and execution profile.</p>
+    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={focusRunId==='generate'?'tests':profile?.runs.length?'runs':'tests'}/><ProjectTestNavigation repo={activeRepo} active={focusRunId==='generate'?'generated':'existing'}/></>}
     {loading&&<p role="status">Loading execution workspace…</p>}
     {error&&<p className="error" role="alert">{error}</p>}
     {busy&&<p className="progress" role="status">{busy==='prepare'?'Preparing approved dependencies and installing the project. This can take several minutes.':busy==='run'?'Collecting and running existing tests…':'Preparing the repository snapshot…'}</p>}
@@ -88,17 +90,23 @@ export function RepositoryExecution({repo,profileId,views,focusRunId}:{repo?:str
           <button className="button" disabled={running} onClick={()=>void action('run',async()=>{setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/runs',{profile_hash:profile.profile_hash}));setTimeout(()=>document.getElementById('repository-evidence')?.scrollIntoView({behavior:'smooth'}),0)})}>{profile.runs.length?'Re-run existing tests':'Run existing tests'}</button>
           <details><summary>Environment recovery</summary><p>Rebuild the approved environment if its worker image is unavailable or preparation needs to be repeated. Earlier runs retain their original environment manifest.</p><button className="button secondary" disabled={running} onClick={()=>void action('prepare',async()=>{setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash}))})}>Rebuild approved environment</button></details>
         </>}
-        {['preparing','running'].includes(profile.state)&&<p role="status">Operation in progress. Saved state refreshes automatically.</p>}
+        {['preparing','running','generating'].includes(profile.state)&&<p role="status">Operation in progress. Saved state refreshes automatically.</p>}
         {profile.state==='interrupted'&&<p className="error">The earlier operation was interrupted. Retry preparation or execution; previous evidence is retained.</p>}
       </section>
+      {profile.environment&&views[profile.provider_id]?.supportsGeneration&&<RepositorySuiteFlow profile={profile} view={views[profile.provider_id]} onProfile={setProfile} focusSuiteId={focusSuiteId}/>}
       <section className="surface" id="repository-evidence"><h2>Saved repository test reports</h2>{!profile.runs.length&&<p>No tests have been executed for this environment yet.</p>}
         {profile.runs.map((run,index)=><article className="run-evidence" id={'run-'+run.id} key={run.id}>
           <h3>Repository run {index+1} · <span className={run.status==='passed'?'passed':run.status==='failed'?'failed':''}>{run.status.replaceAll('_',' ').toUpperCase()}</span></h3>
+          <p><strong>{run.suite_id?'Existing + approved generated tests':'Existing tests'}</strong></p>
+          {run.suite_hash&&<p className="hash">Approved suite SHA256 {run.suite_hash}</p>}
+          {run.baseline_empty&&<p>No existing tests were collected. This report verifies only the approved generated suite.</p>}
+          {run.comparison&&<div className="surface"><h4>Same-suite comparison</h4><p>{run.comparison.complete?'Both executions completed':'Incomplete comparison'} · {run.comparison.source_changed?'Source revision changed':'Same source'} · {run.comparison.same_environment?'Same environment':'Environment changed'}</p>{run.comparison.changes.map(c=><p key={c.id}>{c.id}: <strong>{c.before} → {c.after}</strong></p>)}<p>{run.comparison.added.length} generated cases added · {run.comparison.removed.length} removed</p></div>}
+          {run.suite_id&&<p>Existing: {run.tests.filter(t=>t.origin==='existing').length} cases · Generated: {run.tests.filter(t=>t.origin==='generated').length} cases. Each phase uses a fresh source copy in the recorded environment.</p>}
           <p>{new Date(run.completed_at).toLocaleString()} · {run.profile_hash===profile.profile_hash?'Same approved profile':'Different profile'} · {run.environment_id===profile.environment?.id?'Same prepared environment':'Different environment'}</p>
           {run.summary&&<div className="suite-counts">{Object.entries(run.summary).map(([key,value])=><span key={key} className={key==='passed'?'passed':key==='failed'?'failed':''}><strong>{value}</strong> {labels[key]||key.replaceAll('_',' ')}</span>)}</div>}
           {run.error&&<p className="error">{run.error}</p>}
           <p className="muted">This result covers collected tests. Skips, expected failures and incomplete execution are shown separately; success does not certify untested code.</p>
-          {run.tests.filter(test=>test.status!=='passed').map(test=><details className="test-result" key={test.id} open><summary><strong>{test.status.toUpperCase()}</strong> · {test.id}</summary><pre>{test.detail}</pre></details>)}
+          {run.tests.filter(test=>test.status!=='passed').map(test=><details className="test-result" key={test.id} open><summary><strong>{test.status.toUpperCase()}</strong> · {test.origin||'existing'} · {test.id}</summary><pre>{test.detail}</pre></details>)}
           <details><summary>Passed cases · {run.tests.filter(test=>test.status==='passed').length}</summary>{run.tests.filter(test=>test.status==='passed').map(test=><p className="location" key={test.id}>{test.id} · {test.seconds??0}s</p>)}</details>
           <details><summary>Effective provider configuration</summary><pre>{JSON.stringify(run.effective_config,null,2)}</pre></details>
           {!!run.collection_errors?.length&&<details open><summary>Collection errors</summary><pre>{JSON.stringify(run.collection_errors,null,2)}</pre></details>}

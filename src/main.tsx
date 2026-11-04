@@ -6,9 +6,11 @@ import { Workbench } from './Workbench'
 import type { ExecutionActivity } from './executionTypes'
 import { RepositoryExecution } from './RepositoryExecution'
 import { PythonEnvironmentForm, pythonDefaults } from './providers/PythonEnvironmentForm'
-const providerViews = {'python-pytest': {label:'Python / pytest', Editor:PythonEnvironmentForm, defaults:pythonDefaults}}
+import {PythonGenerationOptions} from './providers/PythonGenerationOptions'
+const providerViews = {'python-pytest': {label:'Python / pytest', Editor:PythonEnvironmentForm, defaults:pythonDefaults,supportsGeneration:true,GenerationOptions:PythonGenerationOptions}}
 import { ProjectHome, ProjectNavigation, type ProjectSummary } from './ProjectHome'
 import { ProjectRuns } from './ProjectRuns'
+import {ProjectGeneratedTests} from './ProjectGeneratedTests'
 
 type Repo = {name:string; description:string}
 type Pull = {number:number; title:string; base:string; head:string}
@@ -33,12 +35,12 @@ function App() {
   const [loading,setLoading] = useState(true)
   const [pending,setPending] = useState(false)
   const [reviewing,setReviewing] = useState(false)
-  const [rawPage, id='', focusRunId=''] = hash.split('/')
+  const [rawPage, id='', focusRunId='', focusSuiteId=''] = hash.split('/')
   const aliases:Record<string,string> = {'results':'runs','repository-tests':'tests','pulls':'ai-review'}
   const page = rawPage === '' ? 'projects' : aliases[rawPage] || rawPage
   let project = ''
-  let invalidRoute = !['projects','connect','project','history','report','testing','test-session','ai-review','runs','tests','execution'].includes(page)
-  if (page === 'project' || page === 'history' || page === 'testing' || page === 'ai-review' || page === 'runs' || page === 'tests') {
+  let invalidRoute = !['projects','connect','project','history','report','testing','generated','test-session','ai-review','runs','tests','execution'].includes(page)
+  if (page === 'project' || page === 'history' || page === 'testing' || page === 'generated' || page === 'ai-review' || page === 'runs' || page === 'tests') {
     try { project = decodeURIComponent(id) } catch { invalidRoute = true }
     if (!project) invalidRoute = true
   }
@@ -159,7 +161,7 @@ function App() {
   }
 
   const projectLink = (repo:string) => '#project/' + encodeURIComponent(repo)
-  const title = page === 'tests' ? 'Tests' : page === 'execution' ? 'Repository execution report' : page === 'testing' ? 'Generated tests' : page === 'test-session' ? 'Test suite and evidence' : page === 'connect' ? 'Add a project' :
+  const title = (page === 'tests'||page === 'generated') ? 'Tests' : page === 'execution' ? 'Repository execution report' : page === 'testing' ? 'Generated tests' : page === 'test-session' ? 'Test suite and evidence' : page === 'connect' ? 'Add a project' :
     page === 'history' ? 'Saved code reviews' : page === 'ai-review' ? 'AI Review' : page === 'project' ? 'Project overview' : page === 'runs' ? 'Runs' : page === 'report' ? 'AI review report' : 'Projects'
 
   return <>
@@ -188,14 +190,15 @@ function App() {
         <div className="row"><input id="repo-url" disabled={pending} required placeholder="https://github.com/owner/repo" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
         <button className="button" disabled={pending}>{pending ? 'Connecting…' : 'Add repository'}</button></div>
       </form>}
+      {!invalidRoute && page==='generated'&&<ProjectGeneratedTests key={hash} repo={project}/>}
       {!invalidRoute && (page === 'testing' || page === 'test-session') && <Workbench key={hash} repo={page === 'testing' ? project : undefined} sessionId={page === 'test-session' ? id : undefined} focusRunId={focusRunId}/>}
-      {!invalidRoute && (page==='tests'||page==='execution') && <RepositoryExecution key={hash} repo={page==='tests'?project:undefined} profileId={page==='execution'?id:undefined} views={providerViews} focusRunId={focusRunId}/>}
+      {!invalidRoute && (page==='tests'||page==='execution') && <RepositoryExecution key={hash} repo={page==='tests'?project:undefined} profileId={page==='execution'?id:undefined} views={providerViews} focusRunId={focusRunId} focusSuiteId={focusSuiteId}/>}
       {repos.map(repo => {
         const stats=summaries?.find(item=>item.repo===repo.name)
         const repoActivity=executionActivity?.find(item=>item.repo===repo.name)
         return <article className="surface row" key={repo.name}><div><h2>{repo.name}</h2><p>{repo.description}</p>
           {summaries?<p className="muted">{stats?.suite_count??0} file suites · {stats?.run_count??0} file runs · Latest file run: {stats?.latest_run?stats.latest_run.status.toUpperCase():'Not run yet'}</p>:<p>Activity summary unavailable.</p>}
-          {executionActivity&&<p className="muted">{repoActivity?.run_count??0} repository runs · Latest repository run: {repoActivity?.latest_run?.status.toUpperCase()||'Not run yet'}</p>}
+          {executionActivity&&<p className="muted">{repoActivity?.suite_count??0} repository suites · {repoActivity?.run_count??0} repository runs · Latest repository run: {repoActivity?.latest_run?.status.toUpperCase()||'Not run yet'}</p>}
         </div><a className="button" href={projectLink(repo.name)}>Open project →</a></article>
       })}
       {!invalidRoute && page==='project' && <ProjectHome key={project} repo={project}/>}

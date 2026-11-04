@@ -4,13 +4,13 @@ Status 4 November 2026. Approved delivery direction. No new testing capability i
 
 Implementation update: M1 / Sprint 3 is accepted by the user. See [SPRINT3.md](SPRINT3.md) for implementation evidence and limits. The current-state description below records the baseline at roadmap approval. [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md) defines the direction beyond Python M4.
 
-M2/M3 delivery update: the first supported repository profile and separated execution core/provider are implemented. [M2_M3.md](M2_M3.md) records the real upstream 297-case pilot and limits; [ARCHITECTURE_REVIEW_M3.md](ARCHITECTURE_REVIEW_M3.md) reviews the as-built boundary and open findings. Company-project acceptance remains pending. M4 is not started.
+M2/M3 delivery update: the first supported repository profile and separated execution core/provider are implemented. [M2_M3.md](M2_M3.md) records the real upstream 297-case pilot and limits; [ARCHITECTURE_REVIEW_M3.md](ARCHITECTURE_REVIEW_M3.md) reviews the as-built boundary and open findings. Company-project acceptance remains pending. M4 was subsequently authorized and implemented; see [M4.md](M4.md).
 
-## Active delivery decision: stop and review at M3
+## Current delivery decision: validate M4 on the company project
 
-Product-navigation update: Overview, Tests, Runs, AI Review are the approved primary project destinations. Existing and generated tests share Tests navigation; Runs links to saved evidence for both. This is a UX change to delivered tools, not M4. Company M3 validation remains the first pending acceptance task. M4 is to follow the same project journey after that review, with a new Architecture Review after M4 before further provider/feature expansion.
+Overview, Tests, Runs and AI Review remain the primary project destinations. M4 now runs inside Tests: prepared environment → bounded generation → review/approval → execution → saved evidence → replay unchanged on a repaired revision. See [M4 implementation/validation](M4.md) and [M4 architecture self-review](ARCHITECTURE_REVIEW_M4.md).
 
-The next delivery scope is M2 (Project Environment) followed by M3 (Repository Test Execution). Do not start repository-wide generated testing, language expansion, coverage dashboards, accounts or other additions during this scope. After M3 passes its acceptance gate, review the product with the user before authorizing M4 implementation.
+M2/M3/M4 have supported-profile engineering evidence. Company acceptance remains NOT RUN. No additional features or runtime expansion are authorized in the current scope. The next gate is the actual company repository, its reference commands and review of the implementation findings.
 
 Pilot status: the user will supply a company Python repository and its installation/test commands. While awaiting that input, engineering validation used the real upstream package pallets/itsdangerous at 2.2.0, not the synthetic tracefold-validation repository. Its 297 cases match a direct pytest reference under the selected environment. This does not substitute for company-project acceptance. Initial inspection of ZEDX-AI-Simulator found the application and existing test suite are JavaScript/TypeScript; Python files are auxiliary agent scripts, so it is not the Python pilot.
 
@@ -168,6 +168,8 @@ Use a nominated real pilot repository. From the same commit, the Tracefold run a
 At this gate Tracefold can run a supported real Python repository's configured tests. That is a meaningful engineering tool even before AI-generated tests cover every module.
 
 ## Milestone 4 — Repository-wide generated tests
+
+Implementation update, 4 November 2026: the authorized bounded M4 workflow is implemented on the supported Python profile. See [M4.md](M4.md) for actual batches, execution evidence and limits, and [architecture self-review](ARCHITECTURE_REVIEW_M4.md). Company repository acceptance remains NOT RUN. The requirements below describe the milestone; they do not imply exhaustive generation or universal repository support.
 
 ### Changes
 

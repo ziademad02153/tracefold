@@ -54,7 +54,78 @@ def requirement(value):
 class PythonRepositoryProvider:
     id='python-pytest'
     version='1'
-    capabilities=('repository-snapshot','prepare-environment','collect-existing','run-existing','native-evidence')
+    capabilities=('repository-snapshot','prepare-environment','collect-existing','run-existing','native-evidence','generate-suites','run-approved-suites')
+
+    def generation_context(self,snapshot,config,environment):
+        from .python_generation import generation_context
+        return generation_context(snapshot,config,environment)
+
+    def generate_suite(self,snapshot,config,environment,request,key,policy):
+        if environment.get('manifest',{}).get('suite_execution_version',0)<1:
+            raise ProviderError('Rebuild the approved environment to enable pinned generated-suite execution.')
+        from .python_generation import generate
+        return generate(snapshot,config,environment,request,key,policy)
+
+    def validate_suite(self,snapshot,config,proposal,key):
+        from .python_generation import validate_proposal
+        return validate_proposal(snapshot,config,proposal,key)
+
+    def validate_suite_target(self,config,suite):
+        if config['component_root']!=suite['metadata']['component_root']:
+            raise ProviderError('Use the same component root when rerunning this approved suite.')
+
+    def execute_suite(self,snapshot,config,environment,suite,policy):
+        if (environment.get('source_hash')!=snapshot.content_hash or environment.get('profile_inputs_hash')!=identity(config)
+                or environment.get('manifest',{}).get('suite_execution_version',0)<1):
+            raise ProviderError('Prepare a compatible environment for this source/configuration and approved suites.')
+        self.validate_suite_target(config,suite)
+        verified=self.validate_suite(snapshot,config,{'files':suite['files'],'metadata':suite['metadata']},suite['id'])
+        if verified['files']!=suite['files']:
+            raise ProviderError('Approved file identity changed; execution was blocked.')
+        name='tracefold-suite-'+uuid4().hex
+        marker='TRACEFOLD-SUITE-'+uuid4().hex+':'
+        with tempfile.TemporaryDirectory(prefix='tracefold-control-') as temporary:
+            control=Path(temporary)
+            (control/'config.json').write_text(json.dumps(config),encoding='utf-8')
+            (control/'suite.json').write_text(json.dumps({'files':suite['files']}),encoding='utf-8')
+            wrapper=(
+                "import base64,json,pathlib,subprocess,sys\n"
+                "python='/opt/tracefold/env/bin/python'\n"
+                "def phase(label):\n"
+                " path='/tmp/'+label+'.json'\n"
+                " code=subprocess.run([python,'/opt/tracefold/executor.py',label,path]).returncode\n"
+                " result=json.loads(pathlib.Path(path).read_text()) if pathlib.Path(path).is_file() else {'collected':[],'tests':[],'collection_errors':[{'detail':'No native evidence'}]}\n"
+                " result['exit_code']=code\n"
+                " return result\n"
+                "bc=phase('collect-existing')\n"
+                "baseline_empty=bc['exit_code']==5 and not bc.get('collection_errors')\n"
+                "b=phase('run-existing') if bc['exit_code']==0 and bc.get('collected') else bc\n"
+                "gc=phase('collect-generated')\n"
+                "g=phase('run-generated') if gc['exit_code']==0 and gc.get('collected') else gc\n"
+                "inventory_ok=(baseline_empty or bc.get('collected')==b.get('collected')) and gc.get('collected')==g.get('collected') and bool(g.get('collected'))\n"
+                "errors=b.get('collection_errors',[])+g.get('collection_errors',[])\n"
+                "if not inventory_ok: errors += [{'detail':'Phase inventories are incomplete or differ.'}]\n"
+                "if not baseline_empty and bc['exit_code']!=0: errors += [{'detail':'Existing test collection could not complete.'}]\n"
+                "if gc['exit_code']!=0: errors += [{'detail':'Generated test collection could not complete.'}]\n"
+                "exit_code=2 if errors or b['exit_code'] not in (0,1,5) or g['exit_code'] not in (0,1) else 1 if b['exit_code']==1 or g['exit_code']==1 else 0\n"
+                "tests=b.get('tests',[])+g.get('tests',[])\n"
+                "statuses=['passed','failed','error','skipped','xfailed','xpassed','not_run']\n"
+                "groups={label:{'total':sum(t.get('origin')==label for t in tests),**{status:sum(t.get('origin')==label and t['status']==status for t in tests) for status in statuses}} for label in ['existing','generated']}\n"
+                "result={'exit_code':exit_code,'collected':b.get('collected',[])+g.get('collected',[]),'tests':tests,'collection_errors':errors,'collection_skips':b.get('collection_skips',[])+g.get('collection_skips',[]),'groups':groups,'baseline_empty':baseline_empty,'inventory_matches':inventory_ok,'effective_config':{'existing':b.get('effective_config'),'generated':g.get('effective_config')},'execution_mode':'separate existing and generated phases in the same pinned environment'}\n"
+                "data=json.dumps(result).encode()\n"
+                f"print('\\n{marker}'+base64.b64encode(data).decode() if len(data)<{policy.output_bytes//2} else '\\nEvidence exceeds artifact limit.',flush=True)\n")
+            args=run_args(name)+['--user','65534:65534','--mount',f'type=bind,source={snapshot.path.resolve()},target=/source,readonly',
+                '--mount',f'type=bind,source={control.resolve()},target=/control,readonly',environment['id'],'/opt/tracefold/env/bin/python','-c',wrapper]
+            try:
+                code,output=command(args,seconds=policy.run_seconds,limit=policy.output_bytes)
+                log,separator,artifact=output.rpartition(marker)
+                if not separator:
+                    raise ProviderError('Combined suite evidence was not returned.\n'+output[-18000:])
+                raw=base64.b64decode(artifact.strip(),validate=True)
+                result=json.loads(raw)
+                return {**result,'log':log[-40000:],'artifacts':[{'media_type':'application/json','name':'suite-native-evidence.json','sha256':hashlib.sha256(raw).hexdigest(),'content':raw.decode()}]}
+            finally:
+                remove('container',name)
 
     def discover(self,snapshot,component):
         root=snapshot.path/relative(component)
@@ -82,6 +153,7 @@ class PythonRepositoryProvider:
                           'Explicit pytest plugin selection; no automatic plugin loading']}
 
     def validate(self,snapshot,config):
+        config={key:value for key,value in config.items() if key not in ('resolved_inputs','manifest_hashes')}
         try:
             parsed=Config.model_validate(config)
         except ValueError as failure:

@@ -1,5 +1,9 @@
 # Tracefold product requirements
 
-The current source of truth is [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md). It defines the project hierarchy, navigation, actual architecture, supported workflow. See SPRINT3.md for delivered File Testing scope and LANGUAGE_EXPANSION_ROADMAP.md for the later language profiles.
+Tracefold is an early AI-assisted testing platform. Python is the first validated provider, not the core platform identity. Current deployment is a single-user local pilot.
 
-Implemented behavior is documented in SPRINT1.md and SPRINT2.md. Sprint 3 remains a proposal for review. The current product is a local Python testing workbench with optional AI code review.
+The current product/navigation source of truth is [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md). The implemented repository workflow and acceptance evidence are in [M4.md](M4.md): connect repository, prepare environment, run existing tests, generate additional tests, review/approve, execute, save evidence and replay the same suite after a repair.
+
+[REPOSITORY_TESTING_ROADMAP.md](REPOSITORY_TESTING_ROADMAP.md) defines M1–M4 and the pending company-project gate. [ARCHITECTURE_REVIEW_M4.md](ARCHITECTURE_REVIEW_M4.md) records current core/provider boundaries and open findings. [LANGUAGE_EXPANSION_ROADMAP.md](LANGUAGE_EXPANSION_ROADMAP.md) is future direction, not delivered language support.
+
+SPRINT1.md, SPRINT2.md and SPRINT3.md retain the historical function/file implementation and validation records. Their narrower scopes are compatibility tools, not a description of the full current repository workflow. Company readiness and shared daily deployment remain separate acceptance gates.

@@ -22,7 +22,7 @@ export function ProjectRuns({repo}:{repo:string}){
         for(const run of results[0].value[0]?.runs||[])merged.push({key:'generated:'+run.id,kind:'Generated suite',status:run.status,date:run.completed_at,revision:run.sha,passed:run.summary?.passed,failed:run.summary?.failed,total:run.summary?.total,href:'#test-session/'+run.session_id+'/'+run.id})
       }else failures.push('Generated-suite history could not be loaded. The list below may be incomplete.')
       if(results[1].status==='fulfilled'){
-        for(const profile of results[1].value)for(const run of profile.runs)merged.push({key:'repository:'+run.id,kind:'Existing repository tests',status:run.status,date:run.completed_at,revision:profile.source.revision,passed:run.summary?.passed,failed:run.summary?.failed,total:run.summary?.total,href:'#execution/'+profile.id+'/'+run.id})
+        for(const profile of results[1].value)for(const run of profile.runs)merged.push({key:'repository:'+run.id,kind:run.suite_id?'Existing + generated tests':'Existing repository tests',status:run.status,date:run.completed_at,revision:profile.source.revision,passed:run.summary?.passed,failed:run.summary?.failed,total:run.summary?.total,href:'#execution/'+profile.id+'/'+run.id})
       }else failures.push('Repository execution history could not be loaded. The list below may be incomplete.')
       merged.sort((a,b)=>b.date.localeCompare(a.date))
       setRows(merged);setErrors(failures);setLoading(false)

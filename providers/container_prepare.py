@@ -26,6 +26,7 @@ metadata = json.loads(subprocess.check_output([python, '-c', manifest_code], tex
 shutil.copyfile('/control/executor.py','/opt/tracefold/executor.py')
 metadata['executor_sha256']=hashlib.sha256(Path('/opt/tracefold/executor.py').read_bytes()).hexdigest()
 metadata['preparation_sha256']=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+metadata['suite_execution_version']=1
 metadata['wheels'] = [{'name':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(Path('/wheels').glob('*.whl'))]
 Path('/opt/tracefold/environment.json').write_text(json.dumps(metadata))
 print('\n' + sys.argv[1] + json.dumps(metadata), flush=True)

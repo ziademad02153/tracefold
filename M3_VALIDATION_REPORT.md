@@ -139,4 +139,4 @@ No company blocker list can be completed from an open-source run. On intake, app
 1. Supported-profile upstream execution: PASS with the documented limits.
 2. New repository core/provider boundary: passes the listed implementation self-review checks; retain the open architectural/operational findings.
 3. Company-project acceptance: PENDING / NOT RUN.
-4. M4: NOT STARTED. Review the company results and architecture findings with the user before choosing M4 or modifying the plan.
+4. Subsequent scope update: the user authorized M4 while the company pilot remained pending. M4 is now implemented and locally validated as recorded in [M4.md](M4.md); this does not close company acceptance. Review company results and the M4 architecture findings before further expansion.

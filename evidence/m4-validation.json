@@ -1,0 +1,3838 @@
+{
+  "date": "2026-11-04",
+  "scope": "M4 supported Python 3.11/Linux/pip/pytest profile; bounded repository-context generation",
+  "company_acceptance": "NOT RUN: company repository has not been supplied",
+  "pilot": {
+    "classification": "Authorized public educational defect/repair fixture; not a company project",
+    "suite": {
+      "id": "88d20bc741f74bab9a1362ae75453ef3",
+      "repo": "ziademad02153/tracefold-validation",
+      "state": "approved",
+      "files": [
+        {
+          "path": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py",
+          "content": "import pytest\nfrom checkout.pricing import price_after_discount, discount_amount\nfrom checkout.validation import is_valid_percent\n\ndef test_price_after_discount_with_20_percent_discount():\n    assert price_after_discount(10000, 20) == 8000\n\ndef test_price_after_discount_with_zero_percent_discount():\n    assert price_after_discount(10000, 0) == 10000\n\ndef test_price_after_discount_with_100_percent_discount():\n    assert price_after_discount(10000, 100) == 0\n\ndef test_discount_amount_with_rounding_behavior():\n    # floor(3333 * 90 / 100) = 2999; 3333 - 2999 = 334.\n    assert discount_amount(3333, 10) == 334\n\ndef test_is_valid_percent_for_negative_and_out_of_range_values():\n    assert is_valid_percent(-1) is False\n    assert is_valid_percent(0) is True\n    assert is_valid_percent(100) is True\n    assert is_valid_percent(101) is False\n",
+          "sha256": "2442d2510c4f77c73e4a7f4402dbd01d173935344f7406e90b14fa1f12c5ca9a"
+        }
+      ],
+      "metadata": {
+        "title": "Tests for pricing and validation logic in checkout module.",
+        "scenarios": [
+          {
+            "name": "test_price_after_discount_with_20_percent_discount",
+            "description": "price_after_discount(10000,20) must equal 8000"
+          },
+          {
+            "name": "test_price_after_discount_with_zero_percent_discount",
+            "description": "price_after_discount(10000,0) equals 10000"
+          },
+          {
+            "name": "test_price_after_discount_with_100_percent_discount",
+            "description": "price_after_discount(10000,100) equals 0"
+          },
+          {
+            "name": "test_discount_amount_with_rounding_behavior",
+            "description": "discount_amount(3333,10) equals 334 because discounted price is floored to integer cents"
+          },
+          {
+            "name": "test_is_valid_percent_for_negative_and_out_of_range_values",
+            "description": "is_valid_percent must return False for -1, True for 0, True for 100, False for 101"
+          }
+        ],
+        "context": {
+          "selected": [
+            {
+              "path": "src/checkout/pricing.py",
+              "module": "checkout.pricing",
+              "public_symbols": [
+                "price_after_discount",
+                "discount_amount"
+              ]
+            },
+            {
+              "path": "src/checkout/validation.py",
+              "module": "checkout.validation",
+              "public_symbols": [
+                "is_valid_percent"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "path": "src/checkout/pricing.py",
+              "module": "checkout.pricing",
+              "source": "from .rules import discount_factor, PERCENT_SCALE\ndef price_after_discount(price_cents, percent):\n    \"\"\"Return discounted integer cents, rounded down; price >= 0, percent 0..100.\"\"\"\n    return price_cents * discount_factor(percent) // PERCENT_SCALE\ndef discount_amount(price_cents, percent):\n    \"\"\"Original price minus discounted integer cents.\"\"\"\n    return price_cents - price_after_discount(price_cents, percent)\n",
+              "sha256": "906e55d7be7fe7711ff035a09843c9b1cd44c494a7a163a0807626999b5f2d36"
+            },
+            {
+              "path": "src/checkout/validation.py",
+              "module": "checkout.validation",
+              "source": "def is_valid_percent(percent):\n    \"\"\"True for a percentage in the inclusive range 0..100.\"\"\"\n    return 0 <= percent <= 100\n",
+              "sha256": "4d75aa29d6ebb46d00cde38f1f712b677f39efac96c873b7cc4f428b1d0f42ff"
+            },
+            {
+              "path": "src/checkout/rules.py",
+              "module": "checkout.rules",
+              "source": "from packaging.version import Version\nPERCENT_SCALE = 100\ndef discount_factor(percent):\n    if Version(\"1.0\") < Version(\"2.0\"):\n        return PERCENT_SCALE + percent\n    raise RuntimeError(\"Unsupported rule version\")\n",
+              "sha256": "482b68ed397154c99b9edc052354457986ee14dabed8bc53cd01dac96b2461a1"
+            }
+          ],
+          "fixtures": [],
+          "existing_test_examples": [],
+          "scope": "selected modules, one-hop local imports and bounded test examples"
+        },
+        "test_directory": "tests",
+        "component_root": "m4_project",
+        "model": "gemma4:e4b",
+        "attempts": 1,
+        "seconds": 13.3
+      },
+      "contract_version": 1,
+      "provider_id": "python-pytest",
+      "provider_version": "1",
+      "origin_profile_id": "f59332495a884c3dbcb9515f9c2367d2",
+      "origin_source": {
+        "repository": "ziademad02153/tracefold-validation",
+        "revision": "489d5b814d0314124a09af69d630baeec780fb66",
+        "content_hash": "533a500499bd2ca4176061c90e079a457340642d57a042e63b4e26dc12e3bcd0",
+        "file_count": 10
+      },
+      "origin_environment_id": "sha256:de7a8616dd4ebbde3ed6f72fae065d7fa5a86a720b4ed93433b8e6ab087d7aba",
+      "request": {
+        "selection": [
+          "src/checkout/pricing.py",
+          "src/checkout/validation.py"
+        ],
+        "intent": "Generate five tests: price_after_discount(10000,20) must equal 8000; price_after_discount(10000,0) equals 10000; price_after_discount(10000,100) equals 0; discount_amount(3333,10) equals 334 because discounted price is floored to integer cents; is_valid_percent must return False for -1, True for 0, True for 100, False for 101. Import from checkout.pricing and checkout.validation. The percentage helper may contain a defect: assert the exact required outputs, never copy the implementation. Use five unique test functions. No module-level constants or helpers.",
+        "options": {}
+      },
+      "created_at": "2026-11-04T15:54:27.224292+00:00",
+      "approved_at": "2026-11-04T15:58:34.557050+00:00",
+      "edited": true,
+      "suite_hash": "9896a76a34e46d576b594893255c80f2da8838e5cdbe1242c35888c9497db145",
+      "edited_at": "2026-11-04T15:58:34.128391+00:00"
+    },
+    "before": {
+      "id": "f59332495a884c3dbcb9515f9c2367d2",
+      "repo": "ziademad02153/tracefold-validation",
+      "provider_id": "python-pytest",
+      "provider_version": "1",
+      "source": {
+        "repository": "ziademad02153/tracefold-validation",
+        "revision": "489d5b814d0314124a09af69d630baeec780fb66",
+        "content_hash": "533a500499bd2ca4176061c90e079a457340642d57a042e63b4e26dc12e3bcd0",
+        "file_count": 10
+      },
+      "config": {
+        "component_root": "m4_project",
+        "runtime": "3.11",
+        "install_project": true,
+        "requirements_files": [],
+        "packages": [
+          "pytest==8.3.5"
+        ],
+        "extras": [],
+        "plugins": [],
+        "pytest_args": [
+          "-q"
+        ],
+        "pythonpath": [],
+        "resolved_inputs": [
+          "packaging==24.0",
+          "pytest==8.3.5",
+          "setuptools==75.1.0",
+          "wheel==0.44.0"
+        ],
+        "manifest_hashes": {
+          "pyproject.toml": "164bb1c85a22c5765b849feb3e270912460bb0a179eaa723a2e515604db26073"
+        }
+      },
+      "profile_hash": "7b5c6f129ad9b5df0c031ad736ae95051314e8b449e5cdc238429ad8b017636c",
+      "environment": {
+        "status": "ready",
+        "id": "sha256:de7a8616dd4ebbde3ed6f72fae065d7fa5a86a720b4ed93433b8e6ab087d7aba",
+        "target": "docker-linux",
+        "base_image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "source_hash": "533a500499bd2ca4176061c90e079a457340642d57a042e63b4e26dc12e3bcd0",
+        "profile_inputs_hash": "676b3fd1b2631f0ad3f376577271ba35b7b984e67b0588470fad1c36546f6c47",
+        "manifest": {
+          "python": "3.11.18",
+          "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+          "packages": [
+            {
+              "name": "iniconfig",
+              "version": "2.3.1"
+            },
+            {
+              "name": "packaging",
+              "version": "24.0"
+            },
+            {
+              "name": "pip",
+              "version": "24.0"
+            },
+            {
+              "name": "pluggy",
+              "version": "1.7.0"
+            },
+            {
+              "name": "pytest",
+              "version": "8.3.5"
+            },
+            {
+              "name": "setuptools",
+              "version": "75.1.0"
+            },
+            {
+              "name": "tracefold-m4-pilot",
+              "version": "1.0.0"
+            },
+            {
+              "name": "wheel",
+              "version": "0.44.0"
+            }
+          ],
+          "executor_sha256": "9ecec54f20546759c94702c8438d9b15d4c6b94c127d192f686221d117df07db",
+          "preparation_sha256": "00c20ab2b3a04ffb4480c72216b874b9e84bd9c126021d95c0a1db6cc8a80619",
+          "suite_execution_version": 1,
+          "wheels": [
+            {
+              "name": "iniconfig-2.3.1-py3-none-any.whl",
+              "sha256": "9121e2c1fdb355232495be3194c8dfe87ccc2d5dee45947b78e68f499790d7a7"
+            },
+            {
+              "name": "packaging-24.0-py3-none-any.whl",
+              "sha256": "2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"
+            },
+            {
+              "name": "pluggy-1.7.0-py3-none-any.whl",
+              "sha256": "7dd7b0d8832ba3cb632c306926ded123429211b83641b35dc5c41ad2d34f9bec"
+            },
+            {
+              "name": "pytest-8.3.5-py3-none-any.whl",
+              "sha256": "c69214aa47deac29fad6c2a4f590b9c4a9fdb16a403176fe154b79c0b4d4d820"
+            },
+            {
+              "name": "setuptools-75.1.0-py3-none-any.whl",
+              "sha256": "35ab7fd3bcd95e6b7fd704e4a1539513edad446c097797f2985e0e4b960772f2"
+            },
+            {
+              "name": "wheel-0.44.0-py3-none-any.whl",
+              "sha256": "2376a90c98cc337d18623527a97c31797bd02bad0033d41547043a1cbfbe448f"
+            }
+          ]
+        },
+        "dependency_mode": "registry wheels; resolved distribution versions and wheel hashes recorded"
+      },
+      "runs": [
+        {
+          "id": "c32966ba4d5d4df599dbb5b3ad7bc5dd",
+          "exit_code": 0,
+          "collected": [
+            "tests/test_existing.py::test_zero_discount",
+            "tests/test_existing.py::test_valid_percent"
+          ],
+          "tests": [
+            {
+              "id": "tests/test_existing.py::test_zero_discount",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_existing.py::test_valid_percent",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            }
+          ],
+          "collection_errors": [],
+          "collection_skips": [],
+          "effective_config": {
+            "rootdir": "/tmp/run/project/m4_project",
+            "config_file": "/tmp/run/project/m4_project/pyproject.toml",
+            "args": [
+              "-p",
+              "no:cacheprovider",
+              "-q"
+            ],
+            "pytest": "8.3.5",
+            "plugins": [
+              "126511919092432",
+              "pytestconfig",
+              "mark",
+              "main",
+              "runner",
+              "fixtures",
+              "helpconfig",
+              "python",
+              "terminal",
+              "debugging",
+              "unittest",
+              "capture",
+              "skipping",
+              "legacypath",
+              "tmpdir",
+              "monkeypatch",
+              "recwarn",
+              "pastebin",
+              "assertion",
+              "junitxml",
+              "doctest",
+              "freeze_support",
+              "setuponly",
+              "setupplan",
+              "warnings",
+              "logging",
+              "reports",
+              "python_path",
+              "unraisableexception",
+              "threadexception",
+              "faulthandler",
+              "126511919092304",
+              "capturemanager",
+              "session",
+              "legacypath-tmpdir",
+              "terminalreporter",
+              "logging-plugin"
+            ]
+          },
+          "phase": "existing",
+          "inventory_matches": true,
+          "status": "passed",
+          "summary": {
+            "total": 2,
+            "passed": 2,
+            "failed": 0,
+            "error": 0,
+            "skipped": 0,
+            "xfailed": 0,
+            "xpassed": 0,
+            "not_run": 0
+          },
+          "source": {
+            "repository": "ziademad02153/tracefold-validation",
+            "revision": "489d5b814d0314124a09af69d630baeec780fb66",
+            "content_hash": "533a500499bd2ca4176061c90e079a457340642d57a042e63b4e26dc12e3bcd0",
+            "file_count": 10
+          },
+          "profile_hash": "7b5c6f129ad9b5df0c031ad736ae95051314e8b449e5cdc238429ad8b017636c",
+          "environment_id": "sha256:de7a8616dd4ebbde3ed6f72fae065d7fa5a86a720b4ed93433b8e6ab087d7aba",
+          "provider_id": "python-pytest",
+          "provider_version": "1",
+          "started_at": "2026-11-04T15:54:10.670760+00:00",
+          "completed_at": "2026-11-04T15:54:13.208422+00:00",
+          "artifacts": [
+            {
+              "media_type": "application/json",
+              "name": "native-test-evidence.json",
+              "sha256": "3ac7d30a6cc1b0af3cee557f253dcb6a0d59c62a2a09b1ebfdfb5f2670211c2b"
+            }
+          ]
+        },
+        {
+          "id": "a28a9cb1017d4854aa8da5ca481a486d",
+          "exit_code": 1,
+          "collected": [
+            "tests/test_existing.py::test_zero_discount",
+            "tests/test_existing.py::test_valid_percent",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_20_percent_discount",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_zero_percent_discount",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_100_percent_discount",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_discount_amount_with_rounding_behavior",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_is_valid_percent_for_negative_and_out_of_range_values"
+          ],
+          "tests": [
+            {
+              "id": "tests/test_existing.py::test_zero_discount",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_existing.py::test_valid_percent",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_20_percent_discount",
+              "status": "failed",
+              "detail": "def test_price_after_discount_with_20_percent_discount():\n>       assert price_after_discount(10000, 20) == 8000\nE       assert 12000 == 8000\nE        +  where 12000 = price_after_discount(10000, 20)\n\ntests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py:6: AssertionError",
+              "seconds": 0.0005,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_zero_percent_discount",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_100_percent_discount",
+              "status": "failed",
+              "detail": "def test_price_after_discount_with_100_percent_discount():\n>       assert price_after_discount(10000, 100) == 0\nE       assert 20000 == 0\nE        +  where 20000 = price_after_discount(10000, 100)\n\ntests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py:12: AssertionError",
+              "seconds": 0.0005,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_discount_amount_with_rounding_behavior",
+              "status": "failed",
+              "detail": "def test_discount_amount_with_rounding_behavior():\n        # floor(3333 * 90 / 100) = 2999; 3333 - 2999 = 334.\n>       assert discount_amount(3333, 10) == 334\nE       assert -333 == 334\nE        +  where -333 = discount_amount(3333, 10)\n\ntests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py:16: AssertionError",
+              "seconds": 0.0004,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_is_valid_percent_for_negative_and_out_of_range_values",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0002,
+              "origin": "generated"
+            }
+          ],
+          "collection_errors": [],
+          "collection_skips": [],
+          "groups": {
+            "existing": {
+              "total": 2,
+              "passed": 2,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "xfailed": 0,
+              "xpassed": 0,
+              "not_run": 0
+            },
+            "generated": {
+              "total": 5,
+              "passed": 2,
+              "failed": 3,
+              "error": 0,
+              "skipped": 0,
+              "xfailed": 0,
+              "xpassed": 0,
+              "not_run": 0
+            }
+          },
+          "baseline_empty": false,
+          "inventory_matches": true,
+          "effective_config": {
+            "existing": {
+              "rootdir": "/tmp/run-existing/project/m4_project",
+              "config_file": "/tmp/run-existing/project/m4_project/pyproject.toml",
+              "args": [
+                "-p",
+                "no:cacheprovider",
+                "-q"
+              ],
+              "pytest": "8.3.5",
+              "plugins": [
+                "124557253071760",
+                "pytestconfig",
+                "mark",
+                "main",
+                "runner",
+                "fixtures",
+                "helpconfig",
+                "python",
+                "terminal",
+                "debugging",
+                "unittest",
+                "capture",
+                "skipping",
+                "legacypath",
+                "tmpdir",
+                "monkeypatch",
+                "recwarn",
+                "pastebin",
+                "assertion",
+                "junitxml",
+                "doctest",
+                "freeze_support",
+                "setuponly",
+                "setupplan",
+                "warnings",
+                "logging",
+                "reports",
+                "python_path",
+                "unraisableexception",
+                "threadexception",
+                "faulthandler",
+                "124557252407056",
+                "capturemanager",
+                "session",
+                "legacypath-tmpdir",
+                "terminalreporter",
+                "logging-plugin"
+              ]
+            },
+            "generated": {
+              "rootdir": "/tmp/run-generated/project/m4_project",
+              "config_file": "/tmp/run-generated/project/m4_project/pyproject.toml",
+              "args": [
+                "-p",
+                "no:cacheprovider",
+                "-q",
+                "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py"
+              ],
+              "pytest": "8.3.5",
+              "plugins": [
+                "139992847342672",
+                "pytestconfig",
+                "mark",
+                "main",
+                "runner",
+                "fixtures",
+                "helpconfig",
+                "python",
+                "terminal",
+                "debugging",
+                "unittest",
+                "capture",
+                "skipping",
+                "legacypath",
+                "tmpdir",
+                "monkeypatch",
+                "recwarn",
+                "pastebin",
+                "assertion",
+                "junitxml",
+                "doctest",
+                "freeze_support",
+                "setuponly",
+                "setupplan",
+                "warnings",
+                "logging",
+                "reports",
+                "python_path",
+                "unraisableexception",
+                "threadexception",
+                "faulthandler",
+                "139992834576208",
+                "capturemanager",
+                "session",
+                "legacypath-tmpdir",
+                "terminalreporter",
+                "logging-plugin"
+              ]
+            }
+          },
+          "execution_mode": "separate existing and generated phases in the same pinned environment",
+          "status": "failed",
+          "summary": {
+            "total": 7,
+            "passed": 4,
+            "failed": 3,
+            "error": 0,
+            "skipped": 0,
+            "xfailed": 0,
+            "xpassed": 0,
+            "not_run": 0
+          },
+          "source": {
+            "repository": "ziademad02153/tracefold-validation",
+            "revision": "489d5b814d0314124a09af69d630baeec780fb66",
+            "content_hash": "533a500499bd2ca4176061c90e079a457340642d57a042e63b4e26dc12e3bcd0",
+            "file_count": 10
+          },
+          "profile_hash": "7b5c6f129ad9b5df0c031ad736ae95051314e8b449e5cdc238429ad8b017636c",
+          "environment_id": "sha256:de7a8616dd4ebbde3ed6f72fae065d7fa5a86a720b4ed93433b8e6ab087d7aba",
+          "provider_id": "python-pytest",
+          "provider_version": "1",
+          "started_at": "2026-11-04T15:58:35.036297+00:00",
+          "completed_at": "2026-11-04T15:58:37.946339+00:00",
+          "suite_id": "88d20bc741f74bab9a1362ae75453ef3",
+          "suite_hash": "9896a76a34e46d576b594893255c80f2da8838e5cdbe1242c35888c9497db145",
+          "suite_origin_source": {
+            "repository": "ziademad02153/tracefold-validation",
+            "revision": "489d5b814d0314124a09af69d630baeec780fb66",
+            "content_hash": "533a500499bd2ca4176061c90e079a457340642d57a042e63b4e26dc12e3bcd0",
+            "file_count": 10
+          },
+          "artifacts": [
+            {
+              "media_type": "application/json",
+              "name": "suite-native-evidence.json",
+              "sha256": "c98448674d8d5ed0ce3ddc1b4f30e77b71cd96a5479dff726980b2cf211e701f"
+            }
+          ]
+        }
+      ]
+    },
+    "after": {
+      "id": "8753d04305054ae48008265c0e4a45ae",
+      "repo": "ziademad02153/tracefold-validation",
+      "provider_id": "python-pytest",
+      "provider_version": "1",
+      "source": {
+        "repository": "ziademad02153/tracefold-validation",
+        "revision": "f88e9f524a428c0ec9aa0e45bc26be5ad725a32a",
+        "content_hash": "3d85878fd0c52063ccf8411625d96f8caf63c4657b9e041bc10e2081df0061ed",
+        "file_count": 10
+      },
+      "config": {
+        "component_root": "m4_project",
+        "runtime": "3.11",
+        "install_project": true,
+        "requirements_files": [],
+        "packages": [
+          "pytest==8.3.5"
+        ],
+        "extras": [],
+        "plugins": [],
+        "pytest_args": [
+          "-q"
+        ],
+        "pythonpath": [],
+        "resolved_inputs": [
+          "packaging==24.0",
+          "pytest==8.3.5",
+          "setuptools==75.1.0",
+          "wheel==0.44.0"
+        ],
+        "manifest_hashes": {
+          "pyproject.toml": "164bb1c85a22c5765b849feb3e270912460bb0a179eaa723a2e515604db26073"
+        }
+      },
+      "profile_hash": "1c589def634c85d8b7be6d927cdca2b15c6106fc6f9bf9529aa843dd962c0ded",
+      "environment": {
+        "status": "ready",
+        "id": "sha256:cf870cfab89745b77ebc6df53f4f49b3d29a216574f44180b017a01a54454d9b",
+        "target": "docker-linux",
+        "base_image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "source_hash": "3d85878fd0c52063ccf8411625d96f8caf63c4657b9e041bc10e2081df0061ed",
+        "profile_inputs_hash": "676b3fd1b2631f0ad3f376577271ba35b7b984e67b0588470fad1c36546f6c47",
+        "manifest": {
+          "python": "3.11.18",
+          "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+          "packages": [
+            {
+              "name": "iniconfig",
+              "version": "2.3.1"
+            },
+            {
+              "name": "packaging",
+              "version": "24.0"
+            },
+            {
+              "name": "pip",
+              "version": "24.0"
+            },
+            {
+              "name": "pluggy",
+              "version": "1.7.0"
+            },
+            {
+              "name": "pytest",
+              "version": "8.3.5"
+            },
+            {
+              "name": "setuptools",
+              "version": "75.1.0"
+            },
+            {
+              "name": "tracefold-m4-pilot",
+              "version": "1.0.0"
+            },
+            {
+              "name": "wheel",
+              "version": "0.44.0"
+            }
+          ],
+          "executor_sha256": "9ecec54f20546759c94702c8438d9b15d4c6b94c127d192f686221d117df07db",
+          "preparation_sha256": "00c20ab2b3a04ffb4480c72216b874b9e84bd9c126021d95c0a1db6cc8a80619",
+          "suite_execution_version": 1,
+          "wheels": [
+            {
+              "name": "iniconfig-2.3.1-py3-none-any.whl",
+              "sha256": "9121e2c1fdb355232495be3194c8dfe87ccc2d5dee45947b78e68f499790d7a7"
+            },
+            {
+              "name": "packaging-24.0-py3-none-any.whl",
+              "sha256": "2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"
+            },
+            {
+              "name": "pluggy-1.7.0-py3-none-any.whl",
+              "sha256": "7dd7b0d8832ba3cb632c306926ded123429211b83641b35dc5c41ad2d34f9bec"
+            },
+            {
+              "name": "pytest-8.3.5-py3-none-any.whl",
+              "sha256": "c69214aa47deac29fad6c2a4f590b9c4a9fdb16a403176fe154b79c0b4d4d820"
+            },
+            {
+              "name": "setuptools-75.1.0-py3-none-any.whl",
+              "sha256": "35ab7fd3bcd95e6b7fd704e4a1539513edad446c097797f2985e0e4b960772f2"
+            },
+            {
+              "name": "wheel-0.44.0-py3-none-any.whl",
+              "sha256": "2376a90c98cc337d18623527a97c31797bd02bad0033d41547043a1cbfbe448f"
+            }
+          ]
+        },
+        "dependency_mode": "registry wheels; resolved distribution versions and wheel hashes recorded"
+      },
+      "runs": [
+        {
+          "id": "d97c34cd2c9246e0adf05fa374758ac0",
+          "exit_code": 0,
+          "collected": [
+            "tests/test_existing.py::test_zero_discount",
+            "tests/test_existing.py::test_valid_percent",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_20_percent_discount",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_zero_percent_discount",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_100_percent_discount",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_discount_amount_with_rounding_behavior",
+            "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_is_valid_percent_for_negative_and_out_of_range_values"
+          ],
+          "tests": [
+            {
+              "id": "tests/test_existing.py::test_zero_discount",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_existing.py::test_valid_percent",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0002,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_20_percent_discount",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_zero_percent_discount",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_100_percent_discount",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_discount_amount_with_rounding_behavior",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0014,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_is_valid_percent_for_negative_and_out_of_range_values",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "generated"
+            }
+          ],
+          "collection_errors": [],
+          "collection_skips": [],
+          "groups": {
+            "existing": {
+              "total": 2,
+              "passed": 2,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "xfailed": 0,
+              "xpassed": 0,
+              "not_run": 0
+            },
+            "generated": {
+              "total": 5,
+              "passed": 5,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "xfailed": 0,
+              "xpassed": 0,
+              "not_run": 0
+            }
+          },
+          "baseline_empty": false,
+          "inventory_matches": true,
+          "effective_config": {
+            "existing": {
+              "rootdir": "/tmp/run-existing/project/m4_project",
+              "config_file": "/tmp/run-existing/project/m4_project/pyproject.toml",
+              "args": [
+                "-p",
+                "no:cacheprovider",
+                "-q"
+              ],
+              "pytest": "8.3.5",
+              "plugins": [
+                "128610821755792",
+                "pytestconfig",
+                "mark",
+                "main",
+                "runner",
+                "fixtures",
+                "helpconfig",
+                "python",
+                "terminal",
+                "debugging",
+                "unittest",
+                "capture",
+                "skipping",
+                "legacypath",
+                "tmpdir",
+                "monkeypatch",
+                "recwarn",
+                "pastebin",
+                "assertion",
+                "junitxml",
+                "doctest",
+                "freeze_support",
+                "setuponly",
+                "setupplan",
+                "warnings",
+                "logging",
+                "reports",
+                "python_path",
+                "unraisableexception",
+                "threadexception",
+                "faulthandler",
+                "128610821091088",
+                "capturemanager",
+                "session",
+                "legacypath-tmpdir",
+                "terminalreporter",
+                "logging-plugin"
+              ]
+            },
+            "generated": {
+              "rootdir": "/tmp/run-generated/project/m4_project",
+              "config_file": "/tmp/run-generated/project/m4_project/pyproject.toml",
+              "args": [
+                "-p",
+                "no:cacheprovider",
+                "-q",
+                "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py"
+              ],
+              "pytest": "8.3.5",
+              "plugins": [
+                "134699591288400",
+                "pytestconfig",
+                "mark",
+                "main",
+                "runner",
+                "fixtures",
+                "helpconfig",
+                "python",
+                "terminal",
+                "debugging",
+                "unittest",
+                "capture",
+                "skipping",
+                "legacypath",
+                "tmpdir",
+                "monkeypatch",
+                "recwarn",
+                "pastebin",
+                "assertion",
+                "junitxml",
+                "doctest",
+                "freeze_support",
+                "setuponly",
+                "setupplan",
+                "warnings",
+                "logging",
+                "reports",
+                "python_path",
+                "unraisableexception",
+                "threadexception",
+                "faulthandler",
+                "134699592631760",
+                "capturemanager",
+                "session",
+                "legacypath-tmpdir",
+                "terminalreporter",
+                "logging-plugin"
+              ]
+            }
+          },
+          "execution_mode": "separate existing and generated phases in the same pinned environment",
+          "status": "passed",
+          "summary": {
+            "total": 7,
+            "passed": 7,
+            "failed": 0,
+            "error": 0,
+            "skipped": 0,
+            "xfailed": 0,
+            "xpassed": 0,
+            "not_run": 0
+          },
+          "source": {
+            "repository": "ziademad02153/tracefold-validation",
+            "revision": "f88e9f524a428c0ec9aa0e45bc26be5ad725a32a",
+            "content_hash": "3d85878fd0c52063ccf8411625d96f8caf63c4657b9e041bc10e2081df0061ed",
+            "file_count": 10
+          },
+          "profile_hash": "1c589def634c85d8b7be6d927cdca2b15c6106fc6f9bf9529aa843dd962c0ded",
+          "environment_id": "sha256:cf870cfab89745b77ebc6df53f4f49b3d29a216574f44180b017a01a54454d9b",
+          "provider_id": "python-pytest",
+          "provider_version": "1",
+          "started_at": "2026-11-04T15:58:59.788529+00:00",
+          "completed_at": "2026-11-04T15:59:02.460744+00:00",
+          "suite_id": "88d20bc741f74bab9a1362ae75453ef3",
+          "suite_hash": "9896a76a34e46d576b594893255c80f2da8838e5cdbe1242c35888c9497db145",
+          "suite_origin_source": {
+            "repository": "ziademad02153/tracefold-validation",
+            "revision": "489d5b814d0314124a09af69d630baeec780fb66",
+            "content_hash": "533a500499bd2ca4176061c90e079a457340642d57a042e63b4e26dc12e3bcd0",
+            "file_count": 10
+          },
+          "comparison": {
+            "previous_run_id": "a28a9cb1017d4854aa8da5ca481a486d",
+            "previous_source": {
+              "repository": "ziademad02153/tracefold-validation",
+              "revision": "489d5b814d0314124a09af69d630baeec780fb66",
+              "content_hash": "533a500499bd2ca4176061c90e079a457340642d57a042e63b4e26dc12e3bcd0",
+              "file_count": 10
+            },
+            "same_suite": true,
+            "same_environment": false,
+            "complete": true,
+            "source_changed": true,
+            "added": [],
+            "removed": [],
+            "changes": [
+              {
+                "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_discount_amount_with_rounding_behavior",
+                "before": "failed",
+                "after": "passed"
+              },
+              {
+                "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_100_percent_discount",
+                "before": "failed",
+                "after": "passed"
+              },
+              {
+                "id": "tests/test_tracefold_88d20bc741f74bab9a1362ae75453ef3.py::test_price_after_discount_with_20_percent_discount",
+                "before": "failed",
+                "after": "passed"
+              }
+            ],
+            "existing_inventory": {
+              "added": [],
+              "removed": []
+            }
+          },
+          "artifacts": [
+            {
+              "media_type": "application/json",
+              "name": "suite-native-evidence.json",
+              "sha256": "525e20b32561ad482763d1b8ea0122ebd2ad604f24f367ea32d9adc15cd6137b"
+            }
+          ]
+        }
+      ]
+    },
+    "browser": {
+      "errors": [],
+      "refresh_persistence": true,
+      "widths": [
+        390,
+        768,
+        1440
+      ],
+      "ui_actions": [
+        "run existing",
+        "generate",
+        "review and edit",
+        "save draft",
+        "approve",
+        "run all",
+        "open repaired revision",
+        "prepare",
+        "reuse approved suite",
+        "run all",
+        "refresh"
+      ]
+    }
+  },
+  "upstream": {
+    "classification": "Unmodified upstream itsdangerous 2.2.0; clean-case smoke check, not a quality benchmark",
+    "suite": {
+      "id": "30d832983beb4db4bd3e8ae3cfe29ade",
+      "repo": "pallets/itsdangerous",
+      "state": "approved",
+      "files": [
+        {
+          "path": "tests/test_tracefold_30d832983beb4db4bd3e8ae3cfe29ade.py",
+          "content": "import pytest\nfrom itsdangerous.encoding import base64_encode, base64_decode, int_to_bytes, bytes_to_int\n\ndef test_base64_encode_and_decode_for_foo():\n    encoded = base64_encode(b\"foo\")\n    assert encoded == b\"Zm9v\"\n    decoded = base64_decode(encoded)\n    assert decoded == b\"foo\"\n\ndef test_int_to_bytes_for_256():\n    result = int_to_bytes(256)\n    assert result == bytes([1, 0])\n\ndef test_bytes_to_int_for_256():\n    result = bytes_to_int(bytes([1, 0]))\n    assert result == 256\n",
+          "sha256": "9498b467adeeb6a2cdd058f0e6dbb72e0ca054c04d666fce4248d3e56c38b3ec"
+        }
+      ],
+      "metadata": {
+        "title": "Tests for base64 encoding/decoding and integer/byte conversions in itsdangerous.encoding",
+        "scenarios": [
+          {
+            "name": "test_base64_encode_and_decode_for_foo",
+            "description": "base64_encode(b\"foo\") returns b\"Zm9v\" and base64_decode(b\"Zm9v\") returns b\"foo\""
+          },
+          {
+            "name": "test_int_to_bytes_for_256",
+            "description": "int_to_bytes(256) returns bytes([1,0])"
+          },
+          {
+            "name": "test_bytes_to_int_for_256",
+            "description": "bytes_to_int(bytes([1,0])) returns 256"
+          }
+        ],
+        "context": {
+          "selected": [
+            {
+              "path": "src/itsdangerous/encoding.py",
+              "module": "itsdangerous.encoding",
+              "public_symbols": [
+                "want_bytes",
+                "base64_encode",
+                "base64_decode",
+                "int_to_bytes",
+                "bytes_to_int"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "path": "src/itsdangerous/encoding.py",
+              "module": "itsdangerous.encoding",
+              "source": "from __future__ import annotations\n\nimport base64\nimport string\nimport struct\nimport typing as t\n\nfrom .exc import BadData\n\n\ndef want_bytes(\n    s: str | bytes, encoding: str = \"utf-8\", errors: str = \"strict\"\n) -> bytes:\n    if isinstance(s, str):\n        s = s.encode(encoding, errors)\n\n    return s\n\n\ndef base64_encode(string: str | bytes) -> bytes:\n    \"\"\"Base64 encode a string of bytes or text. The resulting bytes are\n    safe to use in URLs.\n    \"\"\"\n    string = want_bytes(string)\n    return base64.urlsafe_b64encode(string).rstrip(b\"=\")\n\n\ndef base64_decode(string: str | bytes) -> bytes:\n    \"\"\"Base64 decode a URL-safe string of bytes or text. The result is\n    bytes.\n    \"\"\"\n    string = want_bytes(string, encoding=\"ascii\", errors=\"ignore\")\n    string += b\"=\" * (-len(string) % 4)\n\n    try:\n        return base64.urlsafe_b64decode(string)\n    except (TypeError, ValueError) as e:\n        raise BadData(\"Invalid base64-encoded data\") from e\n\n\n# The alphabet used by base64.urlsafe_*\n_base64_alphabet = f\"{string.ascii_letters}{string.digits}-_=\".encode(\"ascii\")\n\n_int64_struct = struct.Struct(\">Q\")\n_int_to_bytes = _int64_struct.pack\n_bytes_to_int = t.cast(\"t.Callable[[bytes], tuple[int]]\", _int64_struct.unpack)\n\n\ndef int_to_bytes(num: int) -> bytes:\n    return _int_to_bytes(num).lstrip(b\"\\x00\")\n\n\ndef bytes_to_int(bytestr: bytes) -> int:\n    return _bytes_to_int(bytestr.rjust(8, b\"\\x00\"))[0]\n",
+              "sha256": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+            },
+            {
+              "path": "src/itsdangerous/exc.py",
+              "module": "itsdangerous.exc",
+              "source": "from __future__ import annotations\n\nimport typing as t\nfrom datetime import datetime\n\n\nclass BadData(Exception):\n    \"\"\"Raised if bad data of any sort was encountered. This is the base\n    for all exceptions that ItsDangerous defines.\n\n    .. versionadded:: 0.15\n    \"\"\"\n\n    def __init__(self, message: str):\n        super().__init__(message)\n        self.message = message\n\n    def __str__(self) -> str:\n        return self.message\n\n\nclass BadSignature(BadData):\n    \"\"\"Raised if a signature does not match.\"\"\"\n\n    def __init__(self, message: str, payload: t.Any | None = None):\n        super().__init__(message)\n\n        #: The payload that failed the signature test. In some\n        #: situations you might still want to inspect this, even if\n        #: you know it was tampered with.\n        #:\n        #: .. versionadded:: 0.14\n        self.payload: t.Any | None = payload\n\n\nclass BadTimeSignature(BadSignature):\n    \"\"\"Raised if a time-based signature is invalid. This is a subclass\n    of :class:`BadSignature`.\n    \"\"\"\n\n    def __init__(\n        self,\n        message: str,\n        payload: t.Any | None = None,\n        date_signed: datetime | None = None,\n    ):\n        super().__init__(message, payload)\n\n        #: If the signature expired this exposes the date of when the\n        #: signature was created. This can be helpful in order to\n        #: tell the user how long a link has been gone stale.\n        #:\n        #: .. versionchanged:: 2.0\n        #:     The datetime value is timezone-aware rather than naive.\n        #:\n        #: .. versionadded:: 0.14\n        self.date_signed = date_signed\n\n\nclass SignatureExpired(BadTimeSignature):\n    \"\"\"Raised if a signature timestamp is older than ``max_age``. This\n    is a subclass of :exc:`BadTimeSignature`.\n    \"\"\"\n\n\nclass BadHeader(BadSignature):\n    \"\"\"Raised if a signed header is invalid in some form. This only\n    happens for serializers that have a header that goes with the\n    signature.\n\n    .. versionadded:: 0.24\n    \"\"\"\n\n    def __init__(\n        self,\n        message: str,\n        payload: t.Any | None = None,\n        header: t.Any | None = None,\n        original_error: Exception | None = None,\n    ):\n        super().__init__(message, payload)\n\n        #: If the header is actually available but just malformed it\n        #: might be stored here.\n        self.header: t.Any | None = header\n\n        #: If available, the error that indicates why the payload was\n        #: not valid. This might be ``None``.\n        self.original_error: Exception | None = original_error\n\n\nclass BadPayload(BadData):\n    \"\"\"Raised if a payload is invalid. This could happen if the payload\n    is loaded despite an invalid signature, or if there is a mismatch\n    between the serializer and deserializer. The original exception\n    that occurred during loading is stored on as :attr:`original_error`.\n\n    .. versionadded:: 0.15\n    \"\"\"\n\n    def __init__(self, message: str, original_error: Exception | None = None):\n        super().__init__(message)\n\n        #: If available, the error that indicates why the payload was\n        #: not valid. This might be ``None``.\n        self.original_error: Exception | None = original_error\n",
+              "sha256": "46bddec68d0c44511c3d996dc1e7322b5e955756c4d8af7f175f9dfa58dc527e"
+            }
+          ],
+          "fixtures": [],
+          "existing_test_examples": [
+            {
+              "path": "tests/test_itsdangerous/test_encoding.py",
+              "source": "import pytest\n\nfrom itsdangerous.encoding import base64_decode\nfrom itsdangerous.encoding import base64_encode\nfrom itsdangerous.encoding import bytes_to_int\nfrom itsdangerous.encoding import int_to_bytes\nfrom itsdangerous.encoding import want_bytes\nfrom itsdangerous.exc import BadData\n\n\n@pytest.mark.parametrize(\"value\", (\"mañana\", b\"tomorrow\"))\ndef test_want_bytes(value):\n    out = want_bytes(value)\n    assert isinstance(out, bytes)\n\n\n@pytest.mark.parametrize(\"value\", (\"無限\", b\"infinite\"))\ndef test_base64(value):\n    enc = base64_encode(value)\n    assert isinstance(enc, bytes)\n    dec = base64_decode(enc)\n    assert dec == want_bytes(value)\n\n\ndef test_base64_bad():\n    with pytest.raises(BadData):\n        base64_decode(\"12345\")\n\n\n@pytest.mark.parametrize(\n    (\"value\", \"expect\"), ((0, b\"\"), (192, b\"\\xc0\"), (18446744073709551615, b\"\\xff\" * 8))\n)\ndef test_int_bytes(value, expect):\n    enc = int_to_bytes(value)\n    assert enc == expect\n    dec = bytes_to_int(enc)\n    assert dec == value\n",
+              "truncated": false
+            }
+          ],
+          "scope": "selected modules, one-hop local imports and bounded test examples"
+        },
+        "test_directory": "tests",
+        "component_root": ".",
+        "model": "gemma4:e4b",
+        "attempts": 1,
+        "seconds": 15.17
+      },
+      "contract_version": 1,
+      "provider_id": "python-pytest",
+      "provider_version": "1",
+      "origin_profile_id": "b63e7e12cecf4b7f92527d20509a6669",
+      "origin_source": {
+        "repository": "pallets/itsdangerous",
+        "revision": "096c8d42545d3b68ea21a4f890fb2b2d8979c0bd",
+        "content_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+        "file_count": 60
+      },
+      "origin_environment_id": "sha256:3f6b0666ccd36be3c3a6f9f6a528248b868a5e0a10b3b92fc83e257f1f91cf28",
+      "request": {
+        "selection": [
+          "src/itsdangerous/encoding.py"
+        ],
+        "options": {
+          "test_directory": "tests"
+        },
+        "intent": "Generate four tests. base64_encode(b\"foo\") returns b\"Zm9v\". base64_decode(b\"Zm9v\") returns b\"foo\". int_to_bytes(256) returns bytes([1,0]). bytes_to_int(bytes([1,0])) returns 256. Import APIs from itsdangerous.encoding. All variables inside test functions, no module assignments, no helpers."
+      },
+      "created_at": "2026-11-04T15:51:18.995311+00:00",
+      "approved_at": "2026-11-04T15:52:29.895649+00:00",
+      "edited": false,
+      "suite_hash": "805e1ff61cd31c1b89f4b43c3b6b73f8d0429a0ac0e33f4eebfd1e7461673fbe"
+    },
+    "profile": {
+      "id": "b63e7e12cecf4b7f92527d20509a6669",
+      "repo": "pallets/itsdangerous",
+      "provider_id": "python-pytest",
+      "provider_version": "1",
+      "source": {
+        "repository": "pallets/itsdangerous",
+        "revision": "096c8d42545d3b68ea21a4f890fb2b2d8979c0bd",
+        "content_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+        "file_count": 60
+      },
+      "config": {
+        "component_root": ".",
+        "runtime": "3.11",
+        "install_project": true,
+        "requirements_files": [
+          "requirements/tests.txt",
+          "requirements/build.txt"
+        ],
+        "packages": [],
+        "extras": [],
+        "plugins": [],
+        "pytest_args": [
+          "-q"
+        ],
+        "pythonpath": [],
+        "resolved_inputs": [
+          "build==1.2.1",
+          "flit_core<4",
+          "freezegun==1.4.0",
+          "iniconfig==2.0.0",
+          "packaging==24.0",
+          "pluggy==1.4.0",
+          "pyproject-hooks==1.0.0",
+          "pytest==8.1.1",
+          "python-dateutil==2.9.0.post0",
+          "six==1.16.0"
+        ],
+        "manifest_hashes": {
+          "requirements/tests.txt": "6989747e91fc4c09ee14c58305a277a9387fb9ca71615dacf21b5b085c017c4f",
+          "requirements/build.txt": "e623540e870b119c29064c83467dad8b4b99150caf8b37acabf5ce9a86e2abaa",
+          "pyproject.toml": "953e3af993d7ce64856e943e830ab0f0439a4994ae4bc5d5eb1dfdbc18bee521"
+        }
+      },
+      "profile_hash": "03e841e68c6d52a6098253ab42aadc57fa16a5bd175eb62400bc6b7bde5ff710",
+      "environment": {
+        "status": "ready",
+        "id": "sha256:3f6b0666ccd36be3c3a6f9f6a528248b868a5e0a10b3b92fc83e257f1f91cf28",
+        "target": "docker-linux",
+        "base_image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "source_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+        "profile_inputs_hash": "de99ba037d1969d241a06e31f25cc9504cd1ba9b21bbe9c127d4eaaf85ff1df6",
+        "manifest": {
+          "python": "3.11.18",
+          "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+          "packages": [
+            {
+              "name": "build",
+              "version": "1.2.1"
+            },
+            {
+              "name": "flit_core",
+              "version": "3.12.0"
+            },
+            {
+              "name": "freezegun",
+              "version": "1.4.0"
+            },
+            {
+              "name": "iniconfig",
+              "version": "2.0.0"
+            },
+            {
+              "name": "itsdangerous",
+              "version": "2.2.0"
+            },
+            {
+              "name": "packaging",
+              "version": "24.0"
+            },
+            {
+              "name": "pip",
+              "version": "24.0"
+            },
+            {
+              "name": "pluggy",
+              "version": "1.4.0"
+            },
+            {
+              "name": "pyproject_hooks",
+              "version": "1.0.0"
+            },
+            {
+              "name": "pytest",
+              "version": "8.1.1"
+            },
+            {
+              "name": "python-dateutil",
+              "version": "2.9.0.post0"
+            },
+            {
+              "name": "setuptools",
+              "version": "79.0.1"
+            },
+            {
+              "name": "six",
+              "version": "1.16.0"
+            }
+          ],
+          "executor_sha256": "9ecec54f20546759c94702c8438d9b15d4c6b94c127d192f686221d117df07db",
+          "preparation_sha256": "00c20ab2b3a04ffb4480c72216b874b9e84bd9c126021d95c0a1db6cc8a80619",
+          "suite_execution_version": 1,
+          "wheels": [
+            {
+              "name": "build-1.2.1-py3-none-any.whl",
+              "sha256": "75e10f767a433d9a86e50d83f418e83efc18ede923ee5ff7df93b6cb0306c5d4"
+            },
+            {
+              "name": "flit_core-3.12.0-py3-none-any.whl",
+              "sha256": "e7a0304069ea895172e3c7bb703292e992c5d1555dd1233ab7b5621b5b69e62c"
+            },
+            {
+              "name": "freezegun-1.4.0-py3-none-any.whl",
+              "sha256": "55e0fc3c84ebf0a96a5aa23ff8b53d70246479e9a68863f1fcac5a3e52f19dd6"
+            },
+            {
+              "name": "iniconfig-2.0.0-py3-none-any.whl",
+              "sha256": "b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"
+            },
+            {
+              "name": "packaging-24.0-py3-none-any.whl",
+              "sha256": "2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"
+            },
+            {
+              "name": "pluggy-1.4.0-py3-none-any.whl",
+              "sha256": "7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981"
+            },
+            {
+              "name": "pyproject_hooks-1.0.0-py3-none-any.whl",
+              "sha256": "283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8"
+            },
+            {
+              "name": "pytest-8.1.1-py3-none-any.whl",
+              "sha256": "2a8386cfc11fa9d2c50ee7b2a57e7d898ef90470a7a34c4b949ff59662bb78b7"
+            },
+            {
+              "name": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+              "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+            },
+            {
+              "name": "six-1.16.0-py2.py3-none-any.whl",
+              "sha256": "8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
+            }
+          ]
+        },
+        "dependency_mode": "registry wheels; resolved distribution versions and wheel hashes recorded"
+      },
+      "runs": [
+        {
+          "id": "9bdea611e28246da9d3f84cd7773aeb2",
+          "exit_code": 0,
+          "collected": [
+            "tests/test_itsdangerous/test_encoding.py::test_want_bytes[ma\\xf1ana]",
+            "tests/test_itsdangerous/test_encoding.py::test_want_bytes[tomorrow]",
+            "tests/test_itsdangerous/test_encoding.py::test_base64[\\u7121\\u9650]",
+            "tests/test_itsdangerous/test_encoding.py::test_base64[infinite]",
+            "tests/test_itsdangerous/test_encoding.py::test_base64_bad",
+            "tests/test_itsdangerous/test_encoding.py::test_int_bytes[0-]",
+            "tests/test_itsdangerous/test_encoding.py::test_int_bytes[192-\\xc0]",
+            "tests/test_itsdangerous/test_encoding.py::test_int_bytes[18446744073709551615-\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-None]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-True]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-str]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-text]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-value4]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-value5]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-None]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-True]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-str]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-text]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_signature_exception[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_payload_exception[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_loads_unsafe[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_file[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_file[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_alt_salt[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_alt_salt[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_cls[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_cls[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_kwargs[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer_kwargs[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_fallback_signers[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_iter_unsigners[Serializer]",
+            "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+            "tests/test_itsdangerous/test_serializer.py::test_digests",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_signer",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_no_separator",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_broken_signature",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_changed_value",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_invalid_separator",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[concat]",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[django-concat]",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[hmac]",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[none]",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_invalid_key_derivation",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_digest_method",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[None]",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm1]",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm2]",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm3]",
+            "tests/test_itsdangerous/test_signer.py::TestSigner::test_secret_keys",
+            "tests/test_itsdangerous/test_signer.py::test_abstract_algorithm",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-None]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-True]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-str]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-text]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-value4]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-value5]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-None]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-True]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-str]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-text]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_signature_exception[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_payload_exception[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_loads_unsafe[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_file[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_file[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_alt_salt[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_alt_salt[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_cls[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_cls[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_kwargs[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer_kwargs[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_fallback_signers[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_iter_unsigners[Serializer]",
+            "tests/test_itsdangerous/test_timed.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_signer",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_no_separator",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_broken_signature",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_changed_value",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_invalid_separator",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[concat]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[django-concat]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[hmac]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[none]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_invalid_key_derivation",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_digest_method",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[None]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm1]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm2]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm3]",
+            "tests/test_itsdangerous/test_timed.py::TestSigner::test_secret_keys",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_signer",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_no_separator",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_broken_signature",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_changed_value",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_invalid_separator",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[concat]",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[django-concat]",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[hmac]",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[none]",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_invalid_key_derivation",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_digest_method",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[None]",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm1]",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm2]",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm3]",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_secret_keys",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_max_age",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_return_timestamp",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_timestamp_missing",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_malformed_timestamp",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_malformed_future_timestamp",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_future_age",
+            "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_sig_error_date_signed",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[None]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[True]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[str]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[text]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[value4]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[value5]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>0]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>1]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>2]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>3]",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_bad_signature_exception",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_bad_payload_exception",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_loads_unsafe",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_file",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_alt_salt",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_signer_cls",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_signer_kwargs",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer_kwargs",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_fallback_signers",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_iter_unsigners",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_max_age",
+            "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_return_payload",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-None]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-True]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-str]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-text]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-value4]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-value5]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-None]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-True]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-str]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-text]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_signature_exception[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_payload_exception[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_loads_unsafe[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_file[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_file[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_alt_salt[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_alt_salt[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_cls[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_cls[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_kwargs[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer_kwargs[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_fallback_signers[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_iter_unsigners[Serializer]",
+            "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[None]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[True]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[str]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[text]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[value4]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[value5]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>2]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>3]",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_bad_signature_exception",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_bad_payload_exception",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_loads_unsafe",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_file",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_alt_salt",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_signer_cls",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_signer_kwargs",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer_kwargs",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_fallback_signers",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_iter_unsigners",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_max_age",
+            "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_return_payload",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[None]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[True]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[str]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[text]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[value4]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[value5]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>2]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>3]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>2]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>3]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_signature_exception[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_signature_exception[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_payload_exception[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_payload_exception[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_loads_unsafe[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_loads_unsafe[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_file[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_file[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_alt_salt[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_alt_salt[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_cls[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_cls[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_kwargs[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_kwargs[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer_kwargs",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_fallback_signers[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_fallback_signers[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_iter_unsigners",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[None]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[True]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[str]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[text]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[value4]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[value5]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>2]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>3]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>1]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>2]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>3]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_signature_exception[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_signature_exception[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_payload_exception[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_payload_exception[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_loads_unsafe[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_loads_unsafe[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_file[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_file[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_alt_salt[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_alt_salt[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_cls[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_cls[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_kwargs[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_kwargs[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer_kwargs",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_fallback_signers[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_fallback_signers[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_iter_unsigners",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_max_age[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_max_age[zlib]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_return_payload[value0]",
+            "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_return_payload[zlib]",
+            "tests/test_tracefold_30d832983beb4db4bd3e8ae3cfe29ade.py::test_base64_encode_and_decode_for_foo",
+            "tests/test_tracefold_30d832983beb4db4bd3e8ae3cfe29ade.py::test_int_to_bytes_for_256",
+            "tests/test_tracefold_30d832983beb4db4bd3e8ae3cfe29ade.py::test_bytes_to_int_for_256"
+          ],
+          "tests": [
+            {
+              "id": "tests/test_itsdangerous/test_encoding.py::test_want_bytes[ma\\xf1ana]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0011,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_encoding.py::test_want_bytes[tomorrow]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_encoding.py::test_base64[\\u7121\\u9650]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0013,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_encoding.py::test_base64[infinite]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_encoding.py::test_base64_bad",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_encoding.py::test_int_bytes[0-]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_encoding.py::test_int_bytes[192-\\xc0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_encoding.py::test_int_bytes[18446744073709551615-\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0013,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_signature_exception[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_payload_exception[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0017,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_loads_unsafe[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_file[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_file[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_alt_salt[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_alt_salt[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_cls[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_cls[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0011,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_kwargs[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer_kwargs[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_fallback_signers[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0114,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_iter_unsigners[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.001,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_serializer.py::test_digests",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_signer",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_no_separator",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_broken_signature",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_changed_value",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_invalid_separator",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[concat]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[django-concat]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[hmac]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[none]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_invalid_key_derivation",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_digest_method",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::TestSigner::test_secret_keys",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_signer.py::test_abstract_algorithm",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.001,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_signature_exception[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_payload_exception[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_loads_unsafe[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_file[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_file[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_alt_salt[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_alt_salt[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_cls[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_cls[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_kwargs[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer_kwargs[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_fallback_signers[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_iter_unsigners[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_signer",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_no_separator",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_broken_signature",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_changed_value",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_invalid_separator",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[concat]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[django-concat]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[hmac]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[none]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_invalid_key_derivation",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_digest_method",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestSigner::test_secret_keys",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_signer",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0495,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_no_separator",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0054,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_broken_signature",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0047,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_changed_value",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0048,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_invalid_separator",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[concat]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[django-concat]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0036,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[hmac]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[none]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_invalid_key_derivation",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_digest_method",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0044,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0036,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_secret_keys",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0037,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_max_age",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_return_timestamp",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_timestamp_missing",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0037,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_malformed_timestamp",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0046,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_malformed_future_timestamp",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_future_age",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0054,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_sig_error_date_signed",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0044,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0054,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0046,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0049,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0038,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_bad_signature_exception",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_bad_payload_exception",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0038,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_loads_unsafe",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_file",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0038,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_alt_salt",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_signer_cls",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_signer_kwargs",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0047,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer_kwargs",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_fallback_signers",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_iter_unsigners",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_max_age",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0046,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_return_payload",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0038,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_signature_exception[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_payload_exception[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_loads_unsafe[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_file[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_file[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_alt_salt[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_alt_salt[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_cls[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0011,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_cls[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_kwargs[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer_kwargs[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_fallback_signers[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_iter_unsigners[Serializer]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0054,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0056,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0049,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0049,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0049,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0046,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_bad_signature_exception",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_bad_payload_exception",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_loads_unsafe",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_file",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_alt_salt",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0047,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_signer_cls",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0054,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_signer_kwargs",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0048,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer_kwargs",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0052,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_fallback_signers",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_iter_unsigners",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_max_age",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_return_payload",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0044,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_signature_exception[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_signature_exception[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_payload_exception[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_payload_exception[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0009,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_loads_unsafe[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0011,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_loads_unsafe[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0007,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_file[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_file[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_alt_salt[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_alt_salt[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_cls[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0008,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_cls[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_kwargs[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_kwargs[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer_kwargs",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_fallback_signers[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_fallback_signers[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0006,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_iter_unsigners",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[None]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[True]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[str]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0044,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[text]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[value4]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[value5]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0048,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>1]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.005,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>2]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>3]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_signature_exception[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0051,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_signature_exception[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0038,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_payload_exception[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0037,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_payload_exception[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0038,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_loads_unsafe[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0051,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_loads_unsafe[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_file[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.004,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_file[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_alt_salt[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0047,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_alt_salt[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_cls[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_cls[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_kwargs[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0039,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_kwargs[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer_kwargs",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0037,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_fallback_signers[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_fallback_signers[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0041,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_iter_unsigners",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0046,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_max_age[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0045,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_max_age[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0043,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_return_payload[value0]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0042,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_return_payload[zlib]",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0047,
+              "origin": "existing"
+            },
+            {
+              "id": "tests/test_tracefold_30d832983beb4db4bd3e8ae3cfe29ade.py::test_base64_encode_and_decode_for_foo",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_30d832983beb4db4bd3e8ae3cfe29ade.py::test_int_to_bytes_for_256",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "generated"
+            },
+            {
+              "id": "tests/test_tracefold_30d832983beb4db4bd3e8ae3cfe29ade.py::test_bytes_to_int_for_256",
+              "status": "passed",
+              "detail": "Assertions passed.",
+              "seconds": 0.0003,
+              "origin": "generated"
+            }
+          ],
+          "collection_errors": [],
+          "collection_skips": [],
+          "groups": {
+            "existing": {
+              "total": 297,
+              "passed": 297,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "xfailed": 0,
+              "xpassed": 0,
+              "not_run": 0
+            },
+            "generated": {
+              "total": 3,
+              "passed": 3,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "xfailed": 0,
+              "xpassed": 0,
+              "not_run": 0
+            }
+          },
+          "baseline_empty": false,
+          "inventory_matches": true,
+          "effective_config": {
+            "existing": {
+              "rootdir": "/tmp/run-existing/project",
+              "config_file": "/tmp/run-existing/project/pyproject.toml",
+              "args": [
+                "-p",
+                "no:cacheprovider",
+                "-q"
+              ],
+              "pytest": "8.1.1",
+              "plugins": [
+                "130545244066960",
+                "pytestconfig",
+                "mark",
+                "main",
+                "runner",
+                "fixtures",
+                "helpconfig",
+                "python",
+                "terminal",
+                "debugging",
+                "unittest",
+                "capture",
+                "skipping",
+                "legacypath",
+                "tmpdir",
+                "monkeypatch",
+                "recwarn",
+                "pastebin",
+                "assertion",
+                "junitxml",
+                "doctest",
+                "freeze_support",
+                "setuponly",
+                "setupplan",
+                "warnings",
+                "logging",
+                "reports",
+                "python_path",
+                "unraisableexception",
+                "threadexception",
+                "faulthandler",
+                "130545244066768",
+                "capturemanager",
+                "session",
+                "legacypath-tmpdir",
+                "terminalreporter",
+                "logging-plugin"
+              ]
+            },
+            "generated": {
+              "rootdir": "/tmp/run-generated/project",
+              "config_file": "/tmp/run-generated/project/pyproject.toml",
+              "args": [
+                "-p",
+                "no:cacheprovider",
+                "-q",
+                "tests/test_tracefold_30d832983beb4db4bd3e8ae3cfe29ade.py"
+              ],
+              "pytest": "8.1.1",
+              "plugins": [
+                "138302292579280",
+                "pytestconfig",
+                "mark",
+                "main",
+                "runner",
+                "fixtures",
+                "helpconfig",
+                "python",
+                "terminal",
+                "debugging",
+                "unittest",
+                "capture",
+                "skipping",
+                "legacypath",
+                "tmpdir",
+                "monkeypatch",
+                "recwarn",
+                "pastebin",
+                "assertion",
+                "junitxml",
+                "doctest",
+                "freeze_support",
+                "setuponly",
+                "setupplan",
+                "warnings",
+                "logging",
+                "reports",
+                "python_path",
+                "unraisableexception",
+                "threadexception",
+                "faulthandler",
+                "138302306129104",
+                "capturemanager",
+                "session",
+                "legacypath-tmpdir",
+                "terminalreporter",
+                "logging-plugin"
+              ]
+            }
+          },
+          "execution_mode": "separate existing and generated phases in the same pinned environment",
+          "status": "passed",
+          "summary": {
+            "total": 300,
+            "passed": 300,
+            "failed": 0,
+            "error": 0,
+            "skipped": 0,
+            "xfailed": 0,
+            "xpassed": 0,
+            "not_run": 0
+          },
+          "source": {
+            "repository": "pallets/itsdangerous",
+            "revision": "096c8d42545d3b68ea21a4f890fb2b2d8979c0bd",
+            "content_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+            "file_count": 60
+          },
+          "profile_hash": "03e841e68c6d52a6098253ab42aadc57fa16a5bd175eb62400bc6b7bde5ff710",
+          "environment_id": "sha256:3f6b0666ccd36be3c3a6f9f6a528248b868a5e0a10b3b92fc83e257f1f91cf28",
+          "provider_id": "python-pytest",
+          "provider_version": "1",
+          "started_at": "2026-11-04T15:52:30.283989+00:00",
+          "completed_at": "2026-11-04T15:52:37.249866+00:00",
+          "suite_id": "30d832983beb4db4bd3e8ae3cfe29ade",
+          "suite_hash": "805e1ff61cd31c1b89f4b43c3b6b73f8d0429a0ac0e33f4eebfd1e7461673fbe",
+          "suite_origin_source": {
+            "repository": "pallets/itsdangerous",
+            "revision": "096c8d42545d3b68ea21a4f890fb2b2d8979c0bd",
+            "content_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+            "file_count": 60
+          },
+          "artifacts": [
+            {
+              "media_type": "application/json",
+              "name": "suite-native-evidence.json",
+              "sha256": "9a97decd7160ce91c0a776ec261bbab376a8f2e620e2523547af20244a7b5597"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "generation_findings": [
+    {
+      "attempt": "initial two-module upstream request",
+      "result": "Rejected after bounded structural retries; top-level statements outside supported test grammar; no draft approved or execution passed"
+    },
+    {
+      "attempt": "encoding-only upstream batch",
+      "result": "3 test functions covering four required behaviors, all passed alongside 297 existing cases"
+    },
+    {
+      "attempt": "two-module educational package",
+      "result": "5 generated test functions with correct required assertions; human corrected misleading arithmetic comment before approval"
+    }
+  ],
+  "restart_validation": {
+    "backend_restarted": true,
+    "approved_suite_persisted": true,
+    "fixed_run_passed": 7,
+    "upstream_run_passed": 300,
+    "artifact_checksums_verified": true
+  },
+  "final_browser": {
+    "direct_suite_links": true,
+    "repaired_profile_auto_selects_same_suite": true,
+    "suite_refresh_persistence": true,
+    "runs_provenance": true,
+    "compiled_port_8001": true,
+    "widths": [
+      390,
+      768,
+      1440
+    ],
+    "page_errors": []
+  }
+}

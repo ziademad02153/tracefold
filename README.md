@@ -1,8 +1,10 @@
 # Tracefold
 
-Tracefold is an early testing platform with Python as its first proven runtime. It prepares supported repository environments, runs existing tests and saves per-case evidence. Reviewed AI-generated Python file suites and advisory PR review remain separate tools.
+Tracefold is an early testing platform with Python as its first proven runtime. It prepares supported repository environments, runs existing tests, generates additional tests inside that project context, and saves per-case evidence. Developers review and approve generated code, then replay the same suite after a repair. Advisory PR review remains separate.
 
 **Status: single-user local pilot.** Repository execution supports an explicit Python 3.11/Linux/pip/pytest profile, real package installation, internal imports, selected dependency files/plugins and saved results. It does not require AI. The upstream itsdangerous 2.2.0 acceptance run passed 297 existing tests and matched a direct pytest reference. The user's company pilot remains pending. Private access, services/GPU/workspace adapters, other runtimes and shared deployment are not implemented. See [M2/M3 implementation and limits](M2_M3.md).
+
+**M4 implemented on this supported profile:** itsdangerous ran 297 existing + 3 generated cases successfully. A two-module educational package ran seven cases: three failed before repair, all passed after repair using the same reviewed suite hash. Browser generation/review/approval/execution/replay and refresh persistence were exercised. This does not establish company-project acceptance. See [M4 workflow, evidence and limits](M4.md) and [M4 architecture self-review](ARCHITECTURE_REVIEW_M4.md).
 
 ## Architecture
 
@@ -39,7 +41,7 @@ Frontend, in terminal two:
     npm.cmd ci
     npm.cmd run dev
 
-Open [Tracefold](http://127.0.0.1:5173/#connect). Add a public GitHub repository, open its project and choose **Create test suite**. Select a revision and Python file, inspect it, select public functions and describe expected behavior. Review the generated suite, approve it and run it. Rerun the same approved suite on your repair revision. This testing workflow does not require a pull request. Advisory PR review is available separately inside the project.
+Open [Tracefold](http://127.0.0.1:5173/#connect). Add a public GitHub repository, open its Project → Tests and prepare a supported repository environment. Run existing tests, then use Generated tests to select source modules and describe expected behavior. Review/edit the generated draft, approve its exact code and run existing + approved tests. Open a repaired revision, prepare it and select the same saved suite to replay. This testing workflow does not require a pull request. Earlier focused file tools remain accessible as compatibility tools.
 
 ## Build and verify
 
@@ -91,11 +93,11 @@ Sprint 2 established 3–5 pytest tests, whole-suite approval and per-test saved
 
 ## Product structure
 
-Open a Project to see **Overview, Tests, Runs and AI Review**. Tests contains Existing tests and Generated tests; the latter still uses the bounded file-suite workflow. Runs combines saved repository and generated-suite executions and opens the selected report/evidence. AI Review remains advisory PR analysis. Old URLs still work. See [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md) for current navigation, limitations and verification.
+Open a Project to see **Overview, Tests, Runs and AI Review**. Tests contains Existing tests and Generated tests; generated repository suites reuse approved project environments. Runs combines saved execution kinds and opens exact evidence. AI Review remains advisory PR analysis. Earlier focused file tools and saved URLs remain usable. See [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md) and [M4.md](M4.md).
 
 ## Product direction and implementation gates
 
-Current delivery: M2/M3 implemented and validated on the supported upstream profile; company-project acceptance awaits the real Python pilot and install/test commands. Review the working product and Architecture Review before authorizing M4 or other additions.
+Current delivery: M2/M3 plus authorized M4 are implemented and locally validated on the documented profile. Company-project acceptance awaits the real Python pilot and install/test commands. Review that pilot and the as-built architecture findings before any expansion.
 
 Architecture gate: separate Python Provider from Core Platform during M2/M3. At M3, review as-built dependencies, provider-neutral lifecycle/results/evidence, a non-Python contract-test fixture and legacy compatibility alongside the real Python pilot. Both functional and architectural acceptance must pass before the next scope decision. See the [architectural acceptance criteria](REPOSITORY_TESTING_ROADMAP.md#architectural-acceptance-core-platform-and-python-provider).
 
@@ -107,7 +109,7 @@ Language expansion follows Python M4 and uses separately validated execution pro
 
 ## Run existing repository tests (M2/M3)
 
-Open a project and choose **Run repository tests**. Inspect a revision/component, choose dependency files/packages and the install/test profile, save it for review, approve preparation and select **Run existing tests**. Re-run using the same saved environment. Source and profile identities are immutable; testing a new revision requires a new profile. Earlier runs keep their environment manifest if an environment is rebuilt.
+Open a project → Tests → Existing tests. Inspect a revision/component, choose dependency files/packages and the install/test profile, save it for review, approve preparation and select **Run existing tests**. Re-run using the same saved environment. Source and profile identities are immutable; testing a new revision requires a new profile. Earlier runs keep their environment manifest if an environment is rebuilt.
 
 For the real upstream acceptance example, add pallets/itsdangerous, choose tag 2.2.0 and root ., enable project installation, select requirements/tests.txt and requirements/build.txt, remove the default extra pytest pin, retain -q, save/approve/prepare and run. No local model is needed.
 

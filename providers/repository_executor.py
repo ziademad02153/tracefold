@@ -1,7 +1,7 @@
 """Runs inside the prepared environment; records native pytest node IDs and phases."""
 import json
 import os
-from pathlib import Path
+from pathlib import Path,PurePosixPath
 import shutil
 import sys
 
@@ -68,6 +68,18 @@ if __name__ == '__main__':
     root=Path('/tmp')/mode/'project'
     shutil.copytree('/source',root)
     component=root/config['component_root']
+    generated=mode.endswith('-generated')
+    suite=json.loads(Path('/control/suite.json').read_text()) if generated else None
+    if suite:
+        for file in suite['files']:
+            path=PurePosixPath(file['path'])
+            if path.is_absolute() or any(part in ('','.','..') or '\\' in part or ':' in part for part in path.parts):
+                raise ValueError('Invalid generated file path.')
+            target=component.joinpath(*path.parts)
+            if target.exists():
+                raise ValueError('Generated overlay would overwrite a repository file.')
+            target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_text(file['content'],encoding='utf-8')
     os.chdir(component)
     sys.path.insert(0,str(component))
     for relative in reversed(config['pythonpath']):
@@ -77,9 +89,13 @@ if __name__ == '__main__':
     args=['-p','no:cacheprovider']
     for plugin in config['plugins']:
         args += ['-p',plugin]
-    args += config['pytest_args']
-    if mode=='collect':
+    args += ['-q',*[file['path'] for file in suite['files']]] if generated else config['pytest_args']
+    if mode.startswith('collect'):
         args += ['--collect-only','-q']
     code=pytest.main(args,plugins=[evidence])
-    Path(destination).write_text(json.dumps(evidence.result(code)))
+    result=evidence.result(code)
+    for test in result['tests']:
+        test['origin']='generated' if generated else 'existing'
+    result['phase']='generated' if generated else 'existing'
+    Path(destination).write_text(json.dumps(result))
     sys.exit(int(code))
