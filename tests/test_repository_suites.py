@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from execution_core.contracts import ProviderError,Snapshot,Policy
 from execution_core.service import ExecutionService
-from test_execution_core import ContractProvider
+from tests.test_execution_core import ContractProvider
 from providers.python_generation import catalog,context_for,validate_proposal
 
 

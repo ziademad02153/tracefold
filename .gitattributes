@@ -1,0 +1,2 @@
+# Acceptance capsule checksums must be portable across Windows/Linux checkouts.
+docs/validation/evidence/*.json text eol=lf

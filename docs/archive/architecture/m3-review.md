@@ -1,6 +1,8 @@
 # M3 Architecture Review
 
-Historical M3 baseline: M4 subsequently added optional generic suite lifecycle and provider-owned generation. See [M4 architecture self-review](ARCHITECTURE_REVIEW_M4.md) for the current extension and open findings.
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
+Historical M3 baseline: M4 subsequently added optional generic suite lifecycle and provider-owned generation. See [M4 architecture self-review](m4-review.md) for the current extension and open findings.
 
 4 November 2026. Implementation self-review against the approved core/provider acceptance criteria. This is not an external audit or certification. Scope: the newly delivered repository-execution path, with explicit legacy and operational limits below.
 

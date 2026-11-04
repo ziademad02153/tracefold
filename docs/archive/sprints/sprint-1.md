@@ -1,5 +1,7 @@
 # Sprint 1 — Function testing
 
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
 ## Delivered workflow
 
 Choose a connected public repository, a branch or commit, a Python file and a standalone synchronous function. Describe supported inputs and expected output. Gemma generates one pytest test. The developer reviews the code and explicitly approves its hash. The same saved test can run against another revision of the same file and function.

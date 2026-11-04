@@ -1,5 +1,7 @@
 # Sprint 2 — Python test suites
 
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
 ## Delivered
 
 Generate a suite of three to five distinct pytest tests for one supported standalone function. Each scenario has a name and explanation tied to the saved code. Review and approve the whole suite before execution. Run all cases, inspect each result, save evidence and rerun the unchanged suite against a repair revision.

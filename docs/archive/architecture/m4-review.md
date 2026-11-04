@@ -1,6 +1,8 @@
 # M4 as-built architecture review
 
-4 November 2026. Implementation self-review, not an independent audit. This extends [M3 review](ARCHITECTURE_REVIEW_M3.md) after the user's authorization of M4; it does not close the company acceptance or shared-deployment gate.
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
+4 November 2026. Implementation self-review, not an independent audit. This extends [M3 review](m3-review.md) after the user's authorization of M4; it does not close the company acceptance or shared-deployment gate.
 
 ## Boundaries
 

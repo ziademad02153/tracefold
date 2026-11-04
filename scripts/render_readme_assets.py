@@ -101,6 +101,6 @@ for i, title in enumerate(['Python', '.NET', 'Java', 'Web / API', 'C / C++', 'Mo
     x=66+i*154
     arch += rect(x, 635, 139, 49, LIME if i==0 else 'white', '#BDCCB2', 10)
     arch += text(x+69.5, 666, title, 16, DARK, 700, 'text-anchor="middle"')
-arch += text(42, 758, 'Product scope diagram. Executable provider coverage is stated in the README.', 13, MUTED)
+arch += text(42, 758, 'Product scope diagram. Execution profiles are specified in the engineering documentation.', 13, MUTED)
 save('platform-architecture.svg', 1200, 786, 'Tracefold platform architecture', 'A project workspace coordinates shared Core contracts, company AI, execution records, workers and language-specific providers. This is a product scope diagram, not a release support claim.', arch)
 print('Rendered three Tracefold README assets.')

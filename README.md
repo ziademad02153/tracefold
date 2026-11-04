@@ -21,7 +21,7 @@ Tracefold is an **AI-assisted testing platform** that connects project context, 
 
 The platform is organized around **projects and execution profiles**, rather than a collection of language-specific utilities. Shared concepts—snapshots, approvals, suites, runs and evidence—connect specialized language and target providers to the same developer experience.
 
-This overview describes the complete product scope. The implementation boundary is stated in [Product scope and runtime support](#product-scope-and-runtime-support); language logos are not a claim that every provider is executable.
+This overview describes the complete product scope. Engineering specifications, provider contracts and verification records are organized in [the documentation index](docs/README.md).
 
 ### What the developer gets
 
@@ -165,6 +165,8 @@ The model service supplies test drafts and advisory analysis. Expected behavior 
 ### Traceable execution
 
 An execution connects an immutable source snapshot, an approved suite, an environment and native results. Independent identities allow the platform to answer whether the code, tests or environment changed between two outcomes.
+
+<sub>Engineering references: <a href="docs/README.md">documentation</a> · <a href="CONTRIBUTING.md">contribution guide</a> · <a href="docs/assets/README.md">asset credits</a>.</sub>
 
 ### Author
 Tracefold is designed and implemented by Ziad Emad Allam.

@@ -1,5 +1,7 @@
 # اختبار Tracefold وGemma على تغييرات كود حقيقية
 
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
 التاريخ 4 نوفمبر 2026. الموديل gemma4:e4b. تم إنشاء repo عام بموافقة المستخدم بكود تعليمي فقط.
 
 تم استيراد كل PR من خلال واجهة Tracefold، والضغط على Review with AI، ثم تحديث الصفحة والتأكد من حفظ نفس النتيجة. نفس إعدادات وتعليمات المراجعة استُخدمت لكل الحالات. الموديل لم يستلم تصنيف الحالة ولا نتائج الاختبارات.

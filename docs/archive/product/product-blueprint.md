@@ -1,10 +1,12 @@
 # Tracefold product blueprint
 
-Date 4 November 2026. Product structure and navigation baseline. Sprint 3 File Testing passed its bounded M1 acceptance; [SPRINT3.md](SPRINT3.md) is authoritative for its scope and verification. Diagrams below retain the earlier standalone-engine baseline where labeled.
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
 
-The broader direction is defined in [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md). Python M1–M4 remains the current delivery scope.
+Date 4 November 2026. Product structure and navigation baseline. Sprint 3 File Testing passed its bounded M1 acceptance; [SPRINT3.md](../sprints/sprint-3.md) is authoritative for its scope and verification. Diagrams below retain the earlier standalone-engine baseline where labeled.
 
-The new repository-execution path, supported profile and actual provider/core boundary are recorded in [M2_M3.md](M2_M3.md) and [ARCHITECTURE_REVIEW_M3.md](ARCHITECTURE_REVIEW_M3.md). Earlier diagrams below are historical baselines, not the new execution architecture. The user subsequently authorized M4. Its supported workflow, evidence and limits are in [M4.md](M4.md); the company pilot is still pending.
+The broader direction is defined in [Language Expansion Roadmap](../roadmap/language-expansion.md). Python M1–M4 remains the current delivery scope.
+
+The new repository-execution path, supported profile and actual provider/core boundary are recorded in [M2_M3.md](../validation/m2-m3.md) and [ARCHITECTURE_REVIEW_M3.md](../architecture/m3-review.md). Earlier diagrams below are historical baselines, not the new execution architecture. The user subsequently authorized M4. Its supported workflow, evidence and limits are in [M4.md](../validation/m4.md); the company pilot is still pending.
 
 ## Approved project navigation update
 
@@ -21,7 +23,7 @@ Existing #repository-tests, #results and #pulls links remain supported aliases. 
 
 Generated repository suites reuse a prepared environment, have an independent approval hash and execute existing/generated phases with separate provenance. The older #testing file-context tool is a compatibility subview, not the canonical generated repository workflow. Reports and evidence live inside Runs rather than add primary navigation entries. Counts describe saved suites or executions, not unique tested behaviors or a claimed maturity percentage.
 
-Automated browser checks cover four ordered tabs and active state, both Test subviews, unified history/counts, exact-run links, saved AI reports, old-route compatibility, an empty project, a mixed-kind UI fixture, a partial-fetch failure fixture and responsive widths 390/768/1440. No model generation or new project test execution was invoked by these navigation checks. This is not a first-time-user usability study or proof of 30-second comprehension. See [navigation verification](evidence/project-navigation-validation.json).
+Automated browser checks cover four ordered tabs and active state, both Test subviews, unified history/counts, exact-run links, saved AI reports, old-route compatibility, an empty project, a mixed-kind UI fixture, a partial-fetch failure fixture and responsive widths 390/768/1440. No model generation or new project test execution was invoked by these navigation checks. This is not a first-time-user usability study or proof of 30-second comprehension. See [navigation verification](../../validation/evidence/project-navigation-validation.json).
 
 Current gate: validate the implemented M3/M4 workflow on the user's actual company Python repository. Conduct another as-built Architecture Review after successful M4 and before language/target expansion. No numerical maturity percentages are adopted without defined measurements.
 
@@ -156,4 +158,4 @@ The web build passed. A project-summary regression test verifies stored suite an
 
 ## Repository execution design
 
-See [REPOSITORY_TESTING_ROADMAP.md](REPOSITORY_TESTING_ROADMAP.md) for the technical gates from extracted-function tests to real repository execution, dependency environments, pytest configuration, multi-module support and team rollout. This document refines the roadmap without approving Sprint 3 implementation.
+See [REPOSITORY_TESTING_ROADMAP.md](../roadmap/repository-testing.md) for the technical gates from extracted-function tests to real repository execution, dependency environments, pytest configuration, multi-module support and team rollout. This document refines the roadmap without approving Sprint 3 implementation.

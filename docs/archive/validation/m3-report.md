@@ -1,5 +1,7 @@
 # M3 Validation Report
 
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
 Review date: 4 November 2026 (Africa/Cairo). Implementation under review: f12eefd. This report changes documentation only; it does not implement M4 or add runtime capabilities.
 
 **Decision: the supported open-source engineering pilot passed. Company-project validation is NOT RUN and full company acceptance remains pending. Do not start M4 before reviewing that result and obtaining the next scope decision.**
@@ -45,7 +47,7 @@ This is an as-built diagram for the new repository-execution path, not a diagram
 
 Static dependency checks and a non-Python-shaped contract fixture exercise the boundary. The fixture uses screen://submit[locale=ar], an emulator-style environment ID and text/plain evidence; a browser fixture verifies generic rendering. These are architecture tests, not implemented Mobile/Embedded support. Existing function/file tools remain a separately scoped Python-specific compatibility path.
 
-See [the full Architecture Review](ARCHITECTURE_REVIEW_M3.md) for ownership, contract/version constraints, the next-provider change map and open findings.
+See [the full Architecture Review](../architecture/m3-review.md) for ownership, contract/version constraints, the next-provider change map and open findings.
 
 ## 2. What Repository Testing actually does
 
@@ -78,7 +80,7 @@ The runtime environment is currently Linux/Python 3.11. Source/test behavior is 
 | Shared operations | Local supervised single-user pilot; shared authentication, scheduling, retention/backups and strict preparation disk quota remain release requirements |
 | Universal support | No claim that every Python repo builds/runs under the installed profile |
 
-Source, resource and time limits are listed in [M2_M3.md](M2_M3.md). Exceeding them is a supported-profile limitation, not proof of a product-code bug.
+Source, resource and time limits are listed in [M2_M3.md](m2-m3.md). Exceeding them is a supported-profile limitation, not proof of a product-code bug.
 
 ## 4. Verification actually performed
 
@@ -97,7 +99,7 @@ Source, resource and time limits are listed in [M2_M3.md](M2_M3.md). Exceeding t
 
 This is not execution of every upstream CI/tox target. The direct comparison used the recorded Python profile and documented CLI/evidence overrides. A successful 297-case run demonstrates environment and execution fidelity on that profile, not complete bug detection or generated-test quality.
 
-Evidence: [profile/cases/three runs](evidence/m2-m3-itsdangerous.json), [reference comparison](evidence/m2-m3-reference.json), [negative probes](evidence/m2-m3-failure-probes.json), [saved local report](http://127.0.0.1:5173/#execution/b63e7e12cecf4b7f92527d20509a6669). Portable artifacts retain checksums and normalized cases; native artifact bodies remain in the local database.
+Evidence: [profile/cases/three runs](../../validation/evidence/m2-m3-itsdangerous.json), [reference comparison](../../validation/evidence/m2-m3-reference.json), [negative probes](../../validation/evidence/m2-m3-failure-probes.json), [saved local report](http://127.0.0.1:5173/#execution/b63e7e12cecf4b7f92527d20509a6669). Portable artifacts retain checksums and normalized cases; native artifact bodies remain in the local database.
 
 ## 5. Company repository validation — NOT RUN
 
@@ -139,4 +141,4 @@ No company blocker list can be completed from an open-source run. On intake, app
 1. Supported-profile upstream execution: PASS with the documented limits.
 2. New repository core/provider boundary: passes the listed implementation self-review checks; retain the open architectural/operational findings.
 3. Company-project acceptance: PENDING / NOT RUN.
-4. Subsequent scope update: the user authorized M4 while the company pilot remained pending. M4 is now implemented and locally validated as recorded in [M4.md](M4.md); this does not close company acceptance. Review company results and the M4 architecture findings before further expansion.
+4. Subsequent scope update: the user authorized M4 while the company pilot remained pending. M4 is now implemented and locally validated as recorded in [M4.md](m4.md); this does not close company acceptance. Review company results and the M4 architecture findings before further expansion.

@@ -1,8 +1,10 @@
 # Tracefold | Engineering audit and delivery plan
 
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
 ## Current delivery update — 4 November 2026
 
-M2/M3/M4 are implemented and locally validated on the supported Python profile. [M4.md](M4.md) records the working repository generation/approval/execution/replay workflow and evidence. [REPOSITORY_TESTING_ROADMAP.md](REPOSITORY_TESTING_ROADMAP.md) is the active roadmap; [ARCHITECTURE_REVIEW_M4.md](ARCHITECTURE_REVIEW_M4.md) records the self-review and open limits. Company acceptance is still pending the real repository and reference commands. No language or feature expansion is in the active scope.
+M2/M3/M4 are implemented and locally validated on the supported Python profile. [M4.md](../validation/m4.md) records the working repository generation/approval/execution/replay workflow and evidence. [REPOSITORY_TESTING_ROADMAP.md](repository-testing.md) is the active roadmap; [ARCHITECTURE_REVIEW_M4.md](../architecture/m4-review.md) records the self-review and open limits. Company acceptance is still pending the real repository and reference commands. No language or feature expansion is in the active scope.
 
 ## Historical initial audit (superseded capability baseline)
 

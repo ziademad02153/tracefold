@@ -1,14 +1,16 @@
 # Repository Testing technical roadmap
 
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
 Status 4 November 2026. Approved delivery direction. No new testing capability is introduced by this document.
 
-Implementation update: M1 / Sprint 3 is accepted by the user. See [SPRINT3.md](SPRINT3.md) for implementation evidence and limits. The current-state description below records the baseline at roadmap approval. [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md) defines the direction beyond Python M4.
+Implementation update: M1 / Sprint 3 is accepted by the user. See [SPRINT3.md](../sprints/sprint-3.md) for implementation evidence and limits. The current-state description below records the baseline at roadmap approval. [Language Expansion Roadmap](language-expansion.md) defines the direction beyond Python M4.
 
-M2/M3 delivery update: the first supported repository profile and separated execution core/provider are implemented. [M2_M3.md](M2_M3.md) records the real upstream 297-case pilot and limits; [ARCHITECTURE_REVIEW_M3.md](ARCHITECTURE_REVIEW_M3.md) reviews the as-built boundary and open findings. Company-project acceptance remains pending. M4 was subsequently authorized and implemented; see [M4.md](M4.md).
+M2/M3 delivery update: the first supported repository profile and separated execution core/provider are implemented. [M2_M3.md](../validation/m2-m3.md) records the real upstream 297-case pilot and limits; [ARCHITECTURE_REVIEW_M3.md](../architecture/m3-review.md) reviews the as-built boundary and open findings. Company-project acceptance remains pending. M4 was subsequently authorized and implemented; see [M4.md](../validation/m4.md).
 
 ## Current delivery decision: validate M4 on the company project
 
-Overview, Tests, Runs and AI Review remain the primary project destinations. M4 now runs inside Tests: prepared environment → bounded generation → review/approval → execution → saved evidence → replay unchanged on a repaired revision. See [M4 implementation/validation](M4.md) and [M4 architecture self-review](ARCHITECTURE_REVIEW_M4.md).
+Overview, Tests, Runs and AI Review remain the primary project destinations. M4 now runs inside Tests: prepared environment → bounded generation → review/approval → execution → saved evidence → replay unchanged on a repaired revision. See [M4 implementation/validation](../validation/m4.md) and [M4 architecture self-review](../architecture/m4-review.md).
 
 M2/M3/M4 have supported-profile engineering evidence. Company acceptance remains NOT RUN. No additional features or runtime expansion are authorized in the current scope. The next gate is the actual company repository, its reference commands and review of the implementation findings.
 
@@ -169,7 +171,7 @@ At this gate Tracefold can run a supported real Python repository's configured t
 
 ## Milestone 4 — Repository-wide generated tests
 
-Implementation update, 4 November 2026: the authorized bounded M4 workflow is implemented on the supported Python profile. See [M4.md](M4.md) for actual batches, execution evidence and limits, and [architecture self-review](ARCHITECTURE_REVIEW_M4.md). Company repository acceptance remains NOT RUN. The requirements below describe the milestone; they do not imply exhaustive generation or universal repository support.
+Implementation update, 4 November 2026: the authorized bounded M4 workflow is implemented on the supported Python profile. See [M4.md](../validation/m4.md) for actual batches, execution evidence and limits, and [architecture self-review](../architecture/m4-review.md). Company repository acceptance remains NOT RUN. The requirements below describe the milestone; they do not imply exhaustive generation or universal repository support.
 
 ### Changes
 

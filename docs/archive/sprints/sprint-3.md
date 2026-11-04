@@ -1,6 +1,8 @@
 # Sprint 3 — Python File Testing
 
-Status: M1 acceptance passed on the bounded synthetic fixture, 4 November 2026. Scope is M1 in [the Python repository roadmap](REPOSITORY_TESTING_ROADMAP.md). [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md) defines the later C#, Java, C/C++ and Embedded direction; no additional language runner is implemented here. This is not a claim of company-project or full-repository readiness.
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
+Status: M1 acceptance passed on the bounded synthetic fixture, 4 November 2026. Scope is M1 in [the Python repository roadmap](../roadmap/repository-testing.md). [Language Expansion Roadmap](../roadmap/language-expansion.md) defines the later C#, Java, C/C++ and Embedded direction; no additional language runner is implemented here. This is not a claim of company-project or full-repository readiness.
 
 ## Delivered behavior
 
@@ -42,7 +44,7 @@ Public educational repository, previously authorized by the user: [tracefold-val
 - Docker integration tests passed, including a namespace module policy/retries.py whose shared helper defect causes 3 failures plus 1 module-identity pass. The same four tests all pass after repairing the helper. Isolation, missing dependency, skipped tests, output limits and per-test evidence checks also pass.
 - Browser/Gemma acceptance: session 9ba3c48709744ce88a26e4acb7a4b610, 5 tests across both public functions. Bad helper: 1 passed / 4 failed. Repaired helper: 5 passed / 0 failed, same suite hash and image. The explicit rounding oracle was checked before approval. The successful generation used one request after the prompt was strengthened; prior rejected generation attempts are described above.
 - Refresh preserved both runs, all ten per-test entries and suite identity. The earlier Sprint 2 suite remained readable. Desktop/tablet/mobile widths 1440/768/390 had no horizontal overflow and no browser page errors were recorded. Build, workbench and Docker checks are engineering smoke/regression evidence, not a broad model quality benchmark.
-- [Saved acceptance artifact](evidence/sprint3-file-testing.json) contains the approved test code, original source snapshots, identities and results. [Open local report](http://127.0.0.1:5173/#test-session/9ba3c48709744ce88a26e4acb7a4b610).
+- [Saved acceptance artifact](../../validation/evidence/sprint3-file-testing.json) contains the approved test code, original source snapshots, identities and results. [Open local report](http://127.0.0.1:5173/#test-session/9ba3c48709744ce88a26e4acb7a4b610).
 
 ### Reproduce
 

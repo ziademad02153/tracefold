@@ -1,0 +1,38 @@
+{
+  "classification": "Static public-source and educational validation capsules; not live runtime storage",
+  "review_date": "2026-11-05",
+  "credential_pattern_scan": "No matches for the checked credential/private-key patterns; not a complete secret audit",
+  "files": [
+    {
+      "file": "m2-m3-failure-probes.json",
+      "bytes": 31362,
+      "sha256": "0cae1f87bef449a87be710cbdd1ee61344823a852cb39d16b324bdebcb91f779"
+    },
+    {
+      "file": "m2-m3-itsdangerous.json",
+      "bytes": 211497,
+      "sha256": "5785a9d94efa9b1cb476399b119ef7a5d4fce7212b91df6a826ef01576f3ca1f"
+    },
+    {
+      "file": "m2-m3-reference.json",
+      "bytes": 81804,
+      "sha256": "e65c0dd54c1706212463801953a0cc0b33d5516dd0252feedf085f81c266a83f"
+    },
+    {
+      "file": "m4-validation.json",
+      "bytes": 179112,
+      "sha256": "f5a891b2b4dd895c8449e68c23f7fa441789df2c0b45fbc961b0235a52239a6c"
+    },
+    {
+      "file": "project-navigation-validation.json",
+      "bytes": 361,
+      "sha256": "f17d5dce7a7588b505451865ccea5c9f993c955c95b3685f50e6e4beaf1bc997"
+    },
+    {
+      "file": "sprint3-file-testing.json",
+      "bytes": 11763,
+      "sha256": "1442610ae428f4c17b3ac21c1337c5eb554d55968be3d82f520f9de3dd0e0a32"
+    }
+  ],
+  "hash_encoding": "Exact versioned file bytes; LF checkout enforced by .gitattributes"
+}

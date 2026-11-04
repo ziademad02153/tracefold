@@ -1,8 +1,10 @@
 # Language Expansion Roadmap
 
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
 Status: approved product direction, 4 November 2026. Implementation through M4 remains Python only. This document does not claim that any additional language runner exists.
 
-Implementation update: the first Python repository execution profile and provider-neutral core boundary are now delivered. See [M2/M3](M2_M3.md) and the [as-built Architecture Review](ARCHITECTURE_REVIEW_M3.md). M4 repository-context generation is now implemented and locally validated on that profile; see [M4.md](M4.md) and the [M4 architecture self-review](ARCHITECTURE_REVIEW_M4.md). Company acceptance and the next scope decision remain pending; no other language provider has been added.
+Implementation update: the first Python repository execution profile and provider-neutral core boundary are now delivered. See [M2/M3](../validation/m2-m3.md) and the [as-built Architecture Review](../architecture/m3-review.md). M4 repository-context generation is now implemented and locally validated on that profile; see [M4.md](../validation/m4.md) and the [M4 architecture self-review](../architecture/m4-review.md). Company acceptance and the next scope decision remain pending; no other language provider has been added.
 
 ## Product destination
 
@@ -25,7 +27,7 @@ This is the default sequence, not a dated commitment. After M4, inventory real c
 
 ## Shared architecture, language-specific adapters
 
-Keep repository snapshots, approval, job lifecycle, suite identities, history, evidence storage and before/after comparison shared. Separate the Python Provider incrementally during M2 and M3, before adding the next language. The mandatory [post-M3 Architecture Review](REPOSITORY_TESTING_ROADMAP.md#architectural-acceptance-core-platform-and-python-provider) must verify the actual dependency direction, generic contracts and evidence flow. Do not build an unused plugin framework or implement future language providers during this separation.
+Keep repository snapshots, approval, job lifecycle, suite identities, history, evidence storage and before/after comparison shared. Separate the Python Provider incrementally during M2 and M3, before adding the next language. The mandatory [post-M3 Architecture Review](repository-testing.md#architectural-acceptance-core-platform-and-python-provider) must verify the actual dependency direction, generic contracts and evidence flow. Do not build an unused plugin framework or implement future language providers during this separation.
 
 An adapter must implement discovery -> environment preparation -> build -> test collection -> execution -> evidence normalization, plus framework-specific generated-test validation. It declares language/runtime/platform versions, project roots, commands as argument arrays, lock/restore metadata, test framework, resource limits and required services/devices.
 

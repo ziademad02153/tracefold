@@ -1,5 +1,7 @@
 # Tracefold | Verification record — 4 November 2026
 
+> Historical record. For authoritative documentation use [the documentation index](../../README.md). Commands and conclusions below reflect the recorded stage; use the current development guide for execution.
+
 ## Scope
 
 Reviewed all four current routes: repositories, connection, pull request selection and report. Evaluated the implemented local single-user workflow against PRODUCT.md. The core delivered feature is an advisory review of a saved public GitHub PR diff through gemma4:e4b. Repository import, change selection and saved reports support that workflow.
