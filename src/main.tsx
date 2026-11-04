@@ -36,8 +36,8 @@ function App() {
   const [rawPage, id=''] = hash.split('/')
   const page = rawPage === '' ? 'projects' : rawPage
   let project = ''
-  let invalidRoute = !['projects','connect','project','report'].includes(page)
-  if (page === 'project') {
+  let invalidRoute = !['projects','connect','project','history','report'].includes(page)
+  if (page === 'project' || page === 'history') {
     try { project = decodeURIComponent(id) } catch { invalidRoute = true }
     if (!project) invalidRoute = true
   }
@@ -69,6 +69,9 @@ function App() {
         if (page === 'report') {
           const data = await api<Report>('reports/' + encodeURIComponent(id))
           if (active) setReport(data)
+        } else if (page === 'history') {
+          const data = await api<Saved[]>('reports?' + repoPath)
+          if (active) setSaved(data)
         } else if (page === 'project') {
           const results = await Promise.allSettled([
             api<Pull[]>('pulls?' + repoPath),api<Saved[]>('reports?' + repoPath),
@@ -80,9 +83,9 @@ function App() {
             if (savedResult.status === 'fulfilled') setSaved(savedResult.value)
             else setError('Could not load saved reports. Try refreshing the list.')
           }
-        } else {
-          const data = await api<Repo[]>(page === 'connect' ? 'repositories' : 'projects')
-          if (active) setRepos(data)
+        } else if (page === 'projects') {
+          const data = await api<Repo[]>('projects')
+          if (active) setRepos(data.filter(repo => repo.name !== 'tracefold-demo/retry-service'))
         }
       } catch (failure) {
         if (active) setError(String(failure instanceof Error ? failure.message : failure))
@@ -95,7 +98,7 @@ function App() {
   },[page,id,repoPath,invalidRoute,refreshVersion])
 
   useEffect(() => {
-    document.title = page === 'report' ? 'Review report · Tracefold' : page === 'project' ? 'Pull requests · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
+    document.title = page === 'history' ? 'Saved reports · Tracefold' : page === 'report' ? 'Review report · Tracefold' : page === 'project' ? 'Pull requests · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
     heading.current?.focus()
     window.scrollTo(0, 0)
   },[hash,page])
@@ -151,7 +154,7 @@ function App() {
 
   const projectLink = (repo:string) => '#project/' + encodeURIComponent(repo)
   const title = page === 'connect' ? 'Add repository' :
-    page === 'project' ? 'Select a pull request' : page === 'report' ? 'Review report' : 'Projects'
+    page === 'history' ? 'Saved reports' : page === 'project' ? 'Select a pull request' : page === 'report' ? 'Review report' : 'Projects'
 
   return <>
     <a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById("main-content")?.focus() }}>Skip to content</a>
@@ -163,7 +166,7 @@ function App() {
         {['Add repository','Select a pull request','Review with AI'].map((step,index) => <li key={step} className={page === ['connect','project','report'][index] ? 'current' : ''}><span>{index + 1}</span>{step}</li>)}
       </ol>}
       {invalidRoute && <p className="error">This page address is invalid. <a href="#projects">Return to repositories</a>.</p>}
-      {!invalidRoute && <p className="page-help">{page === 'connect' ? 'Add a public repository by its GitHub URL. The demo below is optional.' : page === 'project' ? 'Open a report for the change you want Gemma to review. Previously saved reports are listed below.' : page === 'report' ? 'Inspect the saved change, then request a review from Gemma on the company server.' : 'Choose a connected repository to review one of its pull requests.'}</p>}
+      {!invalidRoute && <p className="page-help">{page === 'connect' ? 'Paste your public GitHub repository URL, choose a pull request, then run an AI review.' : page === 'history' ? 'Open a saved report to read its AI findings, suggested next steps and code diff.' : page === 'project' ? 'Open a report for the change you want Gemma to review. Previously saved reports are listed below.' : page === 'report' ? 'Inspect the saved change, then request a review from Gemma on the company server.' : 'Choose a connected repository to review one of its pull requests.'}</p>}
       {pending && <p role="status">Working… Your repository or report is being prepared.</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {loading && <p role="status">Loading…</p>}
@@ -182,11 +185,16 @@ function App() {
         <button className="button" disabled={pending}>{pending ? 'Connecting…' : 'Add repository'}</button></div>
       </form>}
       {repos.map(repo => <article className="surface row" key={repo.name}><div><h2>{repo.name}</h2><p>{repo.description}</p></div>
-        {page === 'connect' ? <button className="button" disabled={pending} onClick={() => void mutate(async () => {
-          await api<Repo>('projects',{repo:repo.name})
-          return projectLink(repo.name)
-        })}>Try demo</button> : <a className="button" href={projectLink(repo.name)}>View pull requests →</a>}
+        <div className="row"><a className="button secondary" href={'#history/' + encodeURIComponent(repo.name)}>Saved reports →</a><a className="button" href={projectLink(repo.name)}>View pull requests →</a></div>
       </article>)}
+      {page === 'history' && !invalidRoute && <>
+        <div className="row section"><h2>{project}</h2><a className="button secondary" href={projectLink(project)}>Review another pull request →</a></div>
+        {!loading && !error && saved.length === 0 && <p>No saved reports yet. Select a pull request to create your first report.</p>}
+        {saved.map(item => <article className="surface row" key={item.id}>
+          <div><h2>PR #{item.number} · {item.title}</h2><p>Saved change {item.head?.slice(0,7) || item.id.slice(0,8)} · Report {item.id.slice(0,8)}</p></div>
+          <a className="button" href={'#report/' + item.id}>Open review →</a>
+        </article>)}
+      </>}
       {page === 'project' && !invalidRoute && <>
         <div className="row section"><div><h2>{project}</h2><p>Up to 30 recently updated pull requests, including closed changes.</p></div><button className="button secondary" disabled={pending || loading} onClick={() => setRefreshVersion(value => value + 1)}>Refresh list</button></div>
         {pullError && <p className="error" role="alert">{pullError} Saved reports remain available below.</p>}
@@ -204,33 +212,49 @@ function App() {
       {report && <>
         <p className="section"><a href={projectLink(report.repo)}>{report.repo}</a> / PR #{report.number}</p>
         <div className="row"><h2 className="report-title">{report.title}</h2><span className="badge">Saved · {report.source}</span></div>
-        <div className="surface commits"><p>Base <code>{report.base}</code></p><p>Head <code>{report.head}</code></p></div>
 
         <section className="surface ai-section" aria-labelledby="ai-title">
-          <div className="row"><div><p className="eyebrow">Local model · gemma4:e4b</p><h2 id="ai-title">AI code review</h2></div>
+          <div className="row result-header"><div>
+            <p className="eyebrow">AI review result</p>
+            <h2 id="ai-title" className="result-title">
+              {report.ai_review?.result
+                ? report.ai_review.result.findings.length + ' potential issue' + (report.ai_review.result.findings.length === 1 ? '' : 's') + ' found'
+                : report.ai_review?.status === 'running' ? 'Review in progress'
+                : report.ai_review?.status === 'failed' ? 'Review could not finish'
+                : 'Ready to review this change'}
+            </h2>
+          </div>
             <button className="button" disabled={reviewing || report.ai_review?.status === 'running' || report.diff.length > 28000 || !report.diff.trim()}
               onClick={() => void reviewWithAI()}>
               {reviewing || report.ai_review?.status === 'running' ? 'Reviewing with Gemma…' : report.ai_review?.status === 'failed' ? 'Retry AI review' : report.ai_review?.result ? 'Run AI review again' : 'Review with AI'}
             </button>
           </div>
-          <p>Sends this saved change to Gemma on the company network. Loading the model may take a few minutes.</p>
+          {!report.ai_review?.result && <p>Ask Gemma to identify potential bugs, explain their impact and suggest fixes. Uses the company network.</p>}
           {!report.diff.trim() && <p className="muted">This report has no text diff for AI review.</p>}
           {report.diff.length > 28000 && <p className="error">This change exceeds the current 28,000-character review limit. Choose a smaller PR.</p>}
           {report.ai_review?.status === 'running' && <p className="progress" role="status">Gemma is reviewing this change. You can refresh this page to check its saved status.</p>}
           {report.ai_review?.status === 'failed' && <p className="error" role="alert">{report.ai_review.error}</p>}
           {report.ai_review?.result && <>
-            <p className="review-meta">Saved {new Date(report.ai_review.result.completed_at).toLocaleString()} · {report.ai_review.result.seconds}s · {report.ai_review.result.model}</p>
-            {report.ai_review.status !== 'completed' && <p>Previous completed review</p>}
-            <p className="muted">{report.ai_review.result.scope}</p>
-            {report.ai_review.result.findings.length === 0 && <p className="empty-result">No concrete issues identified in this diff. Use tests and human review to assess the full change.</p>}
+            {report.ai_review.status !== 'completed' && <p className="previous-result">Showing the previous saved result{report.ai_review.status === 'running' ? ' while a new review runs.' : '. The latest attempt failed.'}</p>}
+            <p className="result-guidance">{report.ai_review.result.findings.length > 0
+              ? 'Check each issue below before merging this change. Each card shows the location, impact and suggested fix.'
+              : 'Gemma did not identify a concrete problem in this change. This does not verify that the change is correct.'}</p>
+            <p className="review-meta">{report.ai_review.result.model} · Saved {new Date(report.ai_review.result.completed_at).toLocaleString()} · {report.ai_review.result.seconds}s</p>
+            {report.ai_review.result.findings.length === 0 && <p className="empty-result">Next step — run your tests and complete a human review before merging.</p>}
             {report.ai_review.result.findings.map((finding,index) => <article className="finding" key={index}>
-              <p className="location">{finding.file} · Line {finding.line}</p>
-              <h3>{finding.title}</h3><p>{finding.explanation}</p>
-              <p className="suggestion"><strong>Suggested next step</strong><br/>{finding.suggestion}</p>
+              <p className="issue-number">Potential issue {index + 1}</p>
+              <h3>{finding.title}</h3>
+              <dl className="issue-details">
+                <div><dt>Where is it?</dt><dd className="location"><code>{finding.file}</code> · Line {finding.line}</dd></div>
+                <div><dt>Impact and cause</dt><dd>{finding.explanation}</dd></div>
+                <div className="suggestion"><dt>Suggested fix or verification</dt><dd>{finding.suggestion}</dd></div>
+              </dl>
             </article>)}
           </>}
           {!report.ai_review && <p className="muted">No AI review saved yet.</p>}
+          {report.ai_review?.result && <p className="result-scope">Reviewed the saved code changes only. These are AI suggestions; tests were not run by this review.</p>}
         </section>
+        <details className="surface commits"><summary>Compared versions</summary><p>Base <code>{report.base}</code></p><p>Head <code>{report.head}</code></p></details>
         <div className="grid">
           <article className="surface code-panel"><h2>Changed code</h2><p className="muted">Removed lines are red. Added lines are green.</p><pre className="diff-view">{report.diff.split('\n').map((line,index) => <span className={line.startsWith('+++') || line.startsWith('---') || line.startsWith('diff ') || line.startsWith('@@') ? 'diff-header' : line.startsWith('+') ? 'diff-added' : line.startsWith('-') ? 'diff-removed' : ''} key={index}>{line || ' '}</span>)}</pre></article>
           <article className="surface"><h2>Test and CI evidence</h2>{report.checks.map(check => <details key={check.version} open={check.status === 'Failed'}>
