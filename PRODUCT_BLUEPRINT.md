@@ -126,3 +126,7 @@ No coverage percentage, language detection, risk score or whole-repository certi
 - [Next milestone proposal](https://www.figma.com/design/JApksAD4rM8ffWwQcoSENV?node-id=14-135)
 
 The web build passed. A project-summary regression test verifies stored suite and run counts, latest-result selection and a new project with no activity. Browser checks covered project entry, Overview, Tests, Results, saved evidence, empty projects, optional PR analysis and 390/768/1440 pixel widths without overflow. Earlier pilot screens are labeled Archive in Figma. New-user comprehension remains a human usability check.
+
+## Repository execution design
+
+See [REPOSITORY_TESTING_ROADMAP.md](REPOSITORY_TESTING_ROADMAP.md) for the technical gates from extracted-function tests to real repository execution, dependency environments, pytest configuration, multi-module support and team rollout. This document refines the roadmap without approving Sprint 3 implementation.
