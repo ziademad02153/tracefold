@@ -85,3 +85,8 @@ No application data or credentials are mounted into test containers. Docker must
 ## Sprint 2 suites
 
 New sessions generate 3–5 pytest tests for the selected standalone function. Review their scenarios and code, approve the entire suite, then select **Run all tests**. Each saved run shows per-test status, duration and evidence. Reuse the same saved suite on a repair branch. See [SPRINT2.md](SPRINT2.md) for the verified five-test acceptance result and current limitations.
+
+
+## Product structure
+
+Open a Project to see Overview, Tests and Results. Overview uses saved activity only. Tests creates or reopens suites, and Results opens execution evidence. Advisory PR code review is an additional tool inside the project. See [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md) for the sitemap, architecture and proposed File Testing milestone.

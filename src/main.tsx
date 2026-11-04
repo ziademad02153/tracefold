@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './style.css'
 import { api } from './api'
 import { Workbench } from './Workbench'
+import { ProjectHome, ProjectNavigation, type ProjectSummary } from './ProjectHome'
 
 type Repo = {name:string; description:string}
 type Pull = {number:number; title:string; base:string; head:string}
@@ -17,6 +18,7 @@ type Report = Pull & {id:string; repo:string; diff:string; ai_review?:AIReview; 
 function App() {
   const [repoInput,setRepoInput] = useState('')
   const [hash,setHash] = useState(location.hash.slice(1))
+  const [summaries,setSummaries] = useState<ProjectSummary[]>()
   const [repos,setRepos] = useState<Repo[]>([])
   const [pulls,setPulls] = useState<Pull[]>([])
   const [saved,setSaved] = useState<Saved[]>([])
@@ -28,8 +30,8 @@ function App() {
   const [rawPage, id=''] = hash.split('/')
   const page = rawPage === '' ? 'projects' : rawPage
   let project = ''
-  let invalidRoute = !['projects','connect','project','history','report','testing','test-session'].includes(page)
-  if (page === 'project' || page === 'history' || page === 'testing') {
+  let invalidRoute = !['projects','connect','project','history','report','testing','test-session','pulls','results'].includes(page)
+  if (page === 'project' || page === 'history' || page === 'testing' || page === 'pulls' || page === 'results') {
     try { project = decodeURIComponent(id) } catch { invalidRoute = true }
     if (!project) invalidRoute = true
   }
@@ -64,7 +66,7 @@ function App() {
         } else if (page === 'history') {
           const data = await api<Saved[]>('reports?' + repoPath)
           if (active) setSaved(data)
-        } else if (page === 'project') {
+        } else if (page === 'pulls') {
           const results = await Promise.allSettled([
             api<Pull[]>('pulls?' + repoPath),api<Saved[]>('reports?' + repoPath),
           ])
@@ -76,8 +78,12 @@ function App() {
             else setError('Could not load saved reports. Try refreshing the list.')
           }
         } else if (page === 'projects') {
-          const data = await api<Repo[]>('projects')
-          if (active) setRepos(data.filter(repo => repo.name !== 'tracefold-demo/retry-service'))
+          const [projects,stats] = await Promise.allSettled([api<Repo[]>('projects'),api<ProjectSummary[]>('testing/overview')])
+          if (projects.status==='rejected') throw projects.reason
+          if (active) {
+            setRepos(projects.value.filter(repo => repo.name !== 'tracefold-demo/retry-service'))
+            setSummaries(stats.status==='fulfilled'?stats.value:undefined)
+          }
         }
       } catch (failure) {
         if (active) setError(String(failure instanceof Error ? failure.message : failure))
@@ -90,7 +96,7 @@ function App() {
   },[page,id,repoPath,invalidRoute,refreshVersion])
 
   useEffect(() => {
-    document.title = page === 'testing' || page === 'test-session' ? 'Function testing · Tracefold' : page === 'history' ? 'Saved reports · Tracefold' : page === 'report' ? 'Review report · Tracefold' : page === 'project' ? 'Pull requests · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
+    document.title = page === 'testing' || page === 'test-session' ? 'Function testing · Tracefold' : page === 'history' ? 'Saved reports · Tracefold' : page === 'report' ? 'Review report · Tracefold' : page === 'pulls' ? 'Code review · Tracefold' : page === 'project' ? 'Project overview · Tracefold' : page === 'results' ? 'Test results · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
     heading.current?.focus()
     window.scrollTo(0, 0)
   },[hash,page])
@@ -145,20 +151,20 @@ function App() {
   }
 
   const projectLink = (repo:string) => '#project/' + encodeURIComponent(repo)
-  const title = page === 'testing' || page === 'test-session' ? 'Function testing' : page === 'connect' ? 'Add repository' :
-    page === 'history' ? 'Saved reports' : page === 'project' ? 'Select a pull request' : page === 'report' ? 'Review report' : 'Projects'
+  const title = page === 'testing' ? 'Create a test suite' : page === 'test-session' ? 'Test suite and evidence' : page === 'connect' ? 'Add a project' :
+    page === 'history' ? 'Saved code reviews' : page === 'pulls' ? 'Select a pull request' : page === 'project' ? 'Project overview' : page === 'results' ? 'Test results' : page === 'report' ? 'Review report' : 'Projects'
 
   return <>
     <a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById("main-content")?.focus() }}>Skip to content</a>
-    <header><a className="brand" href="#projects"><span className="mark" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 5h15l-5 5H9v4h5l-5 5H4z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><circle cx="18" cy="17" r="2" fill="currentColor"/></svg></span>Tracefold</a><nav aria-label="Main navigation"><a href="#projects" aria-current={page === "projects" ? "page" : undefined}>Repositories</a><a href="#connect" aria-current={page === "connect" ? "page" : undefined}>Add repository</a></nav><span className="workspace">Local AI workspace</span></header>
+    <header><a className="brand" href="#projects"><span className="mark" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 5h15l-5 5H9v4h5l-5 5H4z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><circle cx="18" cy="17" r="2" fill="currentColor"/></svg></span>Tracefold</a><nav aria-label="Main navigation"><a href="#projects" aria-current={page === "projects" ? "page" : undefined}>Projects</a><a href="#connect" aria-current={page === "connect" ? "page" : undefined}>Add project</a></nav><span className="workspace">Local AI workspace</span></header>
     <main id="main-content" tabIndex={-1}>
       <p className="eyebrow"><a href="#projects">Workspace</a> / {title}</p>
-      <div className="row hero"><h1 tabIndex={-1} ref={heading}>{invalidRoute ? "Page not found" : title}</h1>{(page === '' || page === 'projects') && <a className="button" href="#connect">Add repository →</a>}</div>
-      {!invalidRoute && page !== 'testing' && page !== 'test-session' && <ol className="steps" aria-label="Review workflow">
-        {['Add repository','Select a pull request','Review with AI'].map((step,index) => <li key={step} className={page === ['connect','project','report'][index] ? 'current' : ''}><span>{index + 1}</span>{step}</li>)}
+      <div className="row hero"><h1 tabIndex={-1} ref={heading}>{invalidRoute ? "Page not found" : title}</h1>{(page === '' || page === 'projects') && <a className="button" href="#connect">Add project →</a>}</div>
+      {!invalidRoute && ['pulls','history','report'].includes(page) && <ol className="steps" aria-label="Review workflow">
+        {['Add repository','Select a pull request','Review with AI'].map((step,index) => <li key={step} className={page === ['connect','pulls','report'][index] ? 'current' : ''}><span>{index + 1}</span>{step}</li>)}
       </ol>}
       {invalidRoute && <p className="error">This page address is invalid. <a href="#projects">Return to repositories</a>.</p>}
-      {!invalidRoute && page !== 'testing' && page !== 'test-session' && <p className="page-help">{page === 'connect' ? 'Paste your public GitHub repository URL, choose a pull request, then run an AI review.' : page === 'history' ? 'Open a saved report to read its AI findings, suggested next steps and code diff.' : page === 'project' ? 'Open a report for the change you want Gemma to review. Previously saved reports are listed below.' : page === 'report' ? 'Inspect the saved change, then request a review from Gemma on the company server.' : 'Choose a connected repository to review one of its pull requests.'}</p>}
+      {!invalidRoute && page !== 'testing' && page !== 'test-session' && page !== 'project' && page !== 'results' && <p className="page-help">{page === 'connect' ? 'Connect a public GitHub repository to create test suites and keep their execution evidence together.' : page === 'history' ? 'Open a saved report to read its AI findings, suggested next steps and code diff.' : page === 'pulls' ? 'Open a report for the change you want Gemma to review. Previously saved reports are listed below.' : page === 'report' ? 'Inspect the saved change, then request a review from Gemma on the company server.' : 'Generate Python tests, run them and verify a fix using the same saved suite. Open a project to get started.'}</p>}
       {pending && <p role="status">Working… Your repository or report is being prepared.</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {loading && <p role="status">Loading…</p>}
@@ -176,19 +182,24 @@ function App() {
         <div className="row"><input id="repo-url" disabled={pending} required placeholder="https://github.com/owner/repo" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
         <button className="button" disabled={pending}>{pending ? 'Connecting…' : 'Add repository'}</button></div>
       </form>}
+      {!invalidRoute && page==='testing' && <ProjectNavigation repo={project} active="tests"/>}
       {!invalidRoute && (page === 'testing' || page === 'test-session') && <Workbench key={hash} repo={page === 'testing' ? project : undefined} sessionId={page === 'test-session' ? id : undefined}/>}
-      {repos.map(repo => <article className="surface row" key={repo.name}><div><h2>{repo.name}</h2><p>{repo.description}</p></div>
-        <div className="row"><a className="button" href={'#testing/' + encodeURIComponent(repo.name)}>Test a function →</a><a className="button secondary" href={'#history/' + encodeURIComponent(repo.name)}>Saved reports →</a><a className="button" href={projectLink(repo.name)}>View pull requests →</a></div>
-      </article>)}
+      {repos.map(repo => {
+        const stats=summaries?.find(item=>item.repo===repo.name)
+        return <article className="surface row" key={repo.name}><div><h2>{repo.name}</h2><p>{repo.description}</p>
+          {summaries?<p className="muted">{stats?.suite_count??0} saved suites · {stats?.run_count??0} runs · Latest run: {stats?.latest_run?stats.latest_run.status.toUpperCase():'Not run yet'}</p>:<p>Activity summary unavailable.</p>}
+        </div><a className="button" href={projectLink(repo.name)}>Open project →</a></article>
+      })}
+      {!invalidRoute && (page==='project'||page==='results') && <ProjectHome key={project} repo={project} results={page==='results'}/>}
       {page === 'history' && !invalidRoute && <>
-        <div className="row section"><h2>{project}</h2><a className="button secondary" href={projectLink(project)}>Review another pull request →</a></div>
+        <div className="row section"><h2>{project}</h2><a className="button secondary" href={'#pulls/'+encodeURIComponent(project)}>Review another pull request →</a></div>
         {!loading && !error && saved.length === 0 && <p>No saved reports yet. Select a pull request to create your first report.</p>}
         {saved.map(item => <article className="surface row" key={item.id}>
           <div><h2>PR #{item.number} · {item.title}</h2><p>Saved change {item.head?.slice(0,7) || item.id.slice(0,8)} · Report {item.id.slice(0,8)}</p></div>
           <a className="button" href={'#report/' + item.id}>Open review →</a>
         </article>)}
       </>}
-      {page === 'project' && !invalidRoute && <>
+      {page === 'pulls' && !invalidRoute && <>
         <p className="section"><a className="button secondary" href={'#testing/' + encodeURIComponent(project)}>Test a function without a pull request →</a></p>
         <div className="row section"><div><h2>{project}</h2><p>Up to 30 recently updated pull requests, including closed changes.</p></div><button className="button secondary" disabled={pending || loading} onClick={() => setRefreshVersion(value => value + 1)}>Refresh list</button></div>
         {pullError && <p className="error" role="alert">{pullError} Saved reports remain available below.</p>}

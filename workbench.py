@@ -215,6 +215,50 @@ def create_router(engine, github, connected):
             state = "interrupted"
         return {"id": row.id, "repo": row.repo, "state": state, **row.payload, "tests": suite_cases(row.payload), "runs": history}
 
+    @router.get("/overview")
+    def overview(repo: str | None = None):
+        if repo is not None:
+            connected(repo)
+        with engine.connect() as connection:
+            session_rows = connection.execute(select(sessions)).all()
+            run_rows = connection.execute(select(runs)).all()
+        summaries = {}
+        session_projects = {}
+        for row in session_rows:
+            if repo is not None and row.repo != repo:
+                continue
+            item = summaries.setdefault(row.repo, {
+                "repo": row.repo, "suite_count": 0, "test_count": 0,
+                "run_count": 0, "latest_run": None, "suites": [], "runs": [],
+            })
+            count = len(suite_cases(row.payload))
+            item["suite_count"] += 1
+            item["test_count"] += count
+            item["suites"].append({
+                "id": row.id, "function": row.payload["function"], "path": row.payload["path"],
+                "test_count": count, "created_at": row.payload["created_at"],
+            })
+            session_projects[row.id] = row.repo
+        for row in run_rows:
+            project = session_projects.get(row.session_id)
+            if project is None:
+                continue
+            item = summaries[project]
+            run = {"id": row.id, "session_id": row.session_id,
+                   "status": row.payload["status"], "completed_at": row.payload["completed_at"],
+                   "summary": row.payload.get("summary"), "sha": row.payload["sha"]}
+            item["runs"].append(run)
+            item["run_count"] += 1
+            if item["latest_run"] is None or run["completed_at"] > item["latest_run"]["completed_at"]:
+                item["latest_run"] = run
+        for item in summaries.values():
+            item["suites"].sort(key=lambda suite: suite["created_at"], reverse=True)
+            item["runs"].sort(key=lambda run: run["completed_at"], reverse=True)
+        if repo is not None and repo not in summaries:
+            summaries[repo] = {"repo": repo, "suite_count": 0, "test_count": 0, "run_count": 0,
+                               "latest_run": None, "suites": [], "runs": []}
+        return list(summaries.values())
+
     @router.get("/runner")
     def runner():
         return runner_status()

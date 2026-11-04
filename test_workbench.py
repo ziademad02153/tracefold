@@ -105,6 +105,25 @@ class WorkbenchTests(unittest.TestCase):
         loaded=self.endpoint("/sessions/{session_id}","GET")(session["id"])
         self.assertEqual(loaded["runs"],result["runs"])
 
+    def test_project_overview_uses_saved_activity_only(self):
+        from workbench import Approval, RunRequest
+        session=self.session(suite=True)
+        self.endpoint("/sessions/{session_id}/approve","POST")(session["id"],Approval(test_hash=session["test_hash"]))
+        with patch("workbench.execute_test",side_effect=[
+            {"status":"failed","log":"failed","exit_code":1},
+            {"status":"passed","log":"passed","exit_code":0},
+        ]):
+            for ref in ("bad","fixed"):
+                self.endpoint("/sessions/{session_id}/run","POST")(session["id"],RunRequest(ref=ref,test_hash=session["test_hash"]))
+        overview=self.endpoint("/overview","GET")(repo="owner/repo")[0]
+        self.assertEqual(overview["suite_count"],1)
+        self.assertEqual(overview["test_count"],3)
+        self.assertEqual(overview["run_count"],2)
+        self.assertEqual(overview["latest_run"]["status"],"passed")
+        self.assertIsNone(overview["latest_run"]["summary"])
+        self.assertEqual(overview["runs"][0]["status"],"passed")
+        self.assertEqual(self.endpoint("/overview","GET")(repo="other/repo")[0]["run_count"],0)
+
     def test_runner_failure_is_persisted_as_blocked(self):
         from workbench import Approval, RunRequest
         session=self.session()

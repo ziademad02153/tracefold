@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from './api'
+import { ProjectNavigation } from './ProjectHome'
 
 type TestEvidence = {name:string; status:'passed'|'failed'|'blocked'|'skipped'|'not_run'; detail:string; seconds:number}
 type TestCase = {name:string;scenario:string}
@@ -86,6 +87,7 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
   const latest=session?.runs.at(-1)
   return <div className="testing-workspace">
     <p className="page-help">Choose one standalone Python function. Define its expected behavior, review a generated suite of 3–5 tests, then run all tests and save each result.</p>
+    {session&&<ProjectNavigation repo={session.repo} active="tests"/>}
     {activeRepo&&<p><a href={'#testing/'+encodeURIComponent(activeRepo)}>{activeRepo}</a></p>}
     {error&&<p className="error" role="alert">{error}</p>}
     {busy&&<p className="progress" role="status">{busy==='generate'?'Gemma is generating your test. This may take a few minutes.':busy==='run'?'Running the approved test in Docker…':'Loading…'}</p>}
