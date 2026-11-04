@@ -2,7 +2,7 @@
 
 Status: approved product direction, 4 November 2026. Implementation through M4 remains Python only. This document does not claim that any additional language runner exists.
 
-Implementation update: the first Python repository execution profile and provider-neutral core boundary are now delivered. See [M2/M3](M2_M3.md) and the [as-built Architecture Review](ARCHITECTURE_REVIEW_M3.md). The company pilot and next scope decision are pending; no other language provider or M4 generation has been added.
+Implementation update: the first Python repository execution profile and provider-neutral core boundary are now delivered. See [M2/M3](M2_M3.md) and the [as-built Architecture Review](ARCHITECTURE_REVIEW_M3.md). M4 repository-context generation is now implemented and locally validated on that profile; see [M4.md](M4.md) and the [M4 architecture self-review](ARCHITECTURE_REVIEW_M4.md). Company acceptance and the next scope decision remain pending; no other language provider has been added.
 
 ## Product destination
 
@@ -92,7 +92,7 @@ The user sees: detected components -> supported/unsupported profiles -> setup re
 5. Test dependency/build failure, missing tools, zero tests, timeout, skip and interruption paths.
 6. Publish the supported profile and remaining limits before enabling it for users. Estimate implementation after the pilot discovery, not from language syntax alone.
 
-No language expansion is authorized for implementation during Python M1-M4 by this document. Sprint 3 remains Python File Testing.
+This document does not authorize language expansion. Python M1–M4 have implementation records; company validation and the next scope decision remain the current gate.
 
 ## Primary technical references
 
