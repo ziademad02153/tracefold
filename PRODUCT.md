@@ -25,3 +25,7 @@ Help an engineer reviewing a proposed change decide whether it introduced a regr
 
 ## Visual direction
 Light neutral workspace, navy navigation, blue actions. Green and red are reserved for results with explicit text. The lime folded-trace mark is preserved. Figma includes the identity, three workflow screens and six review-state examples.
+
+## Current implementation note — 4 November 2026
+
+The current review feature is advisory AI analysis of a saved public GitHub PR diff. Live CI collection and reproducible execution remain incomplete P0 requirements. The active visual direction is the evidence-focused Figma revision, with warm neutral surfaces, dark green navigation, a lime mark and explicit red/green diff indicators. See AUDIT.md for the implementation-to-requirements review.

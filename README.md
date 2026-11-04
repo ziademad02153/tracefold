@@ -57,3 +57,9 @@ The model is gemma4:e4b. Set OLLAMA_BASE_URL on the backend to override the inte
 The local UI was exercised in a browser against octocat/Hello-World PR 37 and the bundled regression. Saved reviews survived refresh. The controls for repository connection, invalid input and report creation were exercised, and mobile overflow checked. Model testing covered one known bug and one valid function. This is a smoke evaluation, not a quality benchmark.
 
 AI state uses an additive ai_reviews table, so existing reports remain readable. Multiple simultaneous review submissions for one report are rejected using a database claim. The synchronous model request is bounded by a 150-second network timeout. Production worker scheduling, schema migrations, authentication and PostgreSQL integration testing remain open.
+
+## Verification record
+
+See [AUDIT.md](AUDIT.md) for tested flows, fixes and the release decision. Run the automated adapter and persistence checks with:
+
+    .venv/Scripts/python.exe -m unittest test_ai_review -v

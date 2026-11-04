@@ -83,6 +83,35 @@ class SavedReviewTests(unittest.TestCase):
         self.assertEqual(saved["status"], "failed")
         self.assertEqual(saved["result"], result)
 
+    def test_completed_result_stays_visible_during_retry(self):
+        result = {"model":"gemma4:e4b","findings":[FINDING]}
+        with patch.object(self.app, "review_diff", return_value=result):
+            self.app.review_report("test-report")
+        def inspect_running(diff):
+            running = self.app.get_report("test-report")["ai_review"]
+            self.assertEqual(running["status"], "running")
+            self.assertEqual(running["result"], result)
+            return result
+        with patch.object(self.app, "review_diff", side_effect=inspect_running):
+            self.app.review_report("test-report")
+
+    def test_public_snapshot_uses_immutable_merge_base(self):
+        from unittest.mock import call
+        with self.engine.begin() as connection:
+            connection.execute(self.app.projects.insert().values(repo="public/repo"))
+        responses = [
+            {"number":1, "title":"PR", "base":{"sha":"base-tip"}, "head":{"sha":"head-sha"}},
+            {"merge_base_commit":{"sha":"merge-base"}},
+            DIFF,
+        ]
+        with patch.object(self.app, "github", side_effect=responses) as github:
+            report = self.app.create_report(self.app.CreateReport(repo="public/repo",number=1))
+        self.assertEqual(report["base"], "merge-base")
+        self.assertEqual(report["head"], "head-sha")
+        self.assertEqual(github.call_args_list[-1], call(
+            "public/repo/compare/merge-base...head-sha", "application/vnd.github.diff"
+        ))
+
     def test_second_submission_is_rejected_while_running(self):
         from fastapi import HTTPException
         from time import time

@@ -8,7 +8,7 @@ Tracefold is a public GitHub PR importer with durable snapshots and a separate d
 |---|---|---|
 | Repository connection | Public URL is resolved through GitHub. Demo is separate. | GitHub App installation and private repo access, per-user authorization and removal. |
 | Change selection | Most recent 30 PRs. Empty state for a repo with none. | Branch/commit comparison and pagination or targeted PR lookup. |
-| Report | PR diff and commit IDs persisted. Public reports have no checks. | CI evidence, explicit incomplete states and robust snapshot integrity. Current double-read detects some races. It does not atomically bind the diff to the recorded SHAs. |
+| Report | PR diff and commit IDs persisted. Public reports have no checks. | CI evidence, explicit incomplete states and robust snapshot integrity. New imports use a merge base and immutable commit IDs. Earlier snapshots retain their original import semantics. |
 | Data | SQLite verified in development. SQLAlchemy creates tables on startup. | PostgreSQL integration test, migrations, constraints, backup and recovery. |
 | Security | Loopback development. No app users, roles or workspace isolation. | Authentication, authorization on every resource, secret management, audit and retention. Critical before shared deployment. |
 | AI and execution | Model unavailable. Demo check logs are fixture text. | Local-model validation, plus separately authorized and isolated execution if required. |
@@ -39,3 +39,7 @@ Tracefold is a public GitHub PR importer with durable snapshots and a separate d
 Implemented gemma4:e4b review on saved diffs with durable review state, output schema validation, line-location validation, running and failure states, and retry. Browser validation used a real public PR and the demo regression with refresh persistence. Nine automated tests cover the AI adapter, including network and malformed output paths. The initial model test produced a false positive on valid code. More explicit preconditions and review instructions produced an empty result for that valid case on a subsequent request. Wider evaluation remains necessary.
 
 The current AI feature is available before live CI integration. Production multi-user access remains blocked on the access-control milestones above.
+
+
+## UI and reliability review — 4 November 2026
+See AUDIT.md. Eleven browser scenarios and eleven Python tests passed. Added failure-tolerant saved history, invalid-route handling, clearer review actions, stable diff inputs and responsive UI refinements. Shared deployment remains pending access control and operations work.

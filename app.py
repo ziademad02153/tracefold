@@ -141,7 +141,7 @@ def list_reports(repo: str):
     connected(repo)
     with engine.connect() as connection:
         return [
-            {"id": row.id, "number": row.snapshot["number"], "title": row.snapshot["title"]}
+            {"id": row.id, "number": row.snapshot["number"], "title": row.snapshot["title"], "head": row.snapshot["head"]}
             for row in connection.execute(select(reports).where(reports.c.repo == repo))
         ]
 
@@ -160,10 +160,17 @@ def create_report(request: CreateReport):
     else:
         path = f"{request.repo}/pulls/{request.number}"
         summary = pull_summary(github(path))
-        diff = github(path, "application/vnd.github.diff")
-        if pull_summary(github(path)) != summary:
-            raise HTTPException(409, "The pull request changed during import. Try again.")
-        snapshot = {**summary, "diff": diff, "checks": [], "source": "GitHub public repository"}
+        # Resolve the PR merge base, then request a diff between immutable revisions.
+        comparison = github(f"{request.repo}/compare/{summary['base']}...{summary['head']}")
+        diff_base = comparison["merge_base_commit"]["sha"]
+        diff = github(
+            f"{request.repo}/compare/{diff_base}...{summary['head']}",
+            "application/vnd.github.diff",
+        )
+        snapshot = {
+            **summary, "target_base": summary["base"], "base": diff_base,
+            "diff": diff, "checks": [], "source": "GitHub public repository",
+        }
     with engine.begin() as connection:
         connection.execute(reports.insert().values(id=report_id, repo=request.repo, snapshot=snapshot))
     return {"id": report_id, "repo": request.repo, **snapshot}
@@ -199,6 +206,8 @@ def review_report(report_id: str):
         row = connection.execute(select(reviews).where(reviews.c.report_id == report_id)).one()
         previous = row.state
         token = uuid4().hex
+        if previous.get("result"):
+            running["result"] = previous["result"]
         if previous["status"] == "running" and started - previous["started"] <= 210:
             raise HTTPException(409, "A review is already running for this report.")
         changed = connection.execute(
