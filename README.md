@@ -93,6 +93,8 @@ Open a Project to see Overview, Tests and Results. Overview uses saved activity 
 
 ## Product direction and implementation gates
 
+Current approved scope: Sprint 3 / M1 accepted; next M2 Project Environment and M3 Repository Test Execution. The user will supply the real Python pilot and install/test commands. Review the working product at M3 before starting M4 or other additions. Repository execution is not implemented by this planning update.
+
 - [Python M1–M4 repository testing roadmap](REPOSITORY_TESTING_ROADMAP.md)
 - [Language Expansion Roadmap: C#, Java, C/C++ and Embedded](LANGUAGE_EXPANSION_ROADMAP.md)
 - [Sprint 3 File Testing scope and verification](SPRINT3.md)

@@ -1,8 +1,27 @@
 # Repository Testing technical roadmap
 
-Status 4 November 2026. Planning only. No new testing capability is introduced by this document.
+Status 4 November 2026. Approved delivery direction. No new testing capability is introduced by this document.
 
-Implementation update: M1 / Sprint 3 has been authorized. See [SPRINT3.md](SPRINT3.md) for implementation evidence and limits. The current-state description below records the baseline at roadmap approval. [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md) defines the direction beyond Python M4.
+Implementation update: M1 / Sprint 3 is accepted by the user. See [SPRINT3.md](SPRINT3.md) for implementation evidence and limits. The current-state description below records the baseline at roadmap approval. [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md) defines the direction beyond Python M4.
+
+## Active delivery decision: stop and review at M3
+
+The next delivery scope is M2 (Project Environment) followed by M3 (Repository Test Execution). Do not start repository-wide generated testing, language expansion, coverage dashboards, accounts or other additions during this scope. After M3 passes its acceptance gate, review the product with the user before authorizing M4 implementation.
+
+Pilot status: awaiting the real Python repository and its installation/test commands, which the user has elected to supply. Do not substitute the synthetic tracefold-validation repository as evidence of real-project readiness. Initial inspection of ZEDX-AI-Simulator found the application and existing test suite are JavaScript/TypeScript; Python files are auxiliary agent scripts, so it is not the Python pilot.
+
+### Pilot intake and reference run
+
+Record the repository URL, immutable revision, project/component root, supported Python version, installation command, dependency/lock inputs, test extras/plugins and reference test command. Identify services, credentials, datasets, native dependencies or GPU requirements explicitly. Unsupported requirements produce a preparation finding rather than a silent change to the project's intended test selection.
+
+1. Inspect the supplied project and its documented environment before defining its execution profile.
+2. Establish a reference run in an isolated clean environment, recording collection IDs, outcomes and effective configuration. A project with pre-existing failing tests still has a valid reference baseline; failures must remain visible rather than require an artificial all-green result.
+3. Build the approved environment inside isolation, install the actual project and dependencies, and record exact resolved versions and environment identity.
+4. Execute the existing suite through Tracefold using the equivalent profile. Preserve internal imports, conftest, resources and pytest settings. No AI generation is needed for this gate.
+5. Compare collected/executed cases and outcomes with the reference. Explain any differences, represent skipped/error/interrupted cases and verify saved evidence after backend restart.
+6. Re-run the same commit/environment to check repeatability, document the supported profile and review the product with the user at M3.
+
+M2/M3 remain unimplemented until actual runner and UI work is delivered and tested. This intake/approval update does not claim repository execution exists today. A repo-specific implementation estimate follows intake, not a guess before seeing the project's requirements.
 
 ## Direct answer
 
