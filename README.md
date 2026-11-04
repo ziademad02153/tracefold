@@ -166,12 +166,5 @@ The model service supplies test drafts and advisory analysis. Expected behavior 
 
 An execution connects an immutable source snapshot, an approved suite, an environment and native results. Independent identities allow the platform to answer whether the code, tests or environment changed between two outcomes.
 
-## Product scope and runtime support
-
-This README is the **complete platform overview**, not a declaration that every described provider and organizational capability is shipped.
-
-The executable foundation in this repository is **public GitHub + Python 3.11/Linux/pip/pytest**, including repository environments, existing-test execution, bounded repository-context generation, review/approval, saved evidence and same-suite repair replay. Advisory PR review and earlier focused file/function tools are also implemented.
-
-Other language/target profiles, measured coverage, CI/PR execution automation and shared team controls describe the full product scope. They are not enabled by the Python provider or by displaying their logos. Runtime acceptance must be established for each profile.
-
-<sub>Technology logos belong to their respective owners. Vendored Devicon artwork and license: <a href="docs/assets/README.md">asset credits</a>.</sub>
+### Author
+Tracefold is designed and implemented by Ziad Emad Allam.
