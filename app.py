@@ -4,12 +4,15 @@ import re
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from pathlib import Path
+from time import time
+
+from ai_review import review_diff
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from sqlalchemy import JSON, Column, MetaData, String, Table, create_engine, select
+from sqlalchemy import JSON, Column, MetaData, String, Table, create_engine, select, update
 from sqlalchemy.exc import IntegrityError
 
 REPOSITORIES = {
@@ -41,6 +44,12 @@ reports = Table(
     Column("id", String, primary_key=True),
     Column("repo", String, nullable=False),
     Column("snapshot", JSON, nullable=False),
+)
+reviews = Table(
+    "ai_reviews", metadata,
+    Column("report_id", String, primary_key=True),
+    Column("state", JSON, nullable=False),
+    Column("token", String, nullable=False),
 )
 metadata.create_all(engine)
 
@@ -166,7 +175,54 @@ def get_report(report_id: str):
         row = connection.execute(select(reports).where(reports.c.id == report_id)).first()
     if row is None:
         raise HTTPException(404, "Review report was not found.")
-    return {"id": row.id, "repo": row.repo, **row.snapshot}
+    with engine.connect() as connection:
+        review = connection.scalar(select(reviews.c.state).where(reviews.c.report_id == report_id))
+    if review and review["status"] == "running" and time() - review["started"] > 210:
+        review = {**review, "status": "failed", "error": "Review was interrupted. Retry the review."}
+    return {"id": row.id, "repo": row.repo, **row.snapshot, "ai_review": review}
+
+
+@app.post("/api/reports/{report_id}/ai")
+def review_report(report_id: str):
+    report = get_report(report_id)
+    if not report["diff"].strip() or len(report["diff"]) > 28000:
+        raise HTTPException(422, "Choose a nonempty change under 28,000 characters for AI review.")
+    started = time()
+    running = {"status": "running", "started": started}
+    with engine.begin() as connection:
+        try:
+            # A savepoint keeps PostgreSQL usable when a report was already reviewed.
+            with connection.begin_nested():
+                connection.execute(reviews.insert().values(report_id=report_id, state={"status": "new"}, token="initial"))
+        except IntegrityError:
+            pass
+        row = connection.execute(select(reviews).where(reviews.c.report_id == report_id)).one()
+        previous = row.state
+        token = uuid4().hex
+        if previous["status"] == "running" and started - previous["started"] <= 210:
+            raise HTTPException(409, "A review is already running for this report.")
+        changed = connection.execute(
+            update(reviews).where(reviews.c.report_id == report_id, reviews.c.token == row.token)
+            .values(state=running, token=token)
+        )
+        if changed.rowcount != 1:
+            raise HTTPException(409, "A review is already starting. Refresh the report.")
+    try:
+        result = review_diff(report["diff"])
+        state = {"status": "completed", "started": started, "result": result}
+    except ValueError as error:
+        state = {"status": "failed", "started": started, "error": str(error)}
+        if previous.get("result"):
+            state["result"] = previous["result"]
+    except Exception:
+        state = {"status": "failed", "started": started, "error": "Review could not complete. Retry the review."}
+        if previous.get("result"):
+            state["result"] = previous["result"]
+    with engine.begin() as connection:
+        connection.execute(update(reviews).where(
+            reviews.c.report_id == report_id, reviews.c.token == token
+        ).values(state=state))
+    return get_report(report_id)
 
 
 if (root / "dist").is_dir():

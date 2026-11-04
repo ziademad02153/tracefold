@@ -33,3 +33,9 @@ Tracefold is a public GitHub PR importer with durable snapshots and a separate d
 2. Implement and verify comparison without a PR. Start with the existing zero-PR case and two available commits.
 3. On the company network, verify local model access from the intended backend. Record model ID and benchmark results without storing credentials in Git.
 4. Keep the first pilot read-only on GitHub. CI execution and organization-wide rollout require separate milestones.
+
+## Local AI checkpoint — 4 November 2026
+
+Implemented gemma4:e4b review on saved diffs with durable review state, output schema validation, line-location validation, running and failure states, and retry. Browser validation used a real public PR and the demo regression with refresh persistence. Nine automated tests cover the AI adapter, including network and malformed output paths. The initial model test produced a false positive on valid code. More explicit preconditions and review instructions produced an empty result for that valid case on a subsequent request. Wider evaluation remains necessary.
+
+The current AI feature is available before live CI integration. Production multi-user access remains blocked on the access-control milestones above.

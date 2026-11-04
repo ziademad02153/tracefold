@@ -2,7 +2,7 @@
 
 Tracefold is an early engineering review workspace. It imports pull requests from public GitHub repositories and saves a snapshot of the diff and commit IDs for later review.
 
-**Status: local prototype.** The public import uses GitHub data. The bundled demo uses sample check results. Live CI results, private repository access, team authentication and local AI review are planned. Treat this build as a single-user local tool.
+**Status: local prototype.** The public import uses GitHub data. The bundled demo uses sample check results. Local AI diff review uses gemma4:e4b through Ollama. Live CI results, private repository access and team authentication are planned. Treat this build as a single-user local tool.
 
 ## Architecture
 
@@ -45,3 +45,15 @@ SQLite creates an ignored tracefold.db. For PostgreSQL, set POSTGRES_PASSWORD, r
 
 - [Current audit, roadmap and next-session checklist](ROADMAP.md)
 - [Product requirements and acceptance criteria](PRODUCT.md)
+
+## Local AI review
+
+On a saved report, select **Review with AI**. The backend sends only the saved diff to the internal Ollama service and validates the JSON findings and visible new-side line locations before saving. Requests do not execute repository code. Refreshing a running report polls the persisted status. Interrupted reviews can be retried after 210 seconds.
+
+The model is gemma4:e4b. Set OLLAMA_BASE_URL on the backend to override the internal service address. Requests require network access to the model server. Diff inputs are limited to 28,000 characters. Findings are advisory and may include false positives or miss bugs. A timeout or invalid model response is shown with a retry action. A failed retry preserves the previous completed result.
+
+    .venv/Scripts/python.exe -m unittest test_ai_review -v
+
+The local UI was exercised in a browser against octocat/Hello-World PR 37 and the bundled regression. Saved reviews survived refresh. The controls for repository connection, invalid input and report creation were exercised, and mobile overflow checked. Model testing covered one known bug and one valid function. This is a smoke evaluation, not a quality benchmark.
+
+AI state uses an additive ai_reviews table, so existing reports remain readable. Multiple simultaneous review submissions for one report are rejected using a database claim. The synchronous model request is bounded by a 150-second network timeout. Production worker scheduling, schema migrations, authentication and PostgreSQL integration testing remain open.
