@@ -143,3 +143,9 @@ textarea { min-height: 130px; resize: vertical; }
 .history-row, .run-evidence { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
 .run-evidence code { overflow-wrap: anywhere; }
 .session-verdict { padding: 12px 16px; margin-top: 16px; background: #eef3e5; border-radius: 6px; }
+
+.suite-plan { padding-left: 24px; }
+.suite-plan li { margin: 14px 0; overflow-wrap: anywhere; }
+.suite-plan strong { font: 650 14px Consolas, monospace; }
+.suite-counts { display: flex; gap: 16px; flex-wrap: wrap; padding: 12px 16px; background: #f3f5ef; border-radius: 6px; margin: 14px 0; }
+.test-result { border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; overflow-wrap: anywhere; }

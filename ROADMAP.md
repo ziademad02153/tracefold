@@ -47,3 +47,7 @@ See AUDIT.md. Eleven browser scenarios and eleven Python tests passed. Added fai
 
 ## Approved Sprint 1 implementation
 The standalone-function testing path is implemented and verified with a generated test that fails on a defective discount calculation and passes unchanged on a subsequent repair commit. See SPRINT1.md. This advances the previously pending execution milestone for standalone Python functions only. Live CI, project dependencies and shared team deployment remain separate work.
+
+
+## Sprint 2 checkpoint
+Multi-test suites for standalone Python functions are implemented. The acceptance run changed from 2 passed / 3 failed on a known defective revision to 5 passed / 0 failed on its repair, with the same approved suite. Per-test evidence is persisted and Sprint 1 sessions remain readable. See SPRINT2.md. File and repository support still require dependency and environment work; they are separate milestones.

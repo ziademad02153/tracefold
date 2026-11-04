@@ -29,9 +29,14 @@ class WorkbenchTests(unittest.TestCase):
         return next(route.endpoint for route in self.router.routes
                     if route.path == "/api/testing" + suffix and method in route.methods)
 
-    def session(self):
+    def session(self, suite=False):
         from workbench import GenerateRequest
-        with patch("workbench.generate_test", return_value={"scenario":"Discount reduces price","test_code":TEST}), patch("workbench.runner_status",return_value={"image_id":"sha256:test"}):
+        plan = {"scenario":"Discount reduces price","test_code":TEST}
+        if suite:
+            plan["test_code"] = "from target import discount\n" + "\n".join(
+                f"def test_case_{i}():\n    assert discount(100, {i}) == {100-i}\n" for i in range(3))
+            plan["tests"] = [{"name":f"test_case_{i}","scenario":f"Discount of {i} percent"} for i in range(3)]
+        with patch("workbench.generate_test", return_value=plan), patch("workbench.runner_status",return_value={"image_id":"sha256:test"}):
             return self.endpoint("/sessions","POST")(GenerateRequest(
                 repo="owner/repo",ref="bad",path="service.py",function="discount",
                 expected="100 with 20 percent discount returns 80",
@@ -49,6 +54,26 @@ class WorkbenchTests(unittest.TestCase):
             with self.assertRaises(HTTPException):
                 validate_test(code, "discount")
 
+    def test_suite_count_names_duplicates_and_assertions(self):
+        suite = "from target import discount\n" + "\n".join(
+            f"def test_case_{i}():\n    assert discount(100, {i}) == {100-i}\n" for i in range(3))
+        self.assertEqual(validate_test(suite, "discount", 3, 5), suite)
+        for bad in [
+            TEST,
+            suite + "\n" + "\n".join(f"def test_more_{i}():\n assert discount(1, {i}) == 1" for i in range(3)),
+            suite.replace("test_case_2","test_case_1"),
+            suite.replace("discount(100, 2) == 98", "discount(100, 1) == 99"),
+            suite.replace("assert discount(100, 2) == 98","assert True"),
+            suite.replace("def test_case_1():","def test_case_1(*args):"),
+        ]:
+            with self.assertRaises(HTTPException):
+                validate_test(bad, "discount", 3, 5)
+
+    def test_legacy_session_exposes_original_single_test(self):
+        session = self.session()
+        self.assertEqual(session["tests"],[{"name":"test_discount","scenario":"Discount reduces price"}])
+        self.assertEqual(session["test_code"],TEST)
+
     def test_approval_is_required_and_hash_is_verified(self):
         from workbench import Approval, RunRequest
         session = self.session()
@@ -61,7 +86,7 @@ class WorkbenchTests(unittest.TestCase):
 
     def test_two_versions_keep_the_same_saved_test_and_evidence(self):
         from workbench import Approval, RunRequest
-        session=self.session()
+        session=self.session(suite=True)
         self.endpoint("/sessions/{session_id}/approve","POST")(session["id"],Approval(test_hash=session["test_hash"]))
         with patch("workbench.execute_test",side_effect=[
             {"status":"failed","log":"assert 120 == 80","exit_code":1},
@@ -70,11 +95,12 @@ class WorkbenchTests(unittest.TestCase):
             for ref in ("bad","fixed"):
                 result=self.endpoint("/sessions/{session_id}/run","POST")(session["id"],RunRequest(ref=ref,test_hash=session["test_hash"]))
         self.assertEqual([r["status"] for r in result["runs"]],["failed","passed"])
-        self.assertEqual(result["test_code"],TEST)
-        self.assertEqual(result["test_hash"],digest(TEST))
+        self.assertEqual(result["test_code"],session["test_code"])
+        self.assertEqual(len(result["tests"]),3)
+        self.assertEqual(result["test_hash"],digest(session["test_code"]))
         self.assertNotEqual(result["runs"][0]["sha"],result["runs"][1]["sha"])
         for call in runner.call_args_list:
-            self.assertEqual(call.args[1],TEST)
+            self.assertEqual(call.args[1],session["test_code"])
             self.assertEqual(call.args[2],"sha256:test")
         loaded=self.endpoint("/sessions/{session_id}","GET")(session["id"])
         self.assertEqual(loaded["runs"],result["runs"])

@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react'
 import { api } from './api'
 
+type TestEvidence = {name:string; status:'passed'|'failed'|'blocked'|'skipped'|'not_run'; detail:string; seconds:number}
+type TestCase = {name:string;scenario:string}
 type Run = {
   id:string; exit_code:number|null; status:'passed'|'failed'|'blocked'; sha:string; ref:string;
+  tests?:TestEvidence[]; summary?:{total:number;passed:number;failed:number;blocked:number;skipped:number;not_run:number};
   log:string; source:string; seconds?:number; test_hash:string; completed_at:string;
 }
 type Session = {
   id:string; repo:string; state:string; path:string; function:string; expected:string;
   source:string; sha:string; test_code:string; test_hash:string; scenario:string;
-  approved_at:string|null; runs:Run[]; model:string;
+  approved_at:string|null; runs:Run[]; model:string; tests?:TestCase[];
 }
-type History = {id:string; path:string; function:string; created_at:string}
+type History = {test_count?:number; id:string; path:string; function:string; created_at:string}
 type Files = {sha:string; files:string[]}
 type Functions = {sha:string; source:string; functions:string[]}
 
@@ -78,8 +81,11 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
 
   if(initializing)return <p role="status">Loading testing workspace…</p>
   const activeRepo=repo||session?.repo
+  const testCount=session?.tests?.length||1
+  const isSuite=testCount>1
+  const latest=session?.runs.at(-1)
   return <div className="testing-workspace">
-    <p className="page-help">Choose one standalone Python function. Define its expected behavior, review the generated test, then run and save the evidence.</p>
+    <p className="page-help">Choose one standalone Python function. Define its expected behavior, review a generated suite of 3–5 tests, then run all tests and save each result.</p>
     {activeRepo&&<p><a href={'#testing/'+encodeURIComponent(activeRepo)}>{activeRepo}</a></p>}
     {error&&<p className="error" role="alert">{error}</p>}
     {busy&&<p className="progress" role="status">{busy==='generate'?'Gemma is generating your test. This may take a few minutes.':busy==='run'?'Running the approved test in Docker…':'Loading…'}</p>}
@@ -122,47 +128,51 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
         if(location.hash===origin)location.hash='#test-session/'+data.id
       })}}>
         <h2>2. Define the expected behavior</h2>
-        <p>Describe the supported inputs and expected result. Include a concrete example for the assertion.</p>
+        <p>Describe supported inputs, normal behavior and boundary values. Gemma will propose 3–5 distinct tests for your review.</p>
         <label htmlFor="test-expected">Expected behavior</label>
         <textarea id="test-expected" value={expected} minLength={10} maxLength={3000} required disabled={!!busy}
           placeholder="For price 10000 cents and discount 20%, return 8000 cents."
           onChange={event=>setExpected(event.target.value)}/>
-        <button className="button" disabled={!!busy||expected.trim().length<10}>Generate pytest test</button>
+        <button className="button" disabled={!!busy||expected.trim().length<10}>Generate 3–5 pytest tests</button>
       </form>}
       <section className="surface"><h2>Saved test sessions</h2>
         {!history.length&&<p>No saved sessions for this repository yet.</p>}
-        {history.map(item=><div className="row history-row" key={item.id}><div><strong>{item.function}</strong><p>{item.path} · {new Date(item.created_at).toLocaleString()}</p></div>
+        {history.map(item=><div className="row history-row" key={item.id}><div><strong>{item.function}</strong><p>{item.path} · {item.test_count??1} tests · {new Date(item.created_at).toLocaleString()}</p></div>
           <a className="button secondary" href={'#test-session/'+item.id}>Open test session →</a></div>)}
       </section>
     </>}
     {session&&<>
       <section className="surface"><p className="eyebrow">Saved test session</p><h2>{session.function}</h2>
         <p>{session.path} · Initial revision {session.sha.slice(0,12)}</p>
-        {session.runs.length > 0 && <p className="session-verdict"><strong>Latest result: {session.runs[session.runs.length-1].status.toUpperCase()}</strong> · {session.runs.length} saved runs using the same approved test</p>}
+        {session.runs.length > 0 && <p className="session-verdict"><strong>Latest result: {session.runs[session.runs.length-1].status.toUpperCase()}</strong> · {session.runs.length} saved runs using the same approved {isSuite?'suite':'test'}</p>}
+        {latest?.summary&&<div className="suite-counts"><strong>Latest run</strong><span className="passed">{latest.summary.passed} passed</span><span className="failed">{latest.summary.failed} failed</span><span>{latest.summary.blocked+latest.summary.skipped+latest.summary.not_run} incomplete</span>
+          <button className="button secondary" onClick={()=>document.getElementById('execution-evidence')?.scrollIntoView({behavior:'smooth'})}>View per-test results ↓</button></div>}
         <h3>Expected behavior</h3><p>{session.expected}</p>
         <details><summary>Source used to generate the test</summary><pre>{session.source}</pre></details>
       </section>
       <section className="surface">
-        <h2>3. Review generated test</h2><p>{session.scenario}</p>
+        <h2>3. Review generated {isSuite?'tests':'test'} · {testCount} {testCount===1?'test':'tests'}</h2><p>{session.scenario}</p>
+        {isSuite&&<ol className="suite-plan">{session.tests?.map(test=><li key={test.name}><strong>{test.name}</strong><p>{test.scenario}</p></li>)}</ol>}
+        <h3>Code to approve</h3>
         <pre>{session.test_code}</pre>
-        <p className="muted">Generated by {session.model}. Check that the assertion matches your intended behavior before approving it.</p>
+        <p className="muted">Generated by {session.model}. Check that every assertion matches your intended behavior before approving the saved code.</p>
         {!session.approved_at?<button className="button" disabled={!!busy} onClick={()=>void action('approve',async()=>{
           setSession(await api<Session>('testing/sessions/'+session.id+'/approve',{test_hash:session.test_hash}))
-        })}>Approve this test</button>:<p className="passed"><strong>Test approved</strong> · {new Date(session.approved_at).toLocaleString()}</p>}
-        <details><summary>Saved test identity</summary><p className="hash">{session.test_hash}</p></details>
+        })}>{isSuite?'Approve all '+testCount+' tests':'Approve this test'}</button>:<p className="passed"><strong>{isSuite?'Test suite approved':'Test approved'}</strong> · {new Date(session.approved_at).toLocaleString()}</p>}
+        <details><summary>Saved {isSuite?'suite':'test'} identity</summary><p className="hash">{session.test_hash}</p></details>
       </section>
       <form className="surface" onSubmit={event=>{event.preventDefault();void action('run',async()=>{
         setSession(await api<Session>('testing/sessions/'+session.id+'/run',{ref:runRef,test_hash:session.test_hash}))
         window.setTimeout(()=>document.getElementById('execution-evidence')?.scrollIntoView({behavior:'smooth'}),0)
       })}}>
-        <h2>4. Run the same test</h2>
-        <p>Run against the initial revision, then enter the branch or commit containing your fix. The approved test stays unchanged.</p>
+        <h2>4. Run the same {isSuite?'test suite':'test'}</h2>
+        <p>Run against the initial revision, then enter the branch or commit containing your fix. The approved code stays unchanged across runs.</p>
         <label htmlFor="run-ref">Version to run — branch or commit ID</label>
         <div className="row"><input id="run-ref" value={runRef} required disabled={!!busy||session.state==='running'} onChange={event=>setRunRef(event.target.value)}/>
-          <button className="button" disabled={!!busy||!session.approved_at||session.state==='running'}>Run approved test</button></div>
-        {!session.approved_at&&<p>Review and approve the test above to enable execution.</p>}
+          <button className="button" disabled={!!busy||!session.approved_at||session.state==='running'}>{isSuite?'Run all tests':'Run approved test'}</button></div>
+        {!session.approved_at&&<p>Review and approve all generated tests above to enable execution.</p>}
         {session.state==='running'&&<p role="status">Run in progress. This page will refresh the saved result automatically.</p>}
-        {session.state==='interrupted'&&<p className="error">The last run was interrupted. Retry the same test.</p>}
+        {session.state==='interrupted'&&<p className="error">The last run was interrupted. Retry the same saved test code.</p>}
         {runner&&!runner.ready&&<p className="error">{runner.message}</p>}
       </form>
       <section className="surface" id="execution-evidence">
@@ -172,8 +182,15 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
         {session.runs.map((run,index)=><article className="run-evidence" key={run.id}>
           <div className="row"><h3>Run {index+1} · <span className={run.status==='passed'?'passed':run.status==='failed'?'failed':''}>{run.status.toUpperCase()}</span></h3><span>{run.seconds!==undefined?run.seconds+'s':''}</span></div>
           <p>{run.ref} → <code>{run.sha.slice(0,12)}</code> · {new Date(run.completed_at).toLocaleString()}</p>
-          <p className="muted">{run.test_hash===session.test_hash?'Same saved test':'Different test identity'} · Exit code {run.exit_code??'unavailable'}</p>
-          <pre>{run.log}</pre>
+          <p className="muted">{run.test_hash===session.test_hash?'Same saved '+(isSuite?'suite':'test'):'Different test identity'} · Exit code {run.exit_code??'unavailable'}</p>
+          {run.summary&&<p className="suite-counts"><strong>{run.summary.total} tests</strong><span className="passed">{run.summary.passed} passed</span><span className="failed">{run.summary.failed} failed</span><span>{run.summary.blocked} blocked · {run.summary.skipped} skipped · {run.summary.not_run} not run</span></p>}
+          {run.tests?.map(test=><details className="test-result" key={test.name} open={test.status!=='passed'}>
+            <summary><strong className={test.status==='passed'?'passed':test.status==='failed'?'failed':''}>{test.status.replace('_',' ').toUpperCase()}</strong> · {test.name} · {test.seconds}s</summary>
+            <p>{session.tests?.find(item=>item.name===test.name)?.scenario}</p>
+            <pre>{test.detail}</pre>
+          </details>)}
+          {!run.tests&&<p className="muted">Per-test evidence was not recorded for this earlier run. The original output is preserved below.</p>}
+          <details><summary>Full pytest output</summary><pre>{run.log}</pre></details>
           <details><summary>Source executed in this run</summary><pre>{run.source}</pre></details>
         </article>)}
       </section>

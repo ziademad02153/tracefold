@@ -80,3 +80,8 @@ Select **Test a function** on a repository card. Choose a branch, file and funct
     docker build -t tracefold-pytest:1 runner
 
 No application data or credentials are mounted into test containers. Docker must be running. Tests that require external project packages or helper modules are outside this standalone-function workflow.
+
+
+## Sprint 2 suites
+
+New sessions generate 3–5 pytest tests for the selected standalone function. Review their scenarios and code, approve the entire suite, then select **Run all tests**. Each saved run shows per-test status, duration and evidence. Reuse the same saved suite on a repair branch. See [SPRINT2.md](SPRINT2.md) for the verified five-test acceptance result and current limitations.
