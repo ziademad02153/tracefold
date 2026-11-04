@@ -1,0 +1,437 @@
+[
+  {
+    "case": "zero-tests",
+    "stage": "execution",
+    "run": {
+      "id": "030b6a643fb24b18bebf81a2769add2e",
+      "exit_code": 5,
+      "collected": [],
+      "tests": [],
+      "collection_errors": [
+        {
+          "detail": "Collection and execution inventories differ, or collection did not complete."
+        }
+      ],
+      "collection_skips": [],
+      "effective_config": {
+        "rootdir": "/tmp/collect/project",
+        "config_file": "/tmp/collect/project/pyproject.toml",
+        "args": [
+          "-p",
+          "no:cacheprovider",
+          "-q",
+          "-k",
+          "tracefold_case_that_does_not_exist",
+          "--collect-only",
+          "-q"
+        ],
+        "pytest": "8.1.1",
+        "plugins": [
+          "137016096328592",
+          "pytestconfig",
+          "mark",
+          "main",
+          "runner",
+          "fixtures",
+          "helpconfig",
+          "python",
+          "terminal",
+          "debugging",
+          "unittest",
+          "capture",
+          "skipping",
+          "legacypath",
+          "tmpdir",
+          "monkeypatch",
+          "recwarn",
+          "pastebin",
+          "assertion",
+          "junitxml",
+          "doctest",
+          "freeze_support",
+          "setuponly",
+          "setupplan",
+          "warnings",
+          "logging",
+          "reports",
+          "python_path",
+          "unraisableexception",
+          "threadexception",
+          "faulthandler",
+          "137016096328400",
+          "capturemanager",
+          "session",
+          "legacypath-tmpdir",
+          "terminalreporter",
+          "logging-plugin"
+        ]
+      },
+      "inventory_matches": false,
+      "log": "\n\n",
+      "artifacts": [
+        {
+          "media_type": "application/json",
+          "name": "native-test-evidence.json",
+          "sha256": "3cea68dddd2faea5b274faf54267a4fc42b61d41414b0994745c87edbaa86080",
+          "content": "{\"exit_code\": 5, \"collected\": [], \"tests\": [], \"collection_errors\": [], \"collection_skips\": [], \"effective_config\": {\"rootdir\": \"/tmp/collect/project\", \"config_file\": \"/tmp/collect/project/pyproject.toml\", \"args\": [\"-p\", \"no:cacheprovider\", \"-q\", \"-k\", \"tracefold_case_that_does_not_exist\", \"--collect-only\", \"-q\"], \"pytest\": \"8.1.1\", \"plugins\": [\"137016096328592\", \"pytestconfig\", \"mark\", \"main\", \"runner\", \"fixtures\", \"helpconfig\", \"python\", \"terminal\", \"debugging\", \"unittest\", \"capture\", \"skipping\", \"legacypath\", \"tmpdir\", \"monkeypatch\", \"recwarn\", \"pastebin\", \"assertion\", \"junitxml\", \"doctest\", \"freeze_support\", \"setuponly\", \"setupplan\", \"warnings\", \"logging\", \"reports\", \"python_path\", \"unraisableexception\", \"threadexception\", \"faulthandler\", \"137016096328400\", \"capturemanager\", \"session\", \"legacypath-tmpdir\", \"terminalreporter\", \"logging-plugin\"]}, \"inventory_matches\": false}"
+        }
+      ],
+      "status": "blocked",
+      "error": "No tests were collected. Inspect selection, collection errors and skipped modules.",
+      "summary": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0,
+        "xfailed": 0,
+        "xpassed": 0,
+        "not_run": 0
+      },
+      "source": {
+        "repository": "pallets/itsdangerous",
+        "revision": "096c8d42545d3b68ea21a4f890fb2b2d8979c0bd",
+        "content_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+        "file_count": 60
+      },
+      "profile_hash": "4f05d6f4262a2431309593425c93b0a7fd2a9234fb7438726dde903dc8446381",
+      "environment_id": "sha256:ec9ad13ec4612dbb1a4bbdd169c30453f371e1c4295399136265f480c0ee39a7",
+      "provider_id": "python-pytest",
+      "environment_snapshot": {
+        "status": "ready",
+        "id": "sha256:ec9ad13ec4612dbb1a4bbdd169c30453f371e1c4295399136265f480c0ee39a7",
+        "target": "docker-linux",
+        "base_image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "source_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+        "profile_inputs_hash": "c1fbb81a3aeb879f6840eb48d54351a77a9082680ef1fa9278d2bb5c3bb0b6ab",
+        "manifest": {
+          "python": "3.11.18",
+          "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+          "packages": [
+            {
+              "name": "build",
+              "version": "1.2.1"
+            },
+            {
+              "name": "flit_core",
+              "version": "3.12.0"
+            },
+            {
+              "name": "freezegun",
+              "version": "1.4.0"
+            },
+            {
+              "name": "iniconfig",
+              "version": "2.0.0"
+            },
+            {
+              "name": "itsdangerous",
+              "version": "2.2.0"
+            },
+            {
+              "name": "packaging",
+              "version": "24.0"
+            },
+            {
+              "name": "pip",
+              "version": "24.0"
+            },
+            {
+              "name": "pluggy",
+              "version": "1.4.0"
+            },
+            {
+              "name": "pyproject_hooks",
+              "version": "1.0.0"
+            },
+            {
+              "name": "pytest",
+              "version": "8.1.1"
+            },
+            {
+              "name": "python-dateutil",
+              "version": "2.9.0.post0"
+            },
+            {
+              "name": "setuptools",
+              "version": "79.0.1"
+            },
+            {
+              "name": "six",
+              "version": "1.16.0"
+            }
+          ],
+          "executor_sha256": "52636f6418348f71b0599fc028cde6706eac0daa30b7156e050af2004430a18d",
+          "preparation_sha256": "106106e2b7f3990a40451476f03a035d0b80e300ab94e9dff117a25a2d0880f8",
+          "wheels": [
+            {
+              "name": "build-1.2.1-py3-none-any.whl",
+              "sha256": "75e10f767a433d9a86e50d83f418e83efc18ede923ee5ff7df93b6cb0306c5d4"
+            },
+            {
+              "name": "flit_core-3.12.0-py3-none-any.whl",
+              "sha256": "e7a0304069ea895172e3c7bb703292e992c5d1555dd1233ab7b5621b5b69e62c"
+            },
+            {
+              "name": "freezegun-1.4.0-py3-none-any.whl",
+              "sha256": "55e0fc3c84ebf0a96a5aa23ff8b53d70246479e9a68863f1fcac5a3e52f19dd6"
+            },
+            {
+              "name": "iniconfig-2.0.0-py3-none-any.whl",
+              "sha256": "b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"
+            },
+            {
+              "name": "packaging-24.0-py3-none-any.whl",
+              "sha256": "2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"
+            },
+            {
+              "name": "pluggy-1.4.0-py3-none-any.whl",
+              "sha256": "7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981"
+            },
+            {
+              "name": "pyproject_hooks-1.0.0-py3-none-any.whl",
+              "sha256": "283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8"
+            },
+            {
+              "name": "pytest-8.1.1-py3-none-any.whl",
+              "sha256": "2a8386cfc11fa9d2c50ee7b2a57e7d898ef90470a7a34c4b949ff59662bb78b7"
+            },
+            {
+              "name": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+              "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+            },
+            {
+              "name": "six-1.16.0-py2.py3-none-any.whl",
+              "sha256": "8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
+            }
+          ]
+        },
+        "log": "Collecting build==1.2.1\n  Downloading build-1.2.1-py3-none-any.whl.metadata (4.3 kB)\nCollecting flit_core<4\n  Downloading flit_core-3.12.0-py3-none-any.whl.metadata (888 bytes)\nCollecting freezegun==1.4.0\n  Downloading freezegun-1.4.0-py3-none-any.whl.metadata (11 kB)\nCollecting iniconfig==2.0.0\n  Downloading iniconfig-2.0.0-py3-none-any.whl.metadata (2.6 kB)\nCollecting packaging==24.0\n  Downloading packaging-24.0-py3-none-any.whl.metadata (3.2 kB)\nCollecting pluggy==1.4.0\n  Downloading pluggy-1.4.0-py3-none-any.whl.metadata (4.3 kB)\nCollecting pyproject-hooks==1.0.0\n  Downloading pyproject_hooks-1.0.0-py3-none-any.whl.metadata (1.3 kB)\nCollecting pytest==8.1.1\n  Downloading pytest-8.1.1-py3-none-any.whl.metadata (7.6 kB)\nCollecting python-dateutil==2.9.0.post0\n  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)\nCollecting six==1.16.0\n  Downloading six-1.16.0-py2.py3-none-any.whl.metadata (1.8 kB)\nDownloading build-1.2.1-py3-none-any.whl (21 kB)\nDownloading freezegun-1.4.0-py3-none-any.whl (17 kB)\nDownloading iniconfig-2.0.0-py3-none-any.whl (5.9 kB)\nDownloading packaging-24.0-py3-none-any.whl (53 kB)\n   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 53.5/53.5 kB 452.8 kB/s eta 0:00:00\nDownloading pluggy-1.4.0-py3-none-any.whl (20 kB)\nDownloading pyproject_hooks-1.0.0-py3-none-any.whl (9.3 kB)\nDownloading pytest-8.1.1-py3-none-any.whl (337 kB)\n   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 337.4/337.4 kB 445.3 kB/s eta 0:00:00\nDownloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)\n   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 229.9/229.9 kB 729.9 kB/s eta 0:00:00\nDownloading six-1.16.0-py2.py3-none-any.whl (11 kB)\nDownloading flit_core-3.12.0-py3-none-any.whl (45 kB)\n   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 45.6/45.6 kB 1.0 MB/s eta 0:00:00\nSaved /tmp/wheels/build-1.2.1-py3-none-any.whl\nSaved /tmp/wheels/freezegun-1.4.0-py3-none-any.whl\nSaved /tmp/wheels/iniconfig-2.0.0-py3-none-any.whl\nSaved /tmp/wheels/packaging-24.0-py3-none-any.whl\nSaved /tmp/wheels/pluggy-1.4.0-py3-none-any.whl\nSaved /tmp/wheels/pyproject_hooks-1.0.0-py3-none-any.whl\nSaved /tmp/wheels/pytest-8.1.1-py3-none-any.whl\nSaved /tmp/wheels/python_dateutil-2.9.0.post0-py2.py3-none-any.whl\nSaved /tmp/wheels/six-1.16.0-py2.py3-none-any.whl\nSaved /tmp/wheels/flit_core-3.12.0-py3-none-any.whl\nSuccessfully downloaded build freezegun iniconfig packaging pluggy pyproject-hooks pytest python-dateutil six flit_core\n\nLooking in links: /wheels\nProcessing /wheels/build-1.2.1-py3-none-any.whl\nProcessing /wheels/flit_core-3.12.0-py3-none-any.whl\nProcessing /wheels/freezegun-1.4.0-py3-none-any.whl\nProcessing /wheels/iniconfig-2.0.0-py3-none-any.whl\nProcessing /wheels/packaging-24.0-py3-none-any.whl\nProcessing /wheels/pluggy-1.4.0-py3-none-any.whl\nProcessing /wheels/pyproject_hooks-1.0.0-py3-none-any.whl\nProcessing /wheels/pytest-8.1.1-py3-none-any.whl\nProcessing /wheels/python_dateutil-2.9.0.post0-py2.py3-none-any.whl\nProcessing /wheels/six-1.16.0-py2.py3-none-any.whl\nInstalling collected packages: six, pyproject-hooks, pluggy, packaging, iniconfig, flit_core, python-dateutil, pytest, build, freezegun\nSuccessfully installed build-1.2.1 flit_core-3.12.0 freezegun-1.4.0 iniconfig-2.0.0 packaging-24.0 pluggy-1.4.0 pyproject-hooks-1.0.0 pytest-8.1.1 python-dateutil-2.9.0.post0 six-1.16.0\nLooking in links: /wheels\nProcessing /tmp/project\n  Preparing metadata (pyproject.toml): started\n  Preparing metadata (pyproject.toml): finished with status 'done'\nBuilding wheels for collected packages: itsdangerous\n  Building wheel for itsdangerous (pyproject.toml): started\n  Building wheel for itsdangerous (pyproject.toml): finished with status 'done'\n  Created wheel for itsdangerous: filename=itsdangerous-2.2.0-py3-none-any.whl size=16276 sha256=f46c69f51ed59b14e3374bb9a059174dbc26eeafca166e5ebaae642fb708dec5\n  Stored in directory: /tmp/pip-ephem-wheel-cache-1h4cry0_/wheels/e7/4c/5a/52ab2205c519262bb22fd0abe89e5186fc046cb07d8a7bb988\nSuccessfully built itsdangerous\nInstalling collected packages: itsdangerous\nSuccessfully installed itsdangerous-2.2.0\nNo broken requirements found.\n\nTRACEFOLD-PREPARE-8ee28d72b67d4edfa4f8c7c6c5392cb4:{\"python\": \"3.11.18\", \"platform\": \"Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.41\", \"packages\": [{\"name\": \"build\", \"version\": \"1.2.1\"}, {\"name\": \"flit_core\", \"version\": \"3.12.0\"}, {\"name\": \"freezegun\", \"version\": \"1.4.0\"}, {\"name\": \"iniconfig\", \"version\": \"2.0.0\"}, {\"name\": \"itsdangerous\", \"version\": \"2.2.0\"}, {\"name\": \"packaging\", \"version\": \"24.0\"}, {\"name\": \"pip\", \"version\": \"24.0\"}, {\"name\": \"pluggy\", \"version\": \"1.4.0\"}, {\"name\": \"pyproject_hooks\", \"version\": \"1.0.0\"}, {\"name\": \"pytest\", \"version\": \"8.1.1\"}, {\"name\": \"python-dateutil\", \"version\": \"2.9.0.post0\"}, {\"name\": \"setuptools\", \"version\": \"79.0.1\"}, {\"name\": \"six\", \"version\": \"1.16.0\"}], \"executor_sha256\": \"52636f6418348f71b0599fc028cde6706eac0daa30b7156e050af2004430a18d\", \"preparation_sha256\": \"106106e2b7f3990a40451476f03a035d0b80e300ab94e9dff117a25a2d0880f8\", \"wheels\": [{\"name\": \"build-1.2.1-py3-none-any.whl\", \"sha256\": \"75e10f767a433d9a86e50d83f418e83efc18ede923ee5ff7df93b6cb0306c5d4\"}, {\"name\": \"flit_core-3.12.0-py3-none-any.whl\", \"sha256\": \"e7a0304069ea895172e3c7bb703292e992c5d1555dd1233ab7b5621b5b69e62c\"}, {\"name\": \"freezegun-1.4.0-py3-none-any.whl\", \"sha256\": \"55e0fc3c84ebf0a96a5aa23ff8b53d70246479e9a68863f1fcac5a3e52f19dd6\"}, {\"name\": \"iniconfig-2.0.0-py3-none-any.whl\", \"sha256\": \"b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374\"}, {\"name\": \"packaging-24.0-py3-none-any.whl\", \"sha256\": \"2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5\"}, {\"name\": \"pluggy-1.4.0-py3-none-any.whl\", \"sha256\": \"7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981\"}, {\"name\": \"pyproject_hooks-1.0.0-py3-none-any.whl\", \"sha256\": \"283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8\"}, {\"name\": \"pytest-8.1.1-py3-none-any.whl\", \"sha256\": \"2a8386cfc11fa9d2c50ee7b2a57e7d898ef90470a7a34c4b949ff59662bb78b7\"}, {\"name\": \"python_dateutil-2.9.0.post0-py2.py3-none-any.whl\", \"sha256\": \"a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427\"}, {\"name\": \"six-1.16.0-py2.py3-none-any.whl\", \"sha256\": \"8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254\"}]}\n",
+        "dependency_mode": "registry wheels; resolved distribution versions and wheel hashes recorded"
+      },
+      "provider_version": "1",
+      "started_at": "2026-11-04T12:18:34.289108+00:00",
+      "completed_at": "2026-11-04T12:18:36.339529+00:00"
+    }
+  },
+  {
+    "case": "collection-error",
+    "stage": "execution",
+    "run": {
+      "id": "2d8d527b80bd45609578764958423374",
+      "exit_code": 4,
+      "collected": [],
+      "tests": [],
+      "collection_errors": [
+        {
+          "detail": "Collection and execution inventories differ, or collection did not complete."
+        }
+      ],
+      "collection_skips": [],
+      "effective_config": {
+        "rootdir": "/tmp/collect/project",
+        "config_file": "/tmp/collect/project/pyproject.toml",
+        "args": [
+          "-p",
+          "no:cacheprovider",
+          "-q",
+          "tracefold_path_that_does_not_exist",
+          "--collect-only",
+          "-q"
+        ],
+        "pytest": "8.1.1",
+        "plugins": [
+          "130227880105296",
+          "pytestconfig",
+          "mark",
+          "main",
+          "runner",
+          "fixtures",
+          "helpconfig",
+          "python",
+          "terminal",
+          "debugging",
+          "unittest",
+          "capture",
+          "skipping",
+          "legacypath",
+          "tmpdir",
+          "monkeypatch",
+          "recwarn",
+          "pastebin",
+          "assertion",
+          "junitxml",
+          "doctest",
+          "freeze_support",
+          "setuponly",
+          "setupplan",
+          "warnings",
+          "logging",
+          "reports",
+          "python_path",
+          "unraisableexception",
+          "threadexception",
+          "faulthandler",
+          "130227880105104",
+          "capturemanager",
+          "session",
+          "legacypath-tmpdir",
+          "terminalreporter",
+          "logging-plugin"
+        ]
+      },
+      "inventory_matches": false,
+      "log": "ERROR: file or directory not found: tracefold_path_that_does_not_exist\n\n\n\n",
+      "artifacts": [
+        {
+          "media_type": "application/json",
+          "name": "native-test-evidence.json",
+          "sha256": "f20e5a03f30c62380eb6966803405cf545e1767dd66638f2cb0a44e9e099662a",
+          "content": "{\"exit_code\": 4, \"collected\": [], \"tests\": [], \"collection_errors\": [], \"collection_skips\": [], \"effective_config\": {\"rootdir\": \"/tmp/collect/project\", \"config_file\": \"/tmp/collect/project/pyproject.toml\", \"args\": [\"-p\", \"no:cacheprovider\", \"-q\", \"tracefold_path_that_does_not_exist\", \"--collect-only\", \"-q\"], \"pytest\": \"8.1.1\", \"plugins\": [\"130227880105296\", \"pytestconfig\", \"mark\", \"main\", \"runner\", \"fixtures\", \"helpconfig\", \"python\", \"terminal\", \"debugging\", \"unittest\", \"capture\", \"skipping\", \"legacypath\", \"tmpdir\", \"monkeypatch\", \"recwarn\", \"pastebin\", \"assertion\", \"junitxml\", \"doctest\", \"freeze_support\", \"setuponly\", \"setupplan\", \"warnings\", \"logging\", \"reports\", \"python_path\", \"unraisableexception\", \"threadexception\", \"faulthandler\", \"130227880105104\", \"capturemanager\", \"session\", \"legacypath-tmpdir\", \"terminalreporter\", \"logging-plugin\"]}, \"inventory_matches\": false}"
+        }
+      ],
+      "status": "blocked",
+      "error": "No tests were collected. Inspect selection, collection errors and skipped modules.",
+      "summary": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0,
+        "xfailed": 0,
+        "xpassed": 0,
+        "not_run": 0
+      },
+      "source": {
+        "repository": "pallets/itsdangerous",
+        "revision": "096c8d42545d3b68ea21a4f890fb2b2d8979c0bd",
+        "content_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+        "file_count": 60
+      },
+      "profile_hash": "7852fc08157b859f3178667c9841dd4f709f8632eb71cc640e4a36d821ccec25",
+      "environment_id": "sha256:8d0fe958a2c08db3209a3766c15b33afbf4194de214ed41d88e943894a9bd654",
+      "provider_id": "python-pytest",
+      "environment_snapshot": {
+        "status": "ready",
+        "id": "sha256:8d0fe958a2c08db3209a3766c15b33afbf4194de214ed41d88e943894a9bd654",
+        "target": "docker-linux",
+        "base_image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "source_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+        "profile_inputs_hash": "b4c9d947d763ffb34a1f9697cd2649a714abd253e46c485640169eca4e4b2130",
+        "manifest": {
+          "python": "3.11.18",
+          "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+          "packages": [
+            {
+              "name": "build",
+              "version": "1.2.1"
+            },
+            {
+              "name": "flit_core",
+              "version": "3.12.0"
+            },
+            {
+              "name": "freezegun",
+              "version": "1.4.0"
+            },
+            {
+              "name": "iniconfig",
+              "version": "2.0.0"
+            },
+            {
+              "name": "itsdangerous",
+              "version": "2.2.0"
+            },
+            {
+              "name": "packaging",
+              "version": "24.0"
+            },
+            {
+              "name": "pip",
+              "version": "24.0"
+            },
+            {
+              "name": "pluggy",
+              "version": "1.4.0"
+            },
+            {
+              "name": "pyproject_hooks",
+              "version": "1.0.0"
+            },
+            {
+              "name": "pytest",
+              "version": "8.1.1"
+            },
+            {
+              "name": "python-dateutil",
+              "version": "2.9.0.post0"
+            },
+            {
+              "name": "setuptools",
+              "version": "79.0.1"
+            },
+            {
+              "name": "six",
+              "version": "1.16.0"
+            }
+          ],
+          "executor_sha256": "52636f6418348f71b0599fc028cde6706eac0daa30b7156e050af2004430a18d",
+          "preparation_sha256": "106106e2b7f3990a40451476f03a035d0b80e300ab94e9dff117a25a2d0880f8",
+          "wheels": [
+            {
+              "name": "build-1.2.1-py3-none-any.whl",
+              "sha256": "75e10f767a433d9a86e50d83f418e83efc18ede923ee5ff7df93b6cb0306c5d4"
+            },
+            {
+              "name": "flit_core-3.12.0-py3-none-any.whl",
+              "sha256": "e7a0304069ea895172e3c7bb703292e992c5d1555dd1233ab7b5621b5b69e62c"
+            },
+            {
+              "name": "freezegun-1.4.0-py3-none-any.whl",
+              "sha256": "55e0fc3c84ebf0a96a5aa23ff8b53d70246479e9a68863f1fcac5a3e52f19dd6"
+            },
+            {
+              "name": "iniconfig-2.0.0-py3-none-any.whl",
+              "sha256": "b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"
+            },
+            {
+              "name": "packaging-24.0-py3-none-any.whl",
+              "sha256": "2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"
+            },
+            {
+              "name": "pluggy-1.4.0-py3-none-any.whl",
+              "sha256": "7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981"
+            },
+            {
+              "name": "pyproject_hooks-1.0.0-py3-none-any.whl",
+              "sha256": "283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8"
+            },
+            {
+              "name": "pytest-8.1.1-py3-none-any.whl",
+              "sha256": "2a8386cfc11fa9d2c50ee7b2a57e7d898ef90470a7a34c4b949ff59662bb78b7"
+            },
+            {
+              "name": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+              "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+            },
+            {
+              "name": "six-1.16.0-py2.py3-none-any.whl",
+              "sha256": "8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
+            }
+          ]
+        },
+        "log": "Collecting build==1.2.1\n  Downloading build-1.2.1-py3-none-any.whl.metadata (4.3 kB)\nCollecting flit_core<4\n  Downloading flit_core-3.12.0-py3-none-any.whl.metadata (888 bytes)\nCollecting freezegun==1.4.0\n  Downloading freezegun-1.4.0-py3-none-any.whl.metadata (11 kB)\nCollecting iniconfig==2.0.0\n  Downloading iniconfig-2.0.0-py3-none-any.whl.metadata (2.6 kB)\nCollecting packaging==24.0\n  Downloading packaging-24.0-py3-none-any.whl.metadata (3.2 kB)\nCollecting pluggy==1.4.0\n  Downloading pluggy-1.4.0-py3-none-any.whl.metadata (4.3 kB)\nCollecting pyproject-hooks==1.0.0\n  Downloading pyproject_hooks-1.0.0-py3-none-any.whl.metadata (1.3 kB)\nCollecting pytest==8.1.1\n  Downloading pytest-8.1.1-py3-none-any.whl.metadata (7.6 kB)\nCollecting python-dateutil==2.9.0.post0\n  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)\nCollecting six==1.16.0\n  Downloading six-1.16.0-py2.py3-none-any.whl.metadata (1.8 kB)\nDownloading build-1.2.1-py3-none-any.whl (21 kB)\nDownloading freezegun-1.4.0-py3-none-any.whl (17 kB)\nDownloading iniconfig-2.0.0-py3-none-any.whl (5.9 kB)\nDownloading packaging-24.0-py3-none-any.whl (53 kB)\n   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 53.5/53.5 kB 704.1 kB/s eta 0:00:00\nDownloading pluggy-1.4.0-py3-none-any.whl (20 kB)\nDownloading pyproject_hooks-1.0.0-py3-none-any.whl (9.3 kB)\nDownloading pytest-8.1.1-py3-none-any.whl (337 kB)\n   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 337.4/337.4 kB 2.7 MB/s eta 0:00:00\nDownloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)\n   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 229.9/229.9 kB 10.9 MB/s eta 0:00:00\nDownloading six-1.16.0-py2.py3-none-any.whl (11 kB)\nDownloading flit_core-3.12.0-py3-none-any.whl (45 kB)\n   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 45.6/45.6 kB 233.3 MB/s eta 0:00:00\nSaved /tmp/wheels/build-1.2.1-py3-none-any.whl\nSaved /tmp/wheels/freezegun-1.4.0-py3-none-any.whl\nSaved /tmp/wheels/iniconfig-2.0.0-py3-none-any.whl\nSaved /tmp/wheels/packaging-24.0-py3-none-any.whl\nSaved /tmp/wheels/pluggy-1.4.0-py3-none-any.whl\nSaved /tmp/wheels/pyproject_hooks-1.0.0-py3-none-any.whl\nSaved /tmp/wheels/pytest-8.1.1-py3-none-any.whl\nSaved /tmp/wheels/python_dateutil-2.9.0.post0-py2.py3-none-any.whl\nSaved /tmp/wheels/six-1.16.0-py2.py3-none-any.whl\nSaved /tmp/wheels/flit_core-3.12.0-py3-none-any.whl\nSuccessfully downloaded build freezegun iniconfig packaging pluggy pyproject-hooks pytest python-dateutil six flit_core\n\nLooking in links: /wheels\nProcessing /wheels/build-1.2.1-py3-none-any.whl\nProcessing /wheels/flit_core-3.12.0-py3-none-any.whl\nProcessing /wheels/freezegun-1.4.0-py3-none-any.whl\nProcessing /wheels/iniconfig-2.0.0-py3-none-any.whl\nProcessing /wheels/packaging-24.0-py3-none-any.whl\nProcessing /wheels/pluggy-1.4.0-py3-none-any.whl\nProcessing /wheels/pyproject_hooks-1.0.0-py3-none-any.whl\nProcessing /wheels/pytest-8.1.1-py3-none-any.whl\nProcessing /wheels/python_dateutil-2.9.0.post0-py2.py3-none-any.whl\nProcessing /wheels/six-1.16.0-py2.py3-none-any.whl\nInstalling collected packages: six, pyproject-hooks, pluggy, packaging, iniconfig, flit_core, python-dateutil, pytest, build, freezegun\nSuccessfully installed build-1.2.1 flit_core-3.12.0 freezegun-1.4.0 iniconfig-2.0.0 packaging-24.0 pluggy-1.4.0 pyproject-hooks-1.0.0 pytest-8.1.1 python-dateutil-2.9.0.post0 six-1.16.0\nLooking in links: /wheels\nProcessing /tmp/project\n  Preparing metadata (pyproject.toml): started\n  Preparing metadata (pyproject.toml): finished with status 'done'\nBuilding wheels for collected packages: itsdangerous\n  Building wheel for itsdangerous (pyproject.toml): started\n  Building wheel for itsdangerous (pyproject.toml): finished with status 'done'\n  Created wheel for itsdangerous: filename=itsdangerous-2.2.0-py3-none-any.whl size=16276 sha256=f46c69f51ed59b14e3374bb9a059174dbc26eeafca166e5ebaae642fb708dec5\n  Stored in directory: /tmp/pip-ephem-wheel-cache-o209vj0v/wheels/e7/4c/5a/52ab2205c519262bb22fd0abe89e5186fc046cb07d8a7bb988\nSuccessfully built itsdangerous\nInstalling collected packages: itsdangerous\nSuccessfully installed itsdangerous-2.2.0\nNo broken requirements found.\n\nTRACEFOLD-PREPARE-61e1ca9ad57b40479312c9c9cc49492f:{\"python\": \"3.11.18\", \"platform\": \"Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.41\", \"packages\": [{\"name\": \"build\", \"version\": \"1.2.1\"}, {\"name\": \"flit_core\", \"version\": \"3.12.0\"}, {\"name\": \"freezegun\", \"version\": \"1.4.0\"}, {\"name\": \"iniconfig\", \"version\": \"2.0.0\"}, {\"name\": \"itsdangerous\", \"version\": \"2.2.0\"}, {\"name\": \"packaging\", \"version\": \"24.0\"}, {\"name\": \"pip\", \"version\": \"24.0\"}, {\"name\": \"pluggy\", \"version\": \"1.4.0\"}, {\"name\": \"pyproject_hooks\", \"version\": \"1.0.0\"}, {\"name\": \"pytest\", \"version\": \"8.1.1\"}, {\"name\": \"python-dateutil\", \"version\": \"2.9.0.post0\"}, {\"name\": \"setuptools\", \"version\": \"79.0.1\"}, {\"name\": \"six\", \"version\": \"1.16.0\"}], \"executor_sha256\": \"52636f6418348f71b0599fc028cde6706eac0daa30b7156e050af2004430a18d\", \"preparation_sha256\": \"106106e2b7f3990a40451476f03a035d0b80e300ab94e9dff117a25a2d0880f8\", \"wheels\": [{\"name\": \"build-1.2.1-py3-none-any.whl\", \"sha256\": \"75e10f767a433d9a86e50d83f418e83efc18ede923ee5ff7df93b6cb0306c5d4\"}, {\"name\": \"flit_core-3.12.0-py3-none-any.whl\", \"sha256\": \"e7a0304069ea895172e3c7bb703292e992c5d1555dd1233ab7b5621b5b69e62c\"}, {\"name\": \"freezegun-1.4.0-py3-none-any.whl\", \"sha256\": \"55e0fc3c84ebf0a96a5aa23ff8b53d70246479e9a68863f1fcac5a3e52f19dd6\"}, {\"name\": \"iniconfig-2.0.0-py3-none-any.whl\", \"sha256\": \"b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374\"}, {\"name\": \"packaging-24.0-py3-none-any.whl\", \"sha256\": \"2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5\"}, {\"name\": \"pluggy-1.4.0-py3-none-any.whl\", \"sha256\": \"7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981\"}, {\"name\": \"pyproject_hooks-1.0.0-py3-none-any.whl\", \"sha256\": \"283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8\"}, {\"name\": \"pytest-8.1.1-py3-none-any.whl\", \"sha256\": \"2a8386cfc11fa9d2c50ee7b2a57e7d898ef90470a7a34c4b949ff59662bb78b7\"}, {\"name\": \"python_dateutil-2.9.0.post0-py2.py3-none-any.whl\", \"sha256\": \"a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427\"}, {\"name\": \"six-1.16.0-py2.py3-none-any.whl\", \"sha256\": \"8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254\"}]}\n",
+        "dependency_mode": "registry wheels; resolved distribution versions and wheel hashes recorded"
+      },
+      "provider_version": "1",
+      "started_at": "2026-11-04T12:18:51.591280+00:00",
+      "completed_at": "2026-11-04T12:18:53.467421+00:00"
+    }
+  },
+  {
+    "case": "missing-dependency",
+    "stage": "preparation",
+    "state": "blocked",
+    "error": "Dependency download failed; no source builds or fallback runtime were attempted.\nCollecting flit_core<4\n  Downloading flit_core-3.12.0-py3-none-any.whl.metadata (888 bytes)\nCollecting pytest==8.3.5\n  Downloading pytest-8.3.5-py3-none-any.whl.metadata (7.6 kB)\nERROR: Could not find a version that satisfies the requirement tracefold-nonexistent-validation-package==0.0.1 (from versions: none)\nERROR: No matching distribution found for tracefold-nonexistent-validation-package==0.0.1\n"
+  }
+]

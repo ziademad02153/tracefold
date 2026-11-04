@@ -4,11 +4,13 @@ Status 4 November 2026. Approved delivery direction. No new testing capability i
 
 Implementation update: M1 / Sprint 3 is accepted by the user. See [SPRINT3.md](SPRINT3.md) for implementation evidence and limits. The current-state description below records the baseline at roadmap approval. [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md) defines the direction beyond Python M4.
 
+M2/M3 delivery update: the first supported repository profile and separated execution core/provider are implemented. [M2_M3.md](M2_M3.md) records the real upstream 297-case pilot and limits; [ARCHITECTURE_REVIEW_M3.md](ARCHITECTURE_REVIEW_M3.md) reviews the as-built boundary and open findings. Company-project acceptance remains pending. M4 is not started.
+
 ## Active delivery decision: stop and review at M3
 
 The next delivery scope is M2 (Project Environment) followed by M3 (Repository Test Execution). Do not start repository-wide generated testing, language expansion, coverage dashboards, accounts or other additions during this scope. After M3 passes its acceptance gate, review the product with the user before authorizing M4 implementation.
 
-Pilot status: awaiting the real Python repository and its installation/test commands, which the user has elected to supply. Do not substitute the synthetic tracefold-validation repository as evidence of real-project readiness. Initial inspection of ZEDX-AI-Simulator found the application and existing test suite are JavaScript/TypeScript; Python files are auxiliary agent scripts, so it is not the Python pilot.
+Pilot status: the user will supply a company Python repository and its installation/test commands. While awaiting that input, engineering validation used the real upstream package pallets/itsdangerous at 2.2.0, not the synthetic tracefold-validation repository. Its 297 cases match a direct pytest reference under the selected environment. This does not substitute for company-project acceptance. Initial inspection of ZEDX-AI-Simulator found the application and existing test suite are JavaScript/TypeScript; Python files are auxiliary agent scripts, so it is not the Python pilot.
 
 ### Pilot intake and reference run
 
@@ -21,7 +23,7 @@ Record the repository URL, immutable revision, project/component root, supported
 5. Compare collected/executed cases and outcomes with the reference. Explain any differences, represent skipped/error/interrupted cases and verify saved evidence after backend restart.
 6. Re-run the same commit/environment to check repeatability, document the supported profile and review the product with the user at M3.
 
-M2/M3 remain unimplemented until actual runner and UI work is delivered and tested. This intake/approval update does not claim repository execution exists today. A repo-specific implementation estimate follows intake, not a guess before seeing the project's requirements.
+M2/M3 runner and UI work is delivered for the bounded profile documented in M2_M3.md. Evaluate the company pilot against that profile before estimating additional requirements; do not infer universal repository support from the upstream acceptance result.
 
 ## Architectural acceptance: Core Platform and Python Provider
 

@@ -1,8 +1,8 @@
 # Tracefold
 
-Tracefold is an early Python testing workspace. It generates reviewed pytest suites, executes them in bounded Docker containers and saves evidence for comparison against a repair revision. Public GitHub PR review is an additional advisory workflow.
+Tracefold is an early testing platform with Python as its first proven runtime. It prepares supported repository environments, runs existing tests and saves per-case evidence. Reviewed AI-generated Python file suites and advisory PR review remain separate tools.
 
-**Status: single-user local pilot.** New test sessions execute an original Python module with same-file helpers and constants, with up to five selected public functions and 3–5 approved tests. Supported standard-library imports only; cross-file imports, package initializers and external dependencies need M2. Earlier standalone sessions remain readable and runnable. Local AI uses gemma4:e4b through Ollama. Private repository access, full repository environments and shared deployment remain planned.
+**Status: single-user local pilot.** Repository execution supports an explicit Python 3.11/Linux/pip/pytest profile, real package installation, internal imports, selected dependency files/plugins and saved results. It does not require AI. The upstream itsdangerous 2.2.0 acceptance run passed 297 existing tests and matched a direct pytest reference. The user's company pilot remains pending. Private access, services/GPU/workspace adapters, other runtimes and shared deployment are not implemented. See [M2/M3 implementation and limits](M2_M3.md).
 
 ## Architecture
 
@@ -13,6 +13,8 @@ Tracefold is an early Python testing workspace. It generates reviewed pytest sui
 | Persistence | SQLAlchemy with SQLite by default. Optional PostgreSQL configuration in compose.yaml |
 | GitHub | Public repository metadata and PR imports through the REST API |
 | Reports | Persisted snapshots addressed by a generated report ID |
+| Execution Core | Provider-neutral contracts, profiles, lifecycle and evidence in execution_core/ |
+| First Provider | Python preparation and native pytest execution in providers/ |
 
 ## Start everything
 
@@ -93,7 +95,7 @@ Open a Project to see Overview, Tests and Results. Overview uses saved activity 
 
 ## Product direction and implementation gates
 
-Current approved scope: Sprint 3 / M1 accepted; next M2 Project Environment and M3 Repository Test Execution. The user will supply the real Python pilot and install/test commands. Review the working product at M3 before starting M4 or other additions. Repository execution is not implemented by this planning update.
+Current delivery: M2/M3 implemented and validated on the supported upstream profile; company-project acceptance awaits the real Python pilot and install/test commands. Review the working product and Architecture Review before authorizing M4 or other additions.
 
 Architecture gate: separate Python Provider from Core Platform during M2/M3. At M3, review as-built dependencies, provider-neutral lifecycle/results/evidence, a non-Python contract-test fixture and legacy compatibility alongside the real Python pilot. Both functional and architectural acceptance must pass before the next scope decision. See the [architectural acceptance criteria](REPOSITORY_TESTING_ROADMAP.md#architectural-acceptance-core-platform-and-python-provider).
 
@@ -102,3 +104,15 @@ Architecture gate: separate Python Provider from Core Platform during M2/M3. At 
 - [Sprint 3 File Testing scope and verification](SPRINT3.md)
 
 Language expansion follows Python M4 and uses separately validated execution profiles. Reading a language is not equivalent to compiling and testing its projects.
+
+## Run existing repository tests (M2/M3)
+
+Open a project and choose **Run repository tests**. Inspect a revision/component, choose dependency files/packages and the install/test profile, save it for review, approve preparation and select **Run existing tests**. Re-run using the same saved environment. Source and profile identities are immutable; testing a new revision requires a new profile. Earlier runs keep their environment manifest if an environment is rebuilt.
+
+For the real upstream acceptance example, add pallets/itsdangerous, choose tag 2.2.0 and root ., enable project installation, select requirements/tests.txt and requirements/build.txt, remove the default extra pytest pin, retain -q, save/approve/prepare and run. No local model is needed.
+
+- [Implementation, reproducibility and release limits](M2_M3.md)
+- [As-built Architecture Review and findings](ARCHITECTURE_REVIEW_M3.md)
+- [Saved upstream report](http://127.0.0.1:5173/#execution/b63e7e12cecf4b7f92527d20509a6669)
+
+Snapshots are cached under ignored .tracefold/. Prepared environments are local Docker images; git clone does not include those images or the local SQLite reports. After installing updated backend requirements and building the bootstrap image, npm start launches the application as before.

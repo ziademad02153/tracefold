@@ -238,6 +238,16 @@ from workbench import create_router
 
 app.include_router(create_router(engine, github, connected))
 
+# Composition root: the core/API never import a concrete runtime provider.
+from execution_core.service import ExecutionService
+from execution_api import create_execution_router
+from snapshot_store import GithubSnapshots
+from providers.python_repository import PythonRepositoryProvider
+
+execution_service = ExecutionService(engine, {'python-pytest': PythonRepositoryProvider()},
+    GithubSnapshots(root / '.tracefold' / 'snapshots', github, connected))
+app.include_router(create_execution_router(execution_service, connected))
+
 
 if (root / "dist").is_dir():
     app.mount("/", StaticFiles(directory=root / "dist", html=True), name="frontend")

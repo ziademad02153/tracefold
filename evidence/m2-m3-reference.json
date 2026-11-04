@@ -1,0 +1,1812 @@
+{
+  "source": {
+    "repository": "pallets/itsdangerous",
+    "revision": "096c8d42545d3b68ea21a4f890fb2b2d8979c0bd",
+    "content_hash": "9f95cdbf2b562147defcc1ea81a550f533b6ba4f2300145941cefc21ef9e4135",
+    "file_count": 60
+  },
+  "environment_id": "sha256:954b268d849faef99075e6b53532bf7f4ed2f343525ecdd7621fd093c5f328a0",
+  "profile_id": "b63e7e12cecf4b7f92527d20509a6669",
+  "reference_commands": [
+    "python -m pytest --collect-only -q",
+    "python -m pytest -q --junitxml=/tmp/reference.xml"
+  ],
+  "provider_overrides": [
+    "explicit evidence plugin",
+    "disable cacheprovider",
+    "approved plugin autoload disabled"
+  ],
+  "same_collection": true,
+  "same_case_outcomes": true,
+  "reference": {
+    "collect_exit": 0,
+    "exit_code": 0,
+    "collected": [
+      "tests/test_itsdangerous/test_encoding.py::test_want_bytes[ma\\xf1ana]",
+      "tests/test_itsdangerous/test_encoding.py::test_want_bytes[tomorrow]",
+      "tests/test_itsdangerous/test_encoding.py::test_base64[\\u7121\\u9650]",
+      "tests/test_itsdangerous/test_encoding.py::test_base64[infinite]",
+      "tests/test_itsdangerous/test_encoding.py::test_base64_bad",
+      "tests/test_itsdangerous/test_encoding.py::test_int_bytes[0-]",
+      "tests/test_itsdangerous/test_encoding.py::test_int_bytes[192-\\xc0]",
+      "tests/test_itsdangerous/test_encoding.py::test_int_bytes[18446744073709551615-\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-None]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-True]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-str]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-text]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-value4]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[Serializer-value5]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-None]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-True]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-str]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-text]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_signature_exception[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_payload_exception[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_loads_unsafe[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_file[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_file[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_alt_salt[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_alt_salt[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_cls[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_cls[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_kwargs[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer_kwargs[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_fallback_signers[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_iter_unsigners[Serializer]",
+      "tests/test_itsdangerous/test_serializer.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+      "tests/test_itsdangerous/test_serializer.py::test_digests",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_signer",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_no_separator",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_broken_signature",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_changed_value",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_invalid_separator",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[concat]",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[django-concat]",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[hmac]",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_key_derivation[none]",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_invalid_key_derivation",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_digest_method",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[None]",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm1]",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm2]",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_algorithm[algorithm3]",
+      "tests/test_itsdangerous/test_signer.py::TestSigner::test_secret_keys",
+      "tests/test_itsdangerous/test_signer.py::test_abstract_algorithm",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-None]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-True]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-str]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-text]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-value4]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[Serializer-value5]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-None]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-True]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-str]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-text]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_signature_exception[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_payload_exception[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_loads_unsafe[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_file[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_file[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_alt_salt[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_alt_salt[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_cls[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_cls[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_kwargs[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer_kwargs[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_fallback_signers[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_iter_unsigners[Serializer]",
+      "tests/test_itsdangerous/test_timed.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_signer",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_no_separator",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_broken_signature",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_changed_value",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_invalid_separator",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[concat]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[django-concat]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[hmac]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_key_derivation[none]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_invalid_key_derivation",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_digest_method",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[None]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm1]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm2]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_algorithm[algorithm3]",
+      "tests/test_itsdangerous/test_timed.py::TestSigner::test_secret_keys",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_signer",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_no_separator",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_broken_signature",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_changed_value",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_invalid_separator",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[concat]",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[django-concat]",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[hmac]",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_key_derivation[none]",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_invalid_key_derivation",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_digest_method",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[None]",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm1]",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm2]",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_algorithm[algorithm3]",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_secret_keys",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_max_age",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_return_timestamp",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_timestamp_missing",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_malformed_timestamp",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_malformed_future_timestamp",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_future_age",
+      "tests/test_itsdangerous/test_timed.py::TestTimestampSigner::test_sig_error_date_signed",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[None]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[True]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[str]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[text]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[value4]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer[value5]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>0]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>1]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>2]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_changed_value[<lambda>3]",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_bad_signature_exception",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_bad_payload_exception",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_loads_unsafe",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_file",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_alt_salt",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_signer_cls",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_signer_kwargs",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_serializer_kwargs",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_fallback_signers",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_iter_unsigners",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_max_age",
+      "tests/test_itsdangerous/test_timed.py::TestTimedSerializer::test_return_payload",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-None]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-True]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-str]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-text]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-value4]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[Serializer-value5]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-None]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-True]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-str]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-text]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-value4]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer[serializer_factory1-value5]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>2]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[Serializer-<lambda>3]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>2]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_changed_value[serializer_factory1-<lambda>3]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_signature_exception[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_signature_exception[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_payload_exception[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_bad_payload_exception[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_loads_unsafe[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_loads_unsafe[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_file[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_file[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_alt_salt[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_alt_salt[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_cls[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_cls[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_kwargs[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_signer_kwargs[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer_kwargs[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_serializer_kwargs[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_fallback_signers[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_fallback_signers[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_iter_unsigners[Serializer]",
+      "tests/test_itsdangerous/test_url_safe.py::TestSerializer::test_iter_unsigners[serializer_factory1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[None]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[True]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[str]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[text]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[value4]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer[value5]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>2]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_changed_value[<lambda>3]",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_bad_signature_exception",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_bad_payload_exception",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_loads_unsafe",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_file",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_alt_salt",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_signer_cls",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_signer_kwargs",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_serializer_kwargs",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_fallback_signers",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_iter_unsigners",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_max_age",
+      "tests/test_itsdangerous/test_url_safe.py::TestTimedSerializer::test_return_payload",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[None]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[True]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[str]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[text]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[value4]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer[value5]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>2]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[value0-<lambda>3]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>2]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_changed_value[zlib-<lambda>3]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_signature_exception[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_signature_exception[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_payload_exception[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_bad_payload_exception[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_loads_unsafe[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_loads_unsafe[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_file[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_file[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_alt_salt[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_alt_salt[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_cls[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_cls[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_kwargs[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_signer_kwargs[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_serializer_kwargs",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_fallback_signers[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_fallback_signers[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeSerializer::test_iter_unsigners",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[None]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[True]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[str]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[text]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[value4]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer[value5]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>2]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[value0-<lambda>3]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>1]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>2]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_changed_value[zlib-<lambda>3]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_signature_exception[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_signature_exception[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_payload_exception[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_bad_payload_exception[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_loads_unsafe[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_loads_unsafe[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_file[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_file[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_alt_salt[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_alt_salt[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_cls[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_cls[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_kwargs[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_signer_kwargs[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_serializer_kwargs",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_fallback_signers[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_fallback_signers[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_iter_unsigners",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_max_age[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_max_age[zlib]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_return_payload[value0]",
+      "tests/test_itsdangerous/test_url_safe.py::TestURLSafeTimedSerializer::test_return_payload[zlib]"
+    ],
+    "cases": [
+      {
+        "classname": "tests.test_itsdangerous.test_encoding",
+        "name": "test_want_bytes[ma\\xf1ana]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_encoding",
+        "name": "test_want_bytes[tomorrow]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_encoding",
+        "name": "test_base64[\\u7121\\u9650]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_encoding",
+        "name": "test_base64[infinite]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_encoding",
+        "name": "test_base64_bad",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_encoding",
+        "name": "test_int_bytes[0-]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_encoding",
+        "name": "test_int_bytes[192-\\xc0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_encoding",
+        "name": "test_int_bytes[18446744073709551615-\\xff\\xff\\xff\\xff\\xff\\xff\\xff\\xff]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[Serializer-None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[Serializer-True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[Serializer-str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[Serializer-text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[Serializer-value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[Serializer-value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[serializer_factory1-None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[serializer_factory1-True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[serializer_factory1-str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[serializer_factory1-text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[serializer_factory1-value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer[serializer_factory1-value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_bad_signature_exception[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_bad_signature_exception[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_bad_payload_exception[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_bad_payload_exception[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_loads_unsafe[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_loads_unsafe[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_file[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_file[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_alt_salt[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_alt_salt[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_signer_cls[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_signer_cls[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_signer_kwargs[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_signer_kwargs[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer_kwargs[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_serializer_kwargs[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_fallback_signers[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_fallback_signers[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_iter_unsigners[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer.TestSerializer",
+        "name": "test_iter_unsigners[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_serializer",
+        "name": "test_digests",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_signer",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_no_separator",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_broken_signature",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_changed_value",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_invalid_separator",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_key_derivation[concat]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_key_derivation[django-concat]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_key_derivation[hmac]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_key_derivation[none]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_invalid_key_derivation",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_digest_method",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_algorithm[None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_algorithm[algorithm1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_algorithm[algorithm2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_algorithm[algorithm3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer.TestSigner",
+        "name": "test_secret_keys",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_signer",
+        "name": "test_abstract_algorithm",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[Serializer-None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[Serializer-True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[Serializer-str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[Serializer-text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[Serializer-value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[Serializer-value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[serializer_factory1-None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[serializer_factory1-True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[serializer_factory1-str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[serializer_factory1-text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[serializer_factory1-value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer[serializer_factory1-value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_bad_signature_exception[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_bad_signature_exception[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_bad_payload_exception[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_bad_payload_exception[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_loads_unsafe[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_loads_unsafe[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_file[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_file[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_alt_salt[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_alt_salt[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_signer_cls[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_signer_cls[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_signer_kwargs[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_signer_kwargs[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer_kwargs[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_serializer_kwargs[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_fallback_signers[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_fallback_signers[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_iter_unsigners[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSerializer",
+        "name": "test_iter_unsigners[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_signer",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_no_separator",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_broken_signature",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_changed_value",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_invalid_separator",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_key_derivation[concat]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_key_derivation[django-concat]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_key_derivation[hmac]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_key_derivation[none]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_invalid_key_derivation",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_digest_method",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_algorithm[None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_algorithm[algorithm1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_algorithm[algorithm2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_algorithm[algorithm3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestSigner",
+        "name": "test_secret_keys",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_signer",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_no_separator",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_broken_signature",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_changed_value",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_invalid_separator",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_key_derivation[concat]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_key_derivation[django-concat]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_key_derivation[hmac]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_key_derivation[none]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_invalid_key_derivation",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_digest_method",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_algorithm[None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_algorithm[algorithm1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_algorithm[algorithm2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_algorithm[algorithm3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_secret_keys",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_max_age",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_return_timestamp",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_timestamp_missing",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_malformed_timestamp",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_malformed_future_timestamp",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_future_age",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimestampSigner",
+        "name": "test_sig_error_date_signed",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_serializer[None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_serializer[True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_serializer[str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_serializer[text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_serializer[value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_serializer[value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_changed_value[<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_changed_value[<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_changed_value[<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_changed_value[<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_bad_signature_exception",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_bad_payload_exception",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_loads_unsafe",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_file",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_alt_salt",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_signer_cls",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_signer_kwargs",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_serializer_kwargs",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_fallback_signers",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_iter_unsigners",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_max_age",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_timed.TestTimedSerializer",
+        "name": "test_return_payload",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[Serializer-None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[Serializer-True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[Serializer-str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[Serializer-text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[Serializer-value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[Serializer-value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[serializer_factory1-None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[serializer_factory1-True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[serializer_factory1-str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[serializer_factory1-text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[serializer_factory1-value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer[serializer_factory1-value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_changed_value[Serializer-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_changed_value[serializer_factory1-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_bad_signature_exception[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_bad_signature_exception[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_bad_payload_exception[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_bad_payload_exception[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_loads_unsafe[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_loads_unsafe[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_file[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_file[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_alt_salt[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_alt_salt[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_signer_cls[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_signer_cls[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_signer_kwargs[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_signer_kwargs[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer_kwargs[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_serializer_kwargs[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_fallback_signers[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_fallback_signers[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_iter_unsigners[Serializer]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestSerializer",
+        "name": "test_iter_unsigners[serializer_factory1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_serializer[None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_serializer[True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_serializer[str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_serializer[text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_serializer[value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_serializer[value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_changed_value[<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_changed_value[<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_changed_value[<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_changed_value[<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_bad_signature_exception",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_bad_payload_exception",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_loads_unsafe",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_file",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_alt_salt",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_signer_cls",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_signer_kwargs",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_serializer_kwargs",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_fallback_signers",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_iter_unsigners",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_max_age",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestTimedSerializer",
+        "name": "test_return_payload",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_serializer[None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_serializer[True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_serializer[str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_serializer[text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_serializer[value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_serializer[value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_changed_value[value0-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_changed_value[value0-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_changed_value[value0-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_changed_value[value0-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_changed_value[zlib-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_changed_value[zlib-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_changed_value[zlib-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_changed_value[zlib-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_bad_signature_exception[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_bad_signature_exception[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_bad_payload_exception[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_bad_payload_exception[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_loads_unsafe[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_loads_unsafe[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_file[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_file[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_alt_salt[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_alt_salt[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_signer_cls[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_signer_cls[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_signer_kwargs[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_signer_kwargs[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_serializer_kwargs",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_fallback_signers[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_fallback_signers[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeSerializer",
+        "name": "test_iter_unsigners",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_serializer[None]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_serializer[True]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_serializer[str]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_serializer[text]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_serializer[value4]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_serializer[value5]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_changed_value[value0-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_changed_value[value0-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_changed_value[value0-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_changed_value[value0-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_changed_value[zlib-<lambda>0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_changed_value[zlib-<lambda>1]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_changed_value[zlib-<lambda>2]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_changed_value[zlib-<lambda>3]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_bad_signature_exception[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_bad_signature_exception[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_bad_payload_exception[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_bad_payload_exception[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_loads_unsafe[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_loads_unsafe[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_file[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_file[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_alt_salt[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_alt_salt[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_signer_cls[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_signer_cls[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_signer_kwargs[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_signer_kwargs[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_serializer_kwargs",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_fallback_signers[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_fallback_signers[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_iter_unsigners",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_max_age[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_max_age[zlib]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_return_payload[value0]",
+        "status": "passed"
+      },
+      {
+        "classname": "tests.test_itsdangerous.test_url_safe.TestURLSafeTimedSerializer",
+        "name": "test_return_payload[zlib]",
+        "status": "passed"
+      }
+    ],
+    "output": "........................................................................ [ 24%]\n........................................................................ [ 48%]\n........................................................................ [ 72%]\n........................................................................ [ 96%]\n.........                                                                [100%]\n-------------------- generated xml file: /tmp/reference.xml --------------------\n297 passed in 0.78s\n"
+  }
+}

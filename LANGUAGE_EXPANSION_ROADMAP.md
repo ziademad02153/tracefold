@@ -2,6 +2,8 @@
 
 Status: approved product direction, 4 November 2026. Implementation through M4 remains Python only. This document does not claim that any additional language runner exists.
 
+Implementation update: the first Python repository execution profile and provider-neutral core boundary are now delivered. See [M2/M3](M2_M3.md) and the [as-built Architecture Review](ARCHITECTURE_REVIEW_M3.md). The company pilot and next scope decision are pending; no other language provider or M4 generation has been added.
+
 ## Product destination
 
 Tracefold is intended to serve Backend, AI and Embedded engineering teams through reproducible testing, reviewed AI-generated tests and saved execution evidence. Users connect a repository, select supported components and execution profiles, run existing tests, approve generated additions, and rerun the same additions against a repair revision.

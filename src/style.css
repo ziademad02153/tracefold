@@ -158,4 +158,9 @@ textarea { min-height: 130px; resize: vertical; }
 .function-choice { display: flex; gap: 10px; align-items: center; margin: 10px 0; overflow-wrap: anywhere; }
 .function-choice input[type="checkbox"] { flex: none; min-width: 18px; width: 18px; height: 18px; padding: 0; }
 .testing-workspace fieldset { border: 1px solid var(--border); border-radius: 6px; margin-top: 20px; }
+.repository-execution p, .repository-execution .hash { overflow-wrap: anywhere; }
+.repository-execution .hash { font: 12px/1.6 Consolas, monospace; }
+.repository-execution fieldset { min-width: 0; border: 1px solid var(--border); border-radius: 6px; margin: 16px 0; padding: 16px; }
+.repository-execution .environment-fields textarea { min-height: 80px; }
+.repository-execution form > input { display: block; width: 100%; margin-bottom: 16px; }
 @media(max-width:600px) { .project-metrics { grid-template-columns: 1fr; gap: 0; } }

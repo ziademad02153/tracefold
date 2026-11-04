@@ -4,6 +4,8 @@ Date 4 November 2026. Product structure and navigation baseline. Sprint 3 File T
 
 The broader direction is defined in [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md). Python M1–M4 remains the current delivery scope.
 
+The new repository-execution path, supported profile and actual provider/core boundary are recorded in [M2_M3.md](M2_M3.md) and [ARCHITECTURE_REVIEW_M3.md](ARCHITECTURE_REVIEW_M3.md). Earlier diagrams below are historical baselines, not the new execution architecture. M4 remains gated on user review and company-pilot scope.
+
 ## Purpose and primary unit
 
 Tracefold helps a developer create, review, execute and retain tests for a specific version of project code, then repeat the same tests after a repair. A Project is the workspace backed by a GitHub repository. Testing is the primary workflow. AI PR code review is an additional analysis tool.
