@@ -2,7 +2,7 @@
 
 Tracefold is an early engineering review workspace. It imports pull requests from public GitHub repositories and saves a snapshot of the diff and commit IDs for later review.
 
-**Status: local prototype.** The public import uses GitHub data. The bundled demo uses sample check results. Local AI diff review uses gemma4:e4b through Ollama. Live CI results, private repository access and team authentication are planned. Treat this build as a single-user local tool.
+**Status: local prototype.** The public import uses GitHub data. The bundled demo uses sample check results. Local AI diff review uses gemma4:e4b through Ollama. Function testing supports standalone Python functions, Gemma-generated pytest tests, explicit approval, Docker execution and saved evidence. Live CI results, private repository access and team authentication are planned. Treat this build as a single-user local tool.
 
 ## Architecture
 
@@ -13,6 +13,14 @@ Tracefold is an early engineering review workspace. It imports pull requests fro
 | Persistence | SQLAlchemy with SQLite by default. Optional PostgreSQL configuration in compose.yaml |
 | GitHub | Public repository metadata and PR imports through the REST API |
 | Reports | Persisted snapshots addressed by a generated report ID |
+
+## Start everything
+
+After the initial dependency setup, run:
+
+    npm start
+
+This starts FastAPI and Vite, waits for the backend and opens the browser. Ctrl+C stops services started by this command. Existing Tracefold services are reused and remain owned by their original terminals. A different service occupying ports 8001 or 5173 produces an error with recovery instructions.
 
 ## Run locally on Windows
 
@@ -63,3 +71,12 @@ AI state uses an additive ai_reviews table, so existing reports remain readable.
 See [AUDIT.md](AUDIT.md) for tested flows, fixes and the release decision. Run the automated adapter and persistence checks with:
 
     .venv/Scripts/python.exe -m unittest test_ai_review -v
+
+
+## Function testing
+
+Select **Test a function** on a repository card. Choose a branch, file and function, describe expected behavior, generate a test and review it before approval. Run the saved test on the initial revision, then rerun it on your repair branch. Sessions and execution evidence are persisted. See [SPRINT1.md](SPRINT1.md) for scope, runner setup and real acceptance evidence.
+
+    docker build -t tracefold-pytest:1 runner
+
+No application data or credentials are mounted into test containers. Docker must be running. Tests that require external project packages or helper modules are outside this standalone-function workflow.

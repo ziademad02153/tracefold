@@ -234,5 +234,10 @@ def review_report(report_id: str):
     return get_report(report_id)
 
 
+from workbench import create_router
+
+app.include_router(create_router(engine, github, connected))
+
+
 if (root / "dist").is_dir():
     app.mount("/", StaticFiles(directory=root / "dist", html=True), name="frontend")

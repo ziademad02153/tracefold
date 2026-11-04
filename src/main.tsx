@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
+import { api } from './api'
+import { Workbench } from './Workbench'
 
 type Repo = {name:string; description:string}
 type Pull = {number:number; title:string; base:string; head:string}
@@ -11,16 +13,6 @@ type AIReview = {status:'running'|'completed'|'failed'; error?:string; result?:{
 }}
 type Report = Pull & {id:string; repo:string; diff:string; ai_review?:AIReview; source:string; checks:{version:string; status:string; log:string}[]}
 
-async function api<T>(path:string, body?:object):Promise<T> {
-  const response = await fetch('/api/' + path, body && {
-    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body),
-  })
-  if (!response.ok) {
-    const detail = await response.json().catch(() => null)
-    throw new Error(typeof detail?.detail === 'string' ? detail.detail : 'Request failed. Check the backend and try again.')
-  }
-  return response.json()
-}
 
 function App() {
   const [repoInput,setRepoInput] = useState('')
@@ -36,12 +28,12 @@ function App() {
   const [rawPage, id=''] = hash.split('/')
   const page = rawPage === '' ? 'projects' : rawPage
   let project = ''
-  let invalidRoute = !['projects','connect','project','history','report'].includes(page)
-  if (page === 'project' || page === 'history') {
+  let invalidRoute = !['projects','connect','project','history','report','testing','test-session'].includes(page)
+  if (page === 'project' || page === 'history' || page === 'testing') {
     try { project = decodeURIComponent(id) } catch { invalidRoute = true }
     if (!project) invalidRoute = true
   }
-  if (page === 'report' && !id) invalidRoute = true
+  if ((page === 'report' || page === 'test-session') && !id) invalidRoute = true
   const heading = useRef<HTMLHeadingElement>(null)
   const [refreshVersion,setRefreshVersion] = useState(0)
   const [pullError,setPullError] = useState('')
@@ -98,7 +90,7 @@ function App() {
   },[page,id,repoPath,invalidRoute,refreshVersion])
 
   useEffect(() => {
-    document.title = page === 'history' ? 'Saved reports · Tracefold' : page === 'report' ? 'Review report · Tracefold' : page === 'project' ? 'Pull requests · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
+    document.title = page === 'testing' || page === 'test-session' ? 'Function testing · Tracefold' : page === 'history' ? 'Saved reports · Tracefold' : page === 'report' ? 'Review report · Tracefold' : page === 'project' ? 'Pull requests · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
     heading.current?.focus()
     window.scrollTo(0, 0)
   },[hash,page])
@@ -153,7 +145,7 @@ function App() {
   }
 
   const projectLink = (repo:string) => '#project/' + encodeURIComponent(repo)
-  const title = page === 'connect' ? 'Add repository' :
+  const title = page === 'testing' || page === 'test-session' ? 'Function testing' : page === 'connect' ? 'Add repository' :
     page === 'history' ? 'Saved reports' : page === 'project' ? 'Select a pull request' : page === 'report' ? 'Review report' : 'Projects'
 
   return <>
@@ -162,11 +154,11 @@ function App() {
     <main id="main-content" tabIndex={-1}>
       <p className="eyebrow"><a href="#projects">Workspace</a> / {title}</p>
       <div className="row hero"><h1 tabIndex={-1} ref={heading}>{invalidRoute ? "Page not found" : title}</h1>{(page === '' || page === 'projects') && <a className="button" href="#connect">Add repository →</a>}</div>
-      {!invalidRoute && <ol className="steps" aria-label="Review workflow">
+      {!invalidRoute && page !== 'testing' && page !== 'test-session' && <ol className="steps" aria-label="Review workflow">
         {['Add repository','Select a pull request','Review with AI'].map((step,index) => <li key={step} className={page === ['connect','project','report'][index] ? 'current' : ''}><span>{index + 1}</span>{step}</li>)}
       </ol>}
       {invalidRoute && <p className="error">This page address is invalid. <a href="#projects">Return to repositories</a>.</p>}
-      {!invalidRoute && <p className="page-help">{page === 'connect' ? 'Paste your public GitHub repository URL, choose a pull request, then run an AI review.' : page === 'history' ? 'Open a saved report to read its AI findings, suggested next steps and code diff.' : page === 'project' ? 'Open a report for the change you want Gemma to review. Previously saved reports are listed below.' : page === 'report' ? 'Inspect the saved change, then request a review from Gemma on the company server.' : 'Choose a connected repository to review one of its pull requests.'}</p>}
+      {!invalidRoute && page !== 'testing' && page !== 'test-session' && <p className="page-help">{page === 'connect' ? 'Paste your public GitHub repository URL, choose a pull request, then run an AI review.' : page === 'history' ? 'Open a saved report to read its AI findings, suggested next steps and code diff.' : page === 'project' ? 'Open a report for the change you want Gemma to review. Previously saved reports are listed below.' : page === 'report' ? 'Inspect the saved change, then request a review from Gemma on the company server.' : 'Choose a connected repository to review one of its pull requests.'}</p>}
       {pending && <p role="status">Working… Your repository or report is being prepared.</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {loading && <p role="status">Loading…</p>}
@@ -184,8 +176,9 @@ function App() {
         <div className="row"><input id="repo-url" disabled={pending} required placeholder="https://github.com/owner/repo" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
         <button className="button" disabled={pending}>{pending ? 'Connecting…' : 'Add repository'}</button></div>
       </form>}
+      {!invalidRoute && (page === 'testing' || page === 'test-session') && <Workbench key={hash} repo={page === 'testing' ? project : undefined} sessionId={page === 'test-session' ? id : undefined}/>}
       {repos.map(repo => <article className="surface row" key={repo.name}><div><h2>{repo.name}</h2><p>{repo.description}</p></div>
-        <div className="row"><a className="button secondary" href={'#history/' + encodeURIComponent(repo.name)}>Saved reports →</a><a className="button" href={projectLink(repo.name)}>View pull requests →</a></div>
+        <div className="row"><a className="button" href={'#testing/' + encodeURIComponent(repo.name)}>Test a function →</a><a className="button secondary" href={'#history/' + encodeURIComponent(repo.name)}>Saved reports →</a><a className="button" href={projectLink(repo.name)}>View pull requests →</a></div>
       </article>)}
       {page === 'history' && !invalidRoute && <>
         <div className="row section"><h2>{project}</h2><a className="button secondary" href={projectLink(project)}>Review another pull request →</a></div>
@@ -196,6 +189,7 @@ function App() {
         </article>)}
       </>}
       {page === 'project' && !invalidRoute && <>
+        <p className="section"><a className="button secondary" href={'#testing/' + encodeURIComponent(project)}>Test a function without a pull request →</a></p>
         <div className="row section"><div><h2>{project}</h2><p>Up to 30 recently updated pull requests, including closed changes.</p></div><button className="button secondary" disabled={pending || loading} onClick={() => setRefreshVersion(value => value + 1)}>Refresh list</button></div>
         {pullError && <p className="error" role="alert">{pullError} Saved reports remain available below.</p>}
         {!loading && !error && !pullError && pulls.length === 0 && <div className="surface empty"><h2>No pull requests to review yet</h2><p>Create a pull request on GitHub and return here, or use another repository with an existing PR.</p><a className="button secondary" href={"https://github.com/" + project + "/pulls"} target="_blank" rel="noreferrer">View pull requests on GitHub ↗</a></div>}

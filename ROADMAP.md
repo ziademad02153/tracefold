@@ -43,3 +43,7 @@ The current AI feature is available before live CI integration. Production multi
 
 ## UI and reliability review — 4 November 2026
 See AUDIT.md. Eleven browser scenarios and eleven Python tests passed. Added failure-tolerant saved history, invalid-route handling, clearer review actions, stable diff inputs and responsive UI refinements. Shared deployment remains pending access control and operations work.
+
+
+## Approved Sprint 1 implementation
+The standalone-function testing path is implemented and verified with a generated test that fails on a defective discount calculation and passes unchanged on a subsequent repair commit. See SPRINT1.md. This advances the previously pending execution milestone for standalone Python functions only. Live CI, project dependencies and shared team deployment remain separate work.
