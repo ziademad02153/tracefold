@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from './api'
-import { ProjectNavigation } from './ProjectHome'
+import { ProjectNavigation, ProjectTestNavigation } from './ProjectHome'
 
 type TestEvidence = {name:string; status:'passed'|'failed'|'blocked'|'skipped'|'not_run'; detail:string; seconds:number}
 type TestCase = {name:string;scenario:string}
@@ -19,7 +19,7 @@ type History = {test_count?:number; id:string; path:string; function:string; cre
 type Files = {sha:string; files:string[]}
 type Functions = {sha:string; source:string; functions:string[]; module_name:string}
 
-export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
+export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:string;focusRunId?:string}) {
   const [session,setSession] = useState<Session>()
   const [history,setHistory] = useState<History[]>([])
   const [branches,setBranches] = useState<string[]>([])
@@ -35,6 +35,11 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
   const [error,setError] = useState('')
   const [runner,setRunner] = useState<{ready:boolean;message:string}>()
   const [initializing,setInitializing] = useState(true)
+  useEffect(()=>{
+    if(!focusRunId||!session?.runs.some(run=>run.id===focusRunId))return
+    const timer=setTimeout(()=>document.getElementById('run-'+focusRunId)?.scrollIntoView({block:'start'}),0)
+    return()=>clearTimeout(timer)
+  },[focusRunId,session?.id])
 
   useEffect(() => {
     let active=true
@@ -89,8 +94,7 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
   const latest=session?.runs.at(-1)
   return <div className="testing-workspace">
     <p className="page-help">{session?(session.mode!=='file'?'This saved session uses the earlier standalone-function runner. Its approved tests and evidence are preserved.':'Review this saved file test suite, run it against a selected revision, then rerun the same tests after your fix. Results are saved below.'):'Test a Python file in context: choose up to five public functions, define expected behavior, review 3–5 generated tests and run them against the original module.'}</p>
-    {session&&<ProjectNavigation repo={session.repo} active="tests"/>}
-    {activeRepo&&<p><a href={'#testing/'+encodeURIComponent(activeRepo)}>{activeRepo}</a></p>}
+    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={session?.runs.length?'runs':'tests'}/>{!session&&<><ProjectTestNavigation repo={activeRepo} active="generated"/><p className="muted">Generated file suites use isolated file context. They are not automatically added to the repository's existing test runs.</p></>}</>}
     {error&&<p className="error" role="alert">{error}</p>}
     {busy&&<p className="progress" role="status">{busy==='generate'?'Gemma is generating your test. This may take a few minutes.':busy==='run'?'Running the approved test in Docker…':'Loading…'}</p>}
     {!session&&repo&&<>
@@ -187,7 +191,7 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
         <h2>5. Saved execution evidence</h2>
         <p>Passed means the test's assertions held. A failed test may indicate a product bug or an incorrect expectation. Blocked means execution could not complete.</p>
         {!session.runs.length&&<p>No execution evidence yet.</p>}
-        {session.runs.map((run,index)=><article className="run-evidence" key={run.id}>
+        {session.runs.map((run,index)=><article className="run-evidence" id={'run-'+run.id} key={run.id}>
           <div className="row"><h3>Run {index+1} · <span className={run.status==='passed'?'passed':run.status==='failed'?'failed':''}>{run.status.toUpperCase()}</span></h3><span>{run.seconds!==undefined?run.seconds+'s':''}</span></div>
           <p>{run.ref} → <code>{run.sha.slice(0,12)}</code> · {new Date(run.completed_at).toLocaleString()}</p>
           <p className="muted">{run.test_hash===session.test_hash?'Same saved '+(isSuite?'suite':'test'):'Different test identity'} · Exit code {run.exit_code??'unavailable'}</p>

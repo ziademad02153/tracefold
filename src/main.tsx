@@ -8,6 +8,7 @@ import { RepositoryExecution } from './RepositoryExecution'
 import { PythonEnvironmentForm, pythonDefaults } from './providers/PythonEnvironmentForm'
 const providerViews = {'python-pytest': {label:'Python / pytest', Editor:PythonEnvironmentForm, defaults:pythonDefaults}}
 import { ProjectHome, ProjectNavigation, type ProjectSummary } from './ProjectHome'
+import { ProjectRuns } from './ProjectRuns'
 
 type Repo = {name:string; description:string}
 type Pull = {number:number; title:string; base:string; head:string}
@@ -32,11 +33,12 @@ function App() {
   const [loading,setLoading] = useState(true)
   const [pending,setPending] = useState(false)
   const [reviewing,setReviewing] = useState(false)
-  const [rawPage, id=''] = hash.split('/')
-  const page = rawPage === '' ? 'projects' : rawPage
+  const [rawPage, id='', focusRunId=''] = hash.split('/')
+  const aliases:Record<string,string> = {'results':'runs','repository-tests':'tests','pulls':'ai-review'}
+  const page = rawPage === '' ? 'projects' : aliases[rawPage] || rawPage
   let project = ''
-  let invalidRoute = !['projects','connect','project','history','report','testing','test-session','pulls','results','repository-tests','execution'].includes(page)
-  if (page === 'project' || page === 'history' || page === 'testing' || page === 'pulls' || page === 'results' || page === 'repository-tests') {
+  let invalidRoute = !['projects','connect','project','history','report','testing','test-session','ai-review','runs','tests','execution'].includes(page)
+  if (page === 'project' || page === 'history' || page === 'testing' || page === 'ai-review' || page === 'runs' || page === 'tests') {
     try { project = decodeURIComponent(id) } catch { invalidRoute = true }
     if (!project) invalidRoute = true
   }
@@ -71,7 +73,7 @@ function App() {
         } else if (page === 'history') {
           const data = await api<Saved[]>('reports?' + repoPath)
           if (active) setSaved(data)
-        } else if (page === 'pulls') {
+        } else if (page === 'ai-review') {
           const results = await Promise.allSettled([
             api<Pull[]>('pulls?' + repoPath),api<Saved[]>('reports?' + repoPath),
           ])
@@ -102,7 +104,7 @@ function App() {
   },[page,id,repoPath,invalidRoute,refreshVersion])
 
   useEffect(() => {
-    document.title = page === 'repository-tests' || page === 'execution' ? 'Repository tests · Tracefold' : page === 'testing' || page === 'test-session' ? 'Python testing · Tracefold' : page === 'history' ? 'Saved reports · Tracefold' : page === 'report' ? 'Review report · Tracefold' : page === 'pulls' ? 'Code review · Tracefold' : page === 'project' ? 'Project overview · Tracefold' : page === 'results' ? 'Test results · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
+    document.title = (invalidRoute ? 'Page not found' : title) + ' · Tracefold'
     heading.current?.focus()
     window.scrollTo(0, 0)
   },[hash,page])
@@ -157,8 +159,8 @@ function App() {
   }
 
   const projectLink = (repo:string) => '#project/' + encodeURIComponent(repo)
-  const title = page === 'repository-tests' ? 'Run repository tests' : page === 'execution' ? 'Repository execution report' : page === 'testing' ? 'Create a test suite' : page === 'test-session' ? 'Test suite and evidence' : page === 'connect' ? 'Add a project' :
-    page === 'history' ? 'Saved code reviews' : page === 'pulls' ? 'Select a pull request' : page === 'project' ? 'Project overview' : page === 'results' ? 'Test results' : page === 'report' ? 'Review report' : 'Projects'
+  const title = page === 'tests' ? 'Tests' : page === 'execution' ? 'Repository execution report' : page === 'testing' ? 'Generated tests' : page === 'test-session' ? 'Test suite and evidence' : page === 'connect' ? 'Add a project' :
+    page === 'history' ? 'Saved code reviews' : page === 'ai-review' ? 'AI Review' : page === 'project' ? 'Project overview' : page === 'runs' ? 'Runs' : page === 'report' ? 'AI review report' : 'Projects'
 
   return <>
     <a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById("main-content")?.focus() }}>Skip to content</a>
@@ -166,11 +168,9 @@ function App() {
     <main id="main-content" tabIndex={-1}>
       <p className="eyebrow"><a href="#projects">Workspace</a> / {title}</p>
       <div className="row hero"><h1 tabIndex={-1} ref={heading}>{invalidRoute ? "Page not found" : title}</h1>{(page === '' || page === 'projects') && <a className="button" href="#connect">Add project →</a>}</div>
-      {!invalidRoute && ['pulls','history','report'].includes(page) && <ol className="steps" aria-label="Review workflow">
-        {['Add repository','Select a pull request','Review with AI'].map((step,index) => <li key={step} className={page === ['connect','pulls','report'][index] ? 'current' : ''}><span>{index + 1}</span>{step}</li>)}
-      </ol>}
+      {!invalidRoute && (page==='ai-review'||page==='history') && <ProjectNavigation repo={project} active="ai-review"/>}
       {invalidRoute && <p className="error">This page address is invalid. <a href="#projects">Return to repositories</a>.</p>}
-      {!invalidRoute && page !== 'testing' && page !== 'test-session' && page !== 'project' && page !== 'results' && page !== 'repository-tests' && page !== 'execution' && <p className="page-help">{page === 'connect' ? 'Connect a public GitHub repository to create test suites and keep their execution evidence together.' : page === 'history' ? 'Open a saved report to read its AI findings, suggested next steps and code diff.' : page === 'pulls' ? 'Open a report for the change you want Gemma to review. Previously saved reports are listed below.' : page === 'report' ? 'Inspect the saved change, then request a review from Gemma on the company server.' : 'Generate Python tests, run them and verify a fix using the same saved suite. Open a project to get started.'}</p>}
+      {!invalidRoute && (page==='projects'||page==='connect') && <p className="page-help">{page==='projects'?"Run your project's existing tests, review AI-generated file tests, and keep execution evidence in one workspace. Open a project to get started.":"Add a public GitHub repository. Testing and AI review stay inside its project workspace."}</p>}
       {pending && <p role="status">Working… Your repository or report is being prepared.</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {loading && <p role="status">Loading…</p>}
@@ -188,9 +188,8 @@ function App() {
         <div className="row"><input id="repo-url" disabled={pending} required placeholder="https://github.com/owner/repo" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
         <button className="button" disabled={pending}>{pending ? 'Connecting…' : 'Add repository'}</button></div>
       </form>}
-      {!invalidRoute && page==='testing' && <ProjectNavigation repo={project} active="tests"/>}
-      {!invalidRoute && (page === 'testing' || page === 'test-session') && <Workbench key={hash} repo={page === 'testing' ? project : undefined} sessionId={page === 'test-session' ? id : undefined}/>}
-      {!invalidRoute && (page==='repository-tests'||page==='execution') && <RepositoryExecution key={hash} repo={page==='repository-tests'?project:undefined} profileId={page==='execution'?id:undefined} views={providerViews}/>}
+      {!invalidRoute && (page === 'testing' || page === 'test-session') && <Workbench key={hash} repo={page === 'testing' ? project : undefined} sessionId={page === 'test-session' ? id : undefined} focusRunId={focusRunId}/>}
+      {!invalidRoute && (page==='tests'||page==='execution') && <RepositoryExecution key={hash} repo={page==='tests'?project:undefined} profileId={page==='execution'?id:undefined} views={providerViews} focusRunId={focusRunId}/>}
       {repos.map(repo => {
         const stats=summaries?.find(item=>item.repo===repo.name)
         const repoActivity=executionActivity?.find(item=>item.repo===repo.name)
@@ -199,17 +198,18 @@ function App() {
           {executionActivity&&<p className="muted">{repoActivity?.run_count??0} repository runs · Latest repository run: {repoActivity?.latest_run?.status.toUpperCase()||'Not run yet'}</p>}
         </div><a className="button" href={projectLink(repo.name)}>Open project →</a></article>
       })}
-      {!invalidRoute && (page==='project'||page==='results') && <ProjectHome key={project} repo={project} results={page==='results'}/>}
+      {!invalidRoute && page==='project' && <ProjectHome key={project} repo={project}/>}
+      {!invalidRoute && page==='runs' && <ProjectRuns key={project} repo={project}/>}
       {page === 'history' && !invalidRoute && <>
-        <div className="row section"><h2>{project}</h2><a className="button secondary" href={'#pulls/'+encodeURIComponent(project)}>Review another pull request →</a></div>
+        <div className="row section"><h2>{project}</h2><a className="button secondary" href={'#ai-review/'+encodeURIComponent(project)}>Review another pull request →</a></div>
         {!loading && !error && saved.length === 0 && <p>No saved reports yet. Select a pull request to create your first report.</p>}
         {saved.map(item => <article className="surface row" key={item.id}>
           <div><h2>PR #{item.number} · {item.title}</h2><p>Saved change {item.head?.slice(0,7) || item.id.slice(0,8)} · Report {item.id.slice(0,8)}</p></div>
           <a className="button" href={'#report/' + item.id}>Open review →</a>
         </article>)}
       </>}
-      {page === 'pulls' && !invalidRoute && <>
-        <p className="section"><a className="button secondary" href={'#testing/' + encodeURIComponent(project)}>Test a Python file without a pull request →</a></p>
+      {page === 'ai-review' && !invalidRoute && <>
+        <p className="page-help">Ask the local model to review a saved pull request change. Findings are advisory and separate from executed test results.</p>
         <div className="row section"><div><h2>{project}</h2><p>Up to 30 recently updated pull requests, including closed changes.</p></div><button className="button secondary" disabled={pending || loading} onClick={() => setRefreshVersion(value => value + 1)}>Refresh list</button></div>
         {pullError && <p className="error" role="alert">{pullError} Saved reports remain available below.</p>}
         {!loading && !error && !pullError && pulls.length === 0 && <div className="surface empty"><h2>No pull requests to review yet</h2><p>Create a pull request on GitHub and return here, or use another repository with an existing PR.</p><a className="button secondary" href={"https://github.com/" + project + "/pulls"} target="_blank" rel="noreferrer">View pull requests on GitHub ↗</a></div>}
@@ -224,6 +224,7 @@ function App() {
         {saved.map(item => <article className="surface row" key={item.id}><div><h2>#{item.number} · {item.title}</h2><p>Snapshot {item.head?.slice(0,7) || item.id.slice(0,8)} · Report {item.id.slice(0,8)}</p></div><a href={'#report/' + item.id}>Open report →</a></article>)}
       </>}
       {report && <>
+        <ProjectNavigation repo={report.repo} active="ai-review"/>
         <p className="section"><a href={projectLink(report.repo)}>{report.repo}</a> / PR #{report.number}</p>
         <div className="row"><h2 className="report-title">{report.title}</h2><span className="badge">Saved · {report.source}</span></div>
 

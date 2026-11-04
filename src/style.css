@@ -153,6 +153,9 @@ textarea { min-height: 130px; resize: vertical; }
 .project-tabs { display: flex; gap: 24px; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin: 20px 0; }
 .project-tabs a { text-decoration: none; padding: 10px 0; }
 .project-tabs a[aria-current="page"] { border-bottom: 3px solid #526b31; font-weight: 700; }
+.test-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+.test-tabs a { text-decoration: none; padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px; }
+.test-tabs a[aria-current="page"] { background: var(--dark); color: white; font-weight: 650; }
 .project-metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
 .project-metrics strong { font-size: 30px; }
 .function-choice { display: flex; gap: 10px; align-items: center; margin: 10px 0; overflow-wrap: anywhere; }

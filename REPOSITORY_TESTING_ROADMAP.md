@@ -8,6 +8,8 @@ M2/M3 delivery update: the first supported repository profile and separated exec
 
 ## Active delivery decision: stop and review at M3
 
+Product-navigation update: Overview, Tests, Runs, AI Review are the approved primary project destinations. Existing and generated tests share Tests navigation; Runs links to saved evidence for both. This is a UX change to delivered tools, not M4. Company M3 validation remains the first pending acceptance task. M4 is to follow the same project journey after that review, with a new Architecture Review after M4 before further provider/feature expansion.
+
 The next delivery scope is M2 (Project Environment) followed by M3 (Repository Test Execution). Do not start repository-wide generated testing, language expansion, coverage dashboards, accounts or other additions during this scope. After M3 passes its acceptance gate, review the product with the user before authorizing M4 implementation.
 
 Pilot status: the user will supply a company Python repository and its installation/test commands. While awaiting that input, engineering validation used the real upstream package pallets/itsdangerous at 2.2.0, not the synthetic tracefold-validation repository. Its 297 cases match a direct pytest reference under the selected environment. This does not substitute for company-project acceptance. Initial inspection of ZEDX-AI-Simulator found the application and existing test suite are JavaScript/TypeScript; Python files are auxiliary agent scripts, so it is not the Python pilot.

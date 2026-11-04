@@ -91,7 +91,7 @@ Sprint 2 established 3–5 pytest tests, whole-suite approval and per-test saved
 
 ## Product structure
 
-Open a Project to see Overview, Tests and Results. Overview uses saved activity only. Tests creates or reopens suites, and Results opens execution evidence. Advisory PR code review is an additional tool inside the project. See [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md) for the sitemap and architecture.
+Open a Project to see **Overview, Tests, Runs and AI Review**. Tests contains Existing tests and Generated tests; the latter still uses the bounded file-suite workflow. Runs combines saved repository and generated-suite executions and opens the selected report/evidence. AI Review remains advisory PR analysis. Old URLs still work. See [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md) for current navigation, limitations and verification.
 
 ## Product direction and implementation gates
 

@@ -6,6 +6,25 @@ The broader direction is defined in [Language Expansion Roadmap](LANGUAGE_EXPANS
 
 The new repository-execution path, supported profile and actual provider/core boundary are recorded in [M2_M3.md](M2_M3.md) and [ARCHITECTURE_REVIEW_M3.md](ARCHITECTURE_REVIEW_M3.md). Earlier diagrams below are historical baselines, not the new execution architecture. M4 remains gated on user review and company-pilot scope.
 
+## Approved project navigation update
+
+The current primary project navigation is **Overview -> Tests -> Runs -> AI Review**. This section supersedes the earlier navigation descriptions below. The change reorganizes current capabilities; it does not implement repository-context test generation.
+
+| Destination | Current content | Canonical route |
+|---|---|---|
+| Overview | Project context, one entry into Tests and actual recorded activity | #project/{repository} |
+| Tests | Existing tests: approved repository environment/execution; Generated tests: bounded existing Python file-suite workflow | #tests/{repository}, with #testing/{repository} as the generated-test subview |
+| Runs | A single chronological list of repository and generated-suite executions; each row opens its exact saved run report/evidence | #runs/{repository} |
+| AI Review | PR selection, advisory AI findings and saved code reviews | #ai-review/{repository} |
+
+Existing #repository-tests, #results and #pulls links remain supported aliases. Saved #execution/{profile} and #test-session/{session} reports remain usable; an optional final run ID opens the corresponding execution evidence. #history remains an AI Review subview, not a separate primary destination.
+
+Generated tests currently use isolated file context and are not automatically added to repository test runs. The UI states that boundary instead of presenting M4 as delivered. Reports and evidence live inside Runs rather than add primary navigation entries. Counts describe saved suites or executions, not unique tested behaviors or a claimed maturity percentage.
+
+Automated browser checks cover four ordered tabs and active state, both Test subviews, unified history/counts, exact-run links, saved AI reports, old-route compatibility, an empty project, a mixed-kind UI fixture, a partial-fetch failure fixture and responsive widths 390/768/1440. No model generation or new project test execution was invoked by these navigation checks. This is not a first-time-user usability study or proof of 30-second comprehension. See [navigation verification](evidence/project-navigation-validation.json).
+
+Priority remains: validate M3 on the user's company Python repository, improve product clarity using existing capabilities, then implement M4 within the same project journey after the agreed review. Conduct another as-built Architecture Review after successful M4 and before language/target expansion. No numerical maturity percentages are adopted without defined measurements.
+
 ## Purpose and primary unit
 
 Tracefold helps a developer create, review, execute and retain tests for a specific version of project code, then repeat the same tests after a repair. A Project is the workspace backed by a GitHub repository. Testing is the primary workflow. AI PR code review is an additional analysis tool.

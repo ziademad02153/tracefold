@@ -1,0 +1,25 @@
+{
+  "tabs": [
+    "Overview",
+    "Tests",
+    "Runs",
+    "AI Review"
+  ],
+  "realProjectRuns": 7,
+  "aliases": [
+    "results",
+    "repository-tests",
+    "pulls",
+    "history"
+  ],
+  "deepRunLinks": true,
+  "mixedFixture": true,
+  "partialFailureFixture": true,
+  "widths": [
+    390,
+    768,
+    1440
+  ],
+  "pageErrors": [],
+  "backendMutation": false
+}

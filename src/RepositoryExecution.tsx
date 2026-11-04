@@ -1,9 +1,9 @@
 import {useEffect,useState} from 'react'
 import {api} from './api'
-import {ProjectNavigation} from './ProjectHome'
+import {ProjectNavigation,ProjectTestNavigation} from './ProjectHome'
 import type {Discovery,ExecutionProfile,ProviderView} from './executionTypes'
 
-export function RepositoryExecution({repo,profileId,views}:{repo?:string;profileId?:string;views:Record<string,ProviderView>}){
+export function RepositoryExecution({repo,profileId,views,focusRunId}:{repo?:string;profileId?:string;views:Record<string,ProviderView>;focusRunId?:string}){
   const [providers,setProviders]=useState<{id:string;version:string}[]>([])
   const [provider,setProvider]=useState('')
   const [ref,setRef]=useState('main')
@@ -15,6 +15,11 @@ export function RepositoryExecution({repo,profileId,views}:{repo?:string;profile
   const [busy,setBusy]=useState('')
   const [loading,setLoading]=useState(true)
   const [error,setError]=useState('')
+  useEffect(()=>{
+    if(!focusRunId||!profile?.runs.some(run=>run.id===focusRunId))return
+    const timer=setTimeout(()=>document.getElementById('run-'+focusRunId)?.scrollIntoView({block:'start'}),0)
+    return()=>clearTimeout(timer)
+  },[focusRunId,profile?.id])
   useEffect(()=>{
     let active=true
     async function load(){try{
@@ -41,7 +46,7 @@ export function RepositoryExecution({repo,profileId,views}:{repo?:string;profile
   const running=!!busy||!!profile&&['running','preparing'].includes(profile.state)
   return <div className="repository-execution">
     <p className="page-help">Run this repository's existing tests in an approved environment. No AI generation is required. Results apply to the recorded revision and supported execution profile.</p>
-    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active="repository"/></>}
+    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={profile?.runs.length?'runs':'tests'}/>{!profile&&<ProjectTestNavigation repo={activeRepo} active="existing"/>}</>}
     {loading&&<p role="status">Loading execution workspace…</p>}
     {error&&<p className="error" role="alert">{error}</p>}
     {busy&&<p className="progress" role="status">{busy==='prepare'?'Preparing approved dependencies and installing the project. This can take several minutes.':busy==='run'?'Collecting and running existing tests…':'Preparing the repository snapshot…'}</p>}
@@ -64,7 +69,7 @@ export function RepositoryExecution({repo,profileId,views}:{repo?:string;profile
         {Editor?<Editor value={config} onChange={setConfig} disabled={running} discovery={discovery.discovery}/>:<p>This provider requires a registered configuration view.</p>}
         <button className="button" disabled={running||!Editor}>Save configuration for review</button>
       </form>}
-      <section className="surface"><h2>Saved repository environments</h2>{!profiles.length&&<p>No repository execution profiles yet.</p>}
+      <section className="surface"><h2>Saved execution profiles</h2>{!profiles.length&&<p>No repository execution profiles yet.</p>}
         {profiles.map(item=><article className="row history-row" key={item.id}><div><strong>{item.provider_id} · {item.state}</strong><p>{item.source.revision.slice(0,12)} · {item.runs.length} saved runs · {new Date(item.created_at).toLocaleString()}</p></div><a className="button secondary" href={'#execution/'+item.id}>Open environment and results →</a></article>)}
       </section>
     </>}
@@ -87,7 +92,7 @@ export function RepositoryExecution({repo,profileId,views}:{repo?:string;profile
         {profile.state==='interrupted'&&<p className="error">The earlier operation was interrupted. Retry preparation or execution; previous evidence is retained.</p>}
       </section>
       <section className="surface" id="repository-evidence"><h2>Saved repository test reports</h2>{!profile.runs.length&&<p>No tests have been executed for this environment yet.</p>}
-        {profile.runs.map((run,index)=><article className="run-evidence" key={run.id}>
+        {profile.runs.map((run,index)=><article className="run-evidence" id={'run-'+run.id} key={run.id}>
           <h3>Repository run {index+1} · <span className={run.status==='passed'?'passed':run.status==='failed'?'failed':''}>{run.status.replaceAll('_',' ').toUpperCase()}</span></h3>
           <p>{new Date(run.completed_at).toLocaleString()} · {run.profile_hash===profile.profile_hash?'Same approved profile':'Different profile'} · {run.environment_id===profile.environment?.id?'Same prepared environment':'Different environment'}</p>
           {run.summary&&<div className="suite-counts">{Object.entries(run.summary).map(([key,value])=><span key={key} className={key==='passed'?'passed':key==='failed'?'failed':''}><strong>{value}</strong> {labels[key]||key.replaceAll('_',' ')}</span>)}</div>}
