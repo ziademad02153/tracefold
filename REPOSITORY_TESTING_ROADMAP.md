@@ -23,6 +23,55 @@ Record the repository URL, immutable revision, project/component root, supported
 
 M2/M3 remain unimplemented until actual runner and UI work is delivered and tested. This intake/approval update does not claim repository execution exists today. A repo-specific implementation estimate follows intake, not a guess before seeing the project's requirements.
 
+## Architectural acceptance: Core Platform and Python Provider
+
+Approved direction: Tracefold is a general testing platform for Backend, AI, Web, API, Mobile and Embedded teams. Python is the first supported runtime. These engineering domains are not interchangeable language identifiers: a component profile also identifies its test framework, execution target and required facilities.
+
+Separate the existing Python workflow incrementally during M2 and M3. Do not postpone the provider boundary until the second language. The backend may remain implemented in Python; platform independence means its orchestration and data contracts do not require the tested project to use Python or pytest.
+
+### Ownership boundaries
+
+| Core Platform owns | Python Provider owns |
+|---|---|
+| Project/component identity and immutable source references | Python project/layout/manifest discovery |
+| Provider selection, contract version and capability negotiation | Interpreter, package installation, extras and dependency resolution |
+| Approved execution profiles, lifecycle and dispatch | Python build and pytest invocation/configuration/plugins |
+| Resource/access policies and worker capability matching | Native collection IDs and pytest outcome parsing |
+| Approval identity, persisted runs, artifact references and comparison | Python-specific source analysis and generated-test validation |
+| Generic result views and explicit unsupported/blocked outcomes | Native diagnostics and framework-specific evidence interpretation |
+
+The first contract covers discovery, preparation, collection, execution and evidence normalization; a build step may be part of preparation. Generation is an optional capability, not a prerequisite for running existing tests. The core must not import Python source analysis, pytest-specific parsers or the concrete Python runner to coordinate a run. A composition root registers/injects the concrete provider. Provider code depends on core contracts; core orchestration does not depend on a concrete provider.
+
+### Data and execution contracts
+
+- A profile has a provider ID/version, component/source identity, execution target, policy and a validated provider-specific configuration section. Python flags and installation settings stay in that section, not required fields of every core profile.
+- Tests use opaque provider-issued IDs, including native parameterized/class identities. A core test case does not require a Python function, .py path or test_ name. Optional display locations/metadata retain their provenance.
+- Results distinguish lifecycle/infrastructure failures from test outcomes. Preserve passed/failed/error/skipped/expected-failure/unexpected-pass/not-run information and the original native outcome where applicable; unsupported or unmapped outcomes cannot silently become a pass.
+- Evidence carries media type, artifact identity/hash and bounded content/reference metadata. Python/JUnit details remain available without making a specific evidence format mandatory for all providers. Reconcile collection and execution so absent evidence cannot produce all-passed status.
+- Runtime image/environment identity is recorded without assuming every target is a Linux Docker container. Future Windows, browser, simulator and hardware workers declare capabilities; they are not implemented by this separation.
+- Generic lifecycle, persistence and result UI consume these contracts. Python forms remain provider-specific views within that shell. Existing saved sessions keep an explicit legacy execution contract; refactoring cannot silently change approved code or historical evidence.
+- A local model is optional for execution. M3 must be usable with existing repository tests when Gemma is unavailable.
+
+### Delivery split
+
+**During M2:** define the minimal versioned contract from real pilot needs, separate Python discovery/preparation from core profile/source/run ownership, and route operations through explicit provider dispatch. Avoid a plugin marketplace, dynamic installation system, speculative universal build DSL or production implementations of future providers.
+
+**During M3:** route collection/execution through the same boundary, persist normalized and native evidence, adapt generic result views and preserve the legacy session path. Complete the architectural review below together with real-project functional acceptance.
+
+### Mandatory Architecture Review after M3, before M4
+
+Produce a review against the delivered code, not only a target diagram. The review record must include:
+
+1. An as-built dependency diagram, module ownership and the implemented provider/profile/result schema, compared with the boundaries above.
+2. Dependency checks showing core orchestration imports contracts rather than Python/pytest implementation details. Provider-specific form fields must not be mandatory for generic runs or evidence.
+3. A contract-test provider with non-Python-shaped identities/artifacts. Exercise dispatch, lifecycle failures, persistence, reopening and generic result rendering without the Python runner or Gemma. This fixture demonstrates boundary behavior only; it does not claim a second language is supported.
+4. The real Python pilot evidence: preparation, native collection/configuration, reference outcome comparison and repeatability after restart, plus regression checks for existing approved sessions.
+5. Failure-path checks for unsupported capability/target, preparation failure, collection failure, zero tests, skipped/expected-failure cases, timeout and incomplete evidence.
+6. A concrete change map for one hypothetical next provider: new provider package/worker profile and registration should suffice for the shared lifecycle and result flow. Any required edits to core orchestration/schema/rendering must be explained and assessed before claiming extensibility.
+7. A findings table with evidence, severity, required fixes and remaining limitations. Mark the review passed only when blocking coupling is resolved; list future extensions honestly rather than promise no core changes will ever be needed.
+
+M3 exits only when both real-project functional acceptance and this Architecture Review pass. Present that review to the user and obtain the next scope decision before starting M4 or language expansion. No claim of architectural independence is made by this document alone.
+
 ## Direct answer
 
 Tracefold becomes capable of executing a real Python repository when it can reproduce that repository's approved test environment and run its existing configured test suite from an immutable checkout. That is the exit gate for Milestone 3 below. Repository-wide AI test generation is a subsequent gate, Milestone 4. Shared daily team use also has a separate operational release gate.

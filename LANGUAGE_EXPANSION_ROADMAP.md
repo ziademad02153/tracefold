@@ -23,7 +23,7 @@ This is the default sequence, not a dated commitment. After M4, inventory real c
 
 ## Shared architecture, language-specific adapters
 
-Keep repository snapshots, approval, job lifecycle, suite identities, history, evidence storage and before/after comparison shared. Extract a runner adapter contract from the proven Python pipeline when adding the first new language; do not build an unused plugin framework during Sprint 3.
+Keep repository snapshots, approval, job lifecycle, suite identities, history, evidence storage and before/after comparison shared. Separate the Python Provider incrementally during M2 and M3, before adding the next language. The mandatory [post-M3 Architecture Review](REPOSITORY_TESTING_ROADMAP.md#architectural-acceptance-core-platform-and-python-provider) must verify the actual dependency direction, generic contracts and evidence flow. Do not build an unused plugin framework or implement future language providers during this separation.
 
 An adapter must implement discovery -> environment preparation -> build -> test collection -> execution -> evidence normalization, plus framework-specific generated-test validation. It declares language/runtime/platform versions, project roots, commands as argument arrays, lock/restore metadata, test framework, resource limits and required services/devices.
 

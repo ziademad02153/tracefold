@@ -95,6 +95,8 @@ Open a Project to see Overview, Tests and Results. Overview uses saved activity 
 
 Current approved scope: Sprint 3 / M1 accepted; next M2 Project Environment and M3 Repository Test Execution. The user will supply the real Python pilot and install/test commands. Review the working product at M3 before starting M4 or other additions. Repository execution is not implemented by this planning update.
 
+Architecture gate: separate Python Provider from Core Platform during M2/M3. At M3, review as-built dependencies, provider-neutral lifecycle/results/evidence, a non-Python contract-test fixture and legacy compatibility alongside the real Python pilot. Both functional and architectural acceptance must pass before the next scope decision. See the [architectural acceptance criteria](REPOSITORY_TESTING_ROADMAP.md#architectural-acceptance-core-platform-and-python-provider).
+
 - [Python M1–M4 repository testing roadmap](REPOSITORY_TESTING_ROADMAP.md)
 - [Language Expansion Roadmap: C#, Java, C/C++ and Embedded](LANGUAGE_EXPANSION_ROADMAP.md)
 - [Sprint 3 File Testing scope and verification](SPRINT3.md)
