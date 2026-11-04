@@ -2,6 +2,8 @@
 
 Status 4 November 2026. Planning only. No new testing capability is introduced by this document.
 
+Implementation update: M1 / Sprint 3 has been authorized. See [SPRINT3.md](SPRINT3.md) for implementation evidence and limits. The current-state description below records the baseline at roadmap approval. [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md) defines the direction beyond Python M4.
+
 ## Direct answer
 
 Tracefold becomes capable of executing a real Python repository when it can reproduce that repository's approved test environment and run its existing configured test suite from an immutable checkout. That is the exit gate for Milestone 3 below. Repository-wide AI test generation is a subsequent gate, Milestone 4. Shared daily team use also has a separate operational release gate.

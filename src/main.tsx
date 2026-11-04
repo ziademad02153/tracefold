@@ -96,7 +96,7 @@ function App() {
   },[page,id,repoPath,invalidRoute,refreshVersion])
 
   useEffect(() => {
-    document.title = page === 'testing' || page === 'test-session' ? 'Function testing · Tracefold' : page === 'history' ? 'Saved reports · Tracefold' : page === 'report' ? 'Review report · Tracefold' : page === 'pulls' ? 'Code review · Tracefold' : page === 'project' ? 'Project overview · Tracefold' : page === 'results' ? 'Test results · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
+    document.title = page === 'testing' || page === 'test-session' ? 'Python testing · Tracefold' : page === 'history' ? 'Saved reports · Tracefold' : page === 'report' ? 'Review report · Tracefold' : page === 'pulls' ? 'Code review · Tracefold' : page === 'project' ? 'Project overview · Tracefold' : page === 'results' ? 'Test results · Tracefold' : page === 'connect' ? 'Add repository · Tracefold' : 'Repositories · Tracefold'
     heading.current?.focus()
     window.scrollTo(0, 0)
   },[hash,page])
@@ -200,7 +200,7 @@ function App() {
         </article>)}
       </>}
       {page === 'pulls' && !invalidRoute && <>
-        <p className="section"><a className="button secondary" href={'#testing/' + encodeURIComponent(project)}>Test a function without a pull request →</a></p>
+        <p className="section"><a className="button secondary" href={'#testing/' + encodeURIComponent(project)}>Test a Python file without a pull request →</a></p>
         <div className="row section"><div><h2>{project}</h2><p>Up to 30 recently updated pull requests, including closed changes.</p></div><button className="button secondary" disabled={pending || loading} onClick={() => setRefreshVersion(value => value + 1)}>Refresh list</button></div>
         {pullError && <p className="error" role="alert">{pullError} Saved reports remain available below.</p>}
         {!loading && !error && !pullError && pulls.length === 0 && <div className="surface empty"><h2>No pull requests to review yet</h2><p>Create a pull request on GitHub and return here, or use another repository with an existing PR.</p><a className="button secondary" href={"https://github.com/" + project + "/pulls"} target="_blank" rel="noreferrer">View pull requests on GitHub ↗</a></div>}

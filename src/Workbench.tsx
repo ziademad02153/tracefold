@@ -13,10 +13,11 @@ type Session = {
   id:string; repo:string; state:string; path:string; function:string; expected:string;
   source:string; sha:string; test_code:string; test_hash:string; scenario:string;
   approved_at:string|null; runs:Run[]; model:string; tests?:TestCase[];
+  mode?:'file'|'function'; functions?:string[]; module_name?:string;
 }
 type History = {test_count?:number; id:string; path:string; function:string; created_at:string}
 type Files = {sha:string; files:string[]}
-type Functions = {sha:string; source:string; functions:string[]}
+type Functions = {sha:string; source:string; functions:string[]; module_name:string}
 
 export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
   const [session,setSession] = useState<Session>()
@@ -27,6 +28,7 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
   const [path,setPath] = useState('')
   const [functions,setFunctions] = useState<Functions>()
   const [fn,setFn] = useState('')
+  const [selected,setSelected] = useState<string[]>([])
   const [expected,setExpected] = useState('')
   const [runRef,setRunRef] = useState('')
   const [busy,setBusy] = useState('')
@@ -86,7 +88,7 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
   const isSuite=testCount>1
   const latest=session?.runs.at(-1)
   return <div className="testing-workspace">
-    <p className="page-help">Choose one standalone Python function. Define its expected behavior, review a generated suite of 3–5 tests, then run all tests and save each result.</p>
+    <p className="page-help">{session?(session.mode!=='file'?'This saved session uses the earlier standalone-function runner. Its approved tests and evidence are preserved.':'Review this saved file test suite, run it against a selected revision, then rerun the same tests after your fix. Results are saved below.'):'Test a Python file in context: choose up to five public functions, define expected behavior, review 3–5 generated tests and run them against the original module.'}</p>
     {session&&<ProjectNavigation repo={session.repo} active="tests"/>}
     {activeRepo&&<p><a href={'#testing/'+encodeURIComponent(activeRepo)}>{activeRepo}</a></p>}
     {error&&<p className="error" role="alert">{error}</p>}
@@ -97,7 +99,7 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
         setFiles(await api<Files>('testing/files?repo='+encodeURIComponent(repo)+'&ref='+encodeURIComponent(ref)))
       })}}>
         <h2>1. Select code</h2>
-        <p>Standalone Python functions with built-ins or supported standard-library imports. Classes, project helpers and external dependencies are outside this first workflow.</p>
+        <p>The full file is executed with its helpers, constants and supported standard-library imports. Cross-file imports, package initializers and external dependencies require the later repository environment milestone.</p>
         <label htmlFor="test-ref">Branch or commit ID</label>
         <div className="row"><input id="test-ref" list="test-branches" value={ref} required disabled={!!busy}
           onChange={event=>{setRef(event.target.value);setFiles(undefined);setFunctions(undefined);setFn('')}}/>
@@ -113,24 +115,26 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
         {!files.files.length&&<p>No supported Python files in this revision.</p>}
         <button className="button secondary" disabled={!!busy||!path} onClick={()=>void action('functions',async()=>{
           const data=await api<Functions>('testing/functions?repo='+encodeURIComponent(repo)+'&ref='+files.sha+'&path='+encodeURIComponent(path))
-          setFunctions(data);setFn(data.functions[0]||'')
-        })}>Load functions</button>
+          setFunctions(data);setFn(data.functions[0]||'');setSelected(data.functions.slice(0,5))
+        })}>Inspect file</button>
         {functions&&<>
-          <label htmlFor="test-function">Function</label>
-          <select id="test-function" value={fn} onChange={event=>setFn(event.target.value)} disabled={!!busy}>
-            {functions.functions.map(name=><option key={name} value={name}>{name}</option>)}
-          </select>
-          {!functions.functions.length&&<p>No standalone synchronous functions supported in this file.</p>}
+          <fieldset disabled={!!busy}><legend>Functions to cover · {selected.length}/5 selected</legend>
+            {functions.functions.map(name=><label className="function-choice" key={name}><input type="checkbox" checked={selected.includes(name)}
+              disabled={!selected.includes(name)&&selected.length>=5}
+              onChange={event=>setSelected(current=>event.target.checked?[...current,name]:current.filter(item=>item!==name))}/>{name}</label>)}
+          </fieldset>
+          <p className="muted">Module: {functions.module_name}. Helpers and constants remain in the source file. The suite covers your selected functions, not every possible behavior in the file.</p>
+          {!functions.functions.length&&<p>No public synchronous functions without decorators are available in this file.</p>}
           <details><summary>View source file</summary><pre>{functions.source}</pre></details>
         </>}
       </section>}
-      {functions&&fn&&<form className="surface" onSubmit={event=>{event.preventDefault();void action('generate',async()=>{
+      {functions&&fn&&selected.length>0&&<form className="surface" onSubmit={event=>{event.preventDefault();void action('generate',async()=>{
         const origin=location.hash
-        const data=await api<Session>('testing/sessions',{repo,ref:functions.sha,path,function:fn,expected})
+        const data=await api<Session>('testing/sessions',{repo,ref:functions.sha,path,function:selected[0],functions:selected,mode:'file',expected})
         if(location.hash===origin)location.hash='#test-session/'+data.id
       })}}>
         <h2>2. Define the expected behavior</h2>
-        <p>Describe supported inputs, normal behavior and boundary values. Gemma will propose 3–5 distinct tests for your review.</p>
+        <p>Describe the expected behavior of every selected function, including supported inputs and boundary values. Gemma will propose 3–5 tests across this selection.</p>
         <label htmlFor="test-expected">Expected behavior</label>
         <textarea id="test-expected" value={expected} minLength={10} maxLength={3000} required disabled={!!busy}
           placeholder="For price 10000 cents and discount 20%, return 8000 cents."
@@ -145,7 +149,7 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
     </>}
     {session&&<>
       <section className="surface"><p className="eyebrow">Saved test session</p><h2>{session.function}</h2>
-        <p>{session.path} · Initial revision {session.sha.slice(0,12)}</p>
+        <p>{session.path} · {session.mode==='file'?'Original file context':'Legacy standalone function'} · Initial revision {session.sha.slice(0,12)}</p>
         {session.runs.length > 0 && <p className="session-verdict"><strong>Latest result: {session.runs[session.runs.length-1].status.toUpperCase()}</strong> · {session.runs.length} saved runs using the same approved {isSuite?'suite':'test'}</p>}
         {latest?.summary&&<div className="suite-counts"><strong>Latest run</strong><span className="passed">{latest.summary.passed} passed</span><span className="failed">{latest.summary.failed} failed</span><span>{latest.summary.blocked+latest.summary.skipped+latest.summary.not_run} incomplete</span>
           <button className="button secondary" onClick={()=>document.getElementById('execution-evidence')?.scrollIntoView({behavior:'smooth'})}>View per-test results ↓</button></div>}
@@ -153,7 +157,9 @@ export function Workbench({repo,sessionId}:{repo?:string;sessionId?:string}) {
         <details><summary>Source used to generate the test</summary><pre>{session.source}</pre></details>
       </section>
       <section className="surface">
-        <h2>3. Review generated {isSuite?'tests':'test'} · {testCount} {testCount===1?'test':'tests'}</h2><p>{session.scenario}</p>
+        <h2>3. Review generated {isSuite?'tests':'test'} · {testCount} {testCount===1?'test':'tests'}</h2>
+        <p>Check the scenarios below and verify each expected result before approving the code.</p>
+        <details><summary>Model's suite summary</summary><p>{session.scenario}</p></details>
         {isSuite&&<ol className="suite-plan">{session.tests?.map(test=><li key={test.name}><strong>{test.name}</strong><p>{test.scenario}</p></li>)}</ol>}
         <h3>Code to approve</h3>
         <pre>{session.test_code}</pre>

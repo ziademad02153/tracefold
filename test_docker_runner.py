@@ -4,6 +4,33 @@ from test_runner import execute_test, runner_status, parse_results, summarize
 
 @unittest.skipUnless(runner_status()["ready"], "Build and start the Docker pytest runner first.")
 class DockerRunnerTests(unittest.TestCase):
+    def test_original_module_helpers_constants_and_identity_survive_repair(self):
+        source = '''LIMIT = 3
+def _cap(requested):
+    return max(requested, LIMIT)
+def retry(requested):
+    return _cap(requested)
+def remaining(requested):
+    return LIMIT - retry(requested)
+'''
+        suite = '''from policy.retries import retry, remaining
+def test_cap():
+    assert retry(5) == 3
+def test_small():
+    assert retry(2) == 2
+def test_remaining():
+    assert remaining(2) == 1
+def test_module_identity():
+    assert retry.__module__ == "policy.retries"
+'''
+        bad = execute_test(source, suite, source_path='policy/retries.py')
+        fixed = execute_test(source.replace('max(requested, LIMIT)', 'min(requested, LIMIT)'), suite, source_path='policy/retries.py')
+        self.assertEqual(bad['status'], 'failed', bad['log'])
+        self.assertEqual(bad['summary']['failed'], 3)
+        self.assertEqual(bad['summary']['passed'], 1)
+        self.assertEqual(fixed['status'], 'passed', fixed['log'])
+        self.assertEqual(fixed['summary']['passed'], 4)
+
     def test_pass_failure_and_collection_error_have_distinct_states(self):
         source = "def add(a, b): return a+b"
         for test, expected in [
@@ -66,6 +93,10 @@ def test_isolation():
 
 
 class EvidenceParsingTests(unittest.TestCase):
+    def test_source_paths_cannot_escape_or_replace_generated_tests(self):
+        for path in ['../escape.py', '/tmp/escape.py', 'C:\\escape.py', 'test_generated.py', 'a/../../b.py']:
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                execute_test('def f(): return 1', 'def test_f(): assert True', source_path=path)
     def test_missing_results_remain_not_run(self):
         result=parse_results(b'<testsuites><testsuite><testcase name="test_a" time="0.1"/></testsuite></testsuites>',["test_a","test_b"])
         self.assertEqual(summarize(result),{"total":2,"passed":1,"failed":0,"blocked":0,"skipped":0,"not_run":1})

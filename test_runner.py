@@ -7,6 +7,8 @@ import tempfile
 import threading
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from pathlib import PurePosixPath
+import keyword
 from time import monotonic
 from uuid import uuid4
 
@@ -63,7 +65,13 @@ def summarize(tests):
     }}
 
 
-def execute_test(source, test_code, image_id=None):
+def execute_test(source, test_code, image_id=None, source_path="target.py"):
+    relative = PurePosixPath(source_path)
+    parts = source_path.removesuffix(".py").split("/")
+    if (relative.is_absolute() or not source_path.endswith(".py")
+            or any(not part.isidentifier() or keyword.iskeyword(part) for part in parts)
+            or any(part in {"test_generated", "conftest", "__init__", "pytest"} for part in parts)):
+        raise ValueError("Unsupported source module path.")
     start = monotonic()
     names = planned_tests(test_code)
     tests = [{"name": name, "status": "not_run", "detail": "Run did not complete.", "seconds": 0} for name in names]
@@ -75,7 +83,9 @@ def execute_test(source, test_code, image_id=None):
     name = "tracefold-test-" + uuid4().hex
     with tempfile.TemporaryDirectory(prefix="tracefold-") as directory:
         path = Path(directory)
-        (path / "target.py").write_text(source, encoding="utf-8")
+        module_path = path.joinpath(*relative.parts)
+        module_path.parent.mkdir(parents=True, exist_ok=True)
+        module_path.write_text(source, encoding="utf-8")
         (path / "test_generated.py").write_text(test_code, encoding="utf-8")
         marker = "TRACEFOLD-EVIDENCE-" + uuid4().hex + ":"
         # Read the ephemeral XML before the container exits, then emit a bounded artifact.

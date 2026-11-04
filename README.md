@@ -1,8 +1,8 @@
 # Tracefold
 
-Tracefold is an early engineering review workspace. It imports pull requests from public GitHub repositories and saves a snapshot of the diff and commit IDs for later review.
+Tracefold is an early Python testing workspace. It generates reviewed pytest suites, executes them in bounded Docker containers and saves evidence for comparison against a repair revision. Public GitHub PR review is an additional advisory workflow.
 
-**Status: local prototype.** The public import uses GitHub data. The bundled demo uses sample check results. Local AI diff review uses gemma4:e4b through Ollama. Function testing supports standalone Python functions, Gemma-generated pytest tests, explicit approval, Docker execution and saved evidence. Live CI results, private repository access and team authentication are planned. Treat this build as a single-user local tool.
+**Status: single-user local pilot.** New test sessions execute an original Python module with same-file helpers and constants, with up to five selected public functions and 3–5 approved tests. Supported standard-library imports only; cross-file imports, package initializers and external dependencies need M2. Earlier standalone sessions remain readable and runnable. Local AI uses gemma4:e4b through Ollama. Private repository access, full repository environments and shared deployment remain planned.
 
 ## Architecture
 
@@ -37,7 +37,7 @@ Frontend, in terminal two:
     npm.cmd ci
     npm.cmd run dev
 
-Open [Tracefold](http://127.0.0.1:5173/#connect). Paste a public GitHub repository URL, select a pull request and create a report. Refresh the report and reopen it from Saved reports. A repository with no PRs has no importable change in the current flow. Try demo provides a bundled PR.
+Open [Tracefold](http://127.0.0.1:5173/#connect). Add a public GitHub repository, open its project and choose **Create test suite**. Select a revision and Python file, inspect it, select public functions and describe expected behavior. Review the generated suite, approve it and run it. Rerun the same approved suite on your repair revision. This testing workflow does not require a pull request. Advisory PR review is available separately inside the project.
 
 ## Build and verify
 
@@ -45,7 +45,7 @@ Open [Tracefold](http://127.0.0.1:5173/#connect). Paste a public GitHub reposito
 
 Restart FastAPI after building to serve the compiled frontend and API together at [port 8001](http://127.0.0.1:8001/). Vite on port 5173 proxies API requests to port 8001.
 
-Smoke check the demo, then use a public repository with a PR. Verify the saved report shows the source, two commit IDs and the diff. Check that an invalid repository produces a readable error and a repository with zero PRs shows an empty state.
+Verify the test workflow with a known defect and its repair, confirm the suite hash is unchanged and reopen saved evidence after refresh. Also check invalid repository input, unsupported file dependencies and the separate PR review empty state.
 
 SQLite creates an ignored tracefold.db. For PostgreSQL, set POSTGRES_PASSWORD, run docker compose up -d, and set DATABASE_URL to a postgresql+psycopg URL before starting FastAPI. PostgreSQL and SQLite use separate stores. The PostgreSQL deployment path still needs integration testing.
 
@@ -75,18 +75,26 @@ See [AUDIT.md](AUDIT.md) for tested flows, fixes and the release decision. Run t
 
 ## Function testing
 
-Select **Test a function** on a repository card. Choose a branch, file and function, describe expected behavior, generate a test and review it before approval. Run the saved test on the initial revision, then rerun it on your repair branch. Sessions and execution evidence are persisted. See [SPRINT1.md](SPRINT1.md) for scope, runner setup and real acceptance evidence.
+The original standalone-function implementation is recorded in [SPRINT1.md](SPRINT1.md). New sessions use file context as described in [SPRINT3.md](SPRINT3.md); older approved sessions retain their original execution contract.
 
     docker build -t tracefold-pytest:1 runner
 
-No application data or credentials are mounted into test containers. Docker must be running. Tests that require external project packages or helper modules are outside this standalone-function workflow.
+No application data or credentials are mounted into test containers. Docker must be running. Same-file helpers are supported in new sessions. Imports of other project files and external project packages remain outside M1.
 
 
 ## Sprint 2 suites
 
-New sessions generate 3–5 pytest tests for the selected standalone function. Review their scenarios and code, approve the entire suite, then select **Run all tests**. Each saved run shows per-test status, duration and evidence. Reuse the same saved suite on a repair branch. See [SPRINT2.md](SPRINT2.md) for the verified five-test acceptance result and current limitations.
+Sprint 2 established 3–5 pytest tests, whole-suite approval and per-test saved evidence. Those contracts continue in File Testing. See [SPRINT2.md](SPRINT2.md) for its historical acceptance record.
 
 
 ## Product structure
 
-Open a Project to see Overview, Tests and Results. Overview uses saved activity only. Tests creates or reopens suites, and Results opens execution evidence. Advisory PR code review is an additional tool inside the project. See [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md) for the sitemap, architecture and proposed File Testing milestone.
+Open a Project to see Overview, Tests and Results. Overview uses saved activity only. Tests creates or reopens suites, and Results opens execution evidence. Advisory PR code review is an additional tool inside the project. See [PRODUCT_BLUEPRINT.md](PRODUCT_BLUEPRINT.md) for the sitemap and architecture.
+
+## Product direction and implementation gates
+
+- [Python M1–M4 repository testing roadmap](REPOSITORY_TESTING_ROADMAP.md)
+- [Language Expansion Roadmap: C#, Java, C/C++ and Embedded](LANGUAGE_EXPANSION_ROADMAP.md)
+- [Sprint 3 File Testing scope and verification](SPRINT3.md)
+
+Language expansion follows Python M4 and uses separately validated execution profiles. Reading a language is not equivalent to compiling and testing its projects.

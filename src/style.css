@@ -155,4 +155,7 @@ textarea { min-height: 130px; resize: vertical; }
 .project-tabs a[aria-current="page"] { border-bottom: 3px solid #526b31; font-weight: 700; }
 .project-metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
 .project-metrics strong { font-size: 30px; }
+.function-choice { display: flex; gap: 10px; align-items: center; margin: 10px 0; overflow-wrap: anywhere; }
+.function-choice input[type="checkbox"] { flex: none; min-width: 18px; width: 18px; height: 18px; padding: 0; }
+.testing-workspace fieldset { border: 1px solid var(--border); border-radius: 6px; margin-top: 20px; }
 @media(max-width:600px) { .project-metrics { grid-template-columns: 1fr; gap: 0; } }

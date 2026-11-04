@@ -38,7 +38,7 @@ export function ProjectHome({repo,results=false}:{repo:string;results?:boolean})
       {!results&&<>
         <section className="surface row"><div><p className="eyebrow">Your next step</p><h2>{data.suite_count?'Create or rerun a test suite':'Create your first test suite'}</h2>
           <p>Choose Python code, describe its expected behavior, review generated tests and run them.</p>
-          <p className="muted">Available now: one standalone Python function per suite. File and repository testing are planned.</p></div>
+          <p className="muted">Available now: Python file testing with same-file helpers and constants. Select up to five public functions per suite. Cross-file dependencies and repository environments are planned.</p></div>
           <a className="button" href={'#testing/'+encodeURIComponent(repo)}>Create test suite →</a>
         </section>
         <div className="project-metrics">

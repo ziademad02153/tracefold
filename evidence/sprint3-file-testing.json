@@ -1,0 +1,168 @@
+{
+  "url": "http://127.0.0.1:5173/#test-session/9ba3c48709744ce88a26e4acb7a4b610",
+  "session": {
+    "id": "9ba3c48709744ce88a26e4acb7a4b610",
+    "repo": "ziademad02153/tracefold-validation",
+    "state": "ready",
+    "scenario": "Generate a suite of 3 to 5 distinct pytest tests for the selected public Python functions using the FULL source module context. Cover every selected function at least once. Preserve helper calls and constants in the original module; never copy production functions into tests. Each test must exercise a meaningful different example grounded in the user's expected behavior. Include normal and boundary cases within the documented valid inputs. Do not invent negative, null or unsupported inputs. Give each test a unique descriptive name. The names in tests[] must exactly match the functions in test_code. Import selected functions using from pricing import FUNCTION_NAME. Use separate def test_NAME() functions with no parameters, decorators, fixtures or parametrization. Use plain assert statements. Do not change the expected result to match a bug in the code. Copy exact expected values supplied by the user verbatim, including rounding expectations. Use only Python standard library and pytest.",
+    "tests": [
+      {
+        "name": "test_price_twenty_percent",
+        "scenario": "Tests price_after_discount with a standard 20% discount."
+      },
+      {
+        "name": "test_price_zero_percent",
+        "scenario": "Tests price_after_discount when the discount percentage is 0% (boundary case)."
+      },
+      {
+        "name": "test_price_full_discount",
+        "scenario": "Tests price_after_discount when the discount percentage is 100% (boundary case)."
+      },
+      {
+        "name": "test_amount_twenty_percent",
+        "scenario": "Tests discount_amount calculation for a 20% discount."
+      },
+      {
+        "name": "test_amount_rounding",
+        "scenario": "Tests discount_amount calculation where rounding down occurs in price_after_discount."
+      }
+    ],
+    "test_code": "from pricing import price_after_discount, discount_amount\n\ndef test_price_twenty_percent():\n    assert price_after_discount(10000, 20) == 8000\n\ndef test_price_zero_percent():\n    assert price_after_discount(10000, 0) == 10000\n\ndef test_price_full_discount():\n    assert price_after_discount(10000, 100) == 0\n\ndef test_amount_twenty_percent():\n    assert discount_amount(10000, 20) == 2000\n\ndef test_amount_rounding():\n    assert discount_amount(3333, 10) == 334",
+    "generation_attempts": 1,
+    "path": "pricing.py",
+    "function": "price_after_discount, discount_amount",
+    "functions": [
+      "price_after_discount",
+      "discount_amount"
+    ],
+    "mode": "file",
+    "module_name": "pricing",
+    "expected": "Both functions accept integer price_cents >= 0 and integer percent in [0,100]. price_after_discount subtracts the percentage discount and rounds down to whole cents; discount_amount returns original price minus that discounted price. Generate exactly five tests with these UNIQUE names and exact assertions: test_price_twenty_percent: price_after_discount(10000,20)==8000; test_price_zero_percent: price_after_discount(10000,0)==10000; test_price_full_discount: price_after_discount(10000,100)==0; test_amount_twenty_percent: discount_amount(10000,20)==2000; test_amount_rounding: discount_amount(3333,10)==334. Copy the exact expected integers; 334 is intentional because 3333 minus floor(3333*90/100) is 334.",
+    "sha": "6909cd715d747c907ad3114a3c771d1ac6a1494f",
+    "ref": "6909cd715d747c907ad3114a3c771d1ac6a1494f",
+    "source": "PERCENT_SCALE = 100\n\ndef _remaining_percent(percent):\n    return PERCENT_SCALE + percent\n\ndef price_after_discount(price_cents, percent):\n    \"\"\"Return discounted cents, rounded down. price_cents >= 0, percent in [0, 100].\"\"\"\n    return price_cents * _remaining_percent(percent) // PERCENT_SCALE\n\ndef discount_amount(price_cents, percent):\n    \"\"\"Return original price minus discounted price, in integer cents.\"\"\"\n    return price_cents - price_after_discount(price_cents, percent)\n",
+    "model": "gemma4:e4b",
+    "suite_version": 2,
+    "test_hash": "b095a186308951be30b26efa5ad4795de758d087722734ca879735cceb0b4ab9",
+    "created_at": "2026-11-04T11:03:07.735742+00:00",
+    "approved_at": "2026-11-04T11:03:08.426413+00:00",
+    "runner_image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+    "run_started": 1793790192.6697364,
+    "runs": [
+      {
+        "id": "d27cfb9166a946719344f480f9a7b34b",
+        "status": "failed",
+        "exit_code": 1,
+        "log": "F.FFF                                                                    [100%]\n=================================== FAILURES ===================================\n__________________________ test_price_twenty_percent ___________________________\ntest_generated.py:4: in test_price_twenty_percent\n    assert price_after_discount(10000, 20) == 8000\nE   assert 12000 == 8000\nE    +  where 12000 = price_after_discount(10000, 20)\n___________________________ test_price_full_discount ___________________________\ntest_generated.py:10: in test_price_full_discount\n    assert price_after_discount(10000, 100) == 0\nE   assert 20000 == 0\nE    +  where 20000 = price_after_discount(10000, 100)\n__________________________ test_amount_twenty_percent __________________________\ntest_generated.py:13: in test_amount_twenty_percent\n    assert discount_amount(10000, 20) == 2000\nE   assert -2000 == 2000\nE    +  where -2000 = discount_amount(10000, 20)\n_____________________________ test_amount_rounding _____________________________\ntest_generated.py:16: in test_amount_rounding\n    assert discount_amount(3333, 10) == 334\nE   assert -333 == 334\nE    +  where -333 = discount_amount(3333, 10)\n---------------- generated xml file: /tmp/tracefold-results.xml ----------------\n=========================== short test summary info ============================\nFAILED test_generated.py::test_price_twenty_percent - assert 12000 == 8000\nFAILED test_generated.py::test_price_full_discount - assert 20000 == 0\nFAILED test_generated.py::test_amount_twenty_percent - assert -2000 == 2000\nFAILED test_generated.py::test_amount_rounding - assert -333 == 334\n4 failed, 1 passed in 0.13s\n\n",
+        "seconds": 1.75,
+        "image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "tests": [
+          {
+            "name": "test_price_twenty_percent",
+            "status": "failed",
+            "detail": "test_generated.py:4: in test_price_twenty_percent\n    assert price_after_discount(10000, 20) == 8000\nE   assert 12000 == 8000\nE    +  where 12000 = price_after_discount(10000, 20)",
+            "seconds": 0.001
+          },
+          {
+            "name": "test_price_zero_percent",
+            "status": "passed",
+            "detail": "Assertions passed.",
+            "seconds": 0
+          },
+          {
+            "name": "test_price_full_discount",
+            "status": "failed",
+            "detail": "test_generated.py:10: in test_price_full_discount\n    assert price_after_discount(10000, 100) == 0\nE   assert 20000 == 0\nE    +  where 20000 = price_after_discount(10000, 100)",
+            "seconds": 0.001
+          },
+          {
+            "name": "test_amount_twenty_percent",
+            "status": "failed",
+            "detail": "test_generated.py:13: in test_amount_twenty_percent\n    assert discount_amount(10000, 20) == 2000\nE   assert -2000 == 2000\nE    +  where -2000 = discount_amount(10000, 20)",
+            "seconds": 0.001
+          },
+          {
+            "name": "test_amount_rounding",
+            "status": "failed",
+            "detail": "test_generated.py:16: in test_amount_rounding\n    assert discount_amount(3333, 10) == 334\nE   assert -333 == 334\nE    +  where -333 = discount_amount(3333, 10)",
+            "seconds": 0.001
+          }
+        ],
+        "summary": {
+          "total": 5,
+          "passed": 1,
+          "failed": 4,
+          "blocked": 0,
+          "skipped": 0,
+          "not_run": 0
+        },
+        "sha": "6909cd715d747c907ad3114a3c771d1ac6a1494f",
+        "ref": "6909cd715d747c907ad3114a3c771d1ac6a1494f",
+        "source_hash": "e4692846743441f62f267bafb32a3379015942538335f75dad00231c779a6527",
+        "source": "PERCENT_SCALE = 100\n\ndef _remaining_percent(percent):\n    return PERCENT_SCALE + percent\n\ndef price_after_discount(price_cents, percent):\n    \"\"\"Return discounted cents, rounded down. price_cents >= 0, percent in [0, 100].\"\"\"\n    return price_cents * _remaining_percent(percent) // PERCENT_SCALE\n\ndef discount_amount(price_cents, percent):\n    \"\"\"Return original price minus discounted price, in integer cents.\"\"\"\n    return price_cents - price_after_discount(price_cents, percent)\n",
+        "test_hash": "b095a186308951be30b26efa5ad4795de758d087722734ca879735cceb0b4ab9",
+        "mode": "file",
+        "source_path": "pricing.py",
+        "runner_image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "completed_at": "2026-11-04T11:03:10.894106+00:00"
+      },
+      {
+        "id": "2b993543e9834033accc62de4e085f5b",
+        "status": "passed",
+        "exit_code": 0,
+        "log": ".....                                                                    [100%]\n---------------- generated xml file: /tmp/tracefold-results.xml ----------------\n5 passed in 0.09s\n\n",
+        "seconds": 1.41,
+        "image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "tests": [
+          {
+            "name": "test_price_twenty_percent",
+            "status": "passed",
+            "detail": "Assertions passed.",
+            "seconds": 0.001
+          },
+          {
+            "name": "test_price_zero_percent",
+            "status": "passed",
+            "detail": "Assertions passed.",
+            "seconds": 0.001
+          },
+          {
+            "name": "test_price_full_discount",
+            "status": "passed",
+            "detail": "Assertions passed.",
+            "seconds": 0
+          },
+          {
+            "name": "test_amount_twenty_percent",
+            "status": "passed",
+            "detail": "Assertions passed.",
+            "seconds": 0
+          },
+          {
+            "name": "test_amount_rounding",
+            "status": "passed",
+            "detail": "Assertions passed.",
+            "seconds": 0
+          }
+        ],
+        "summary": {
+          "total": 5,
+          "passed": 5,
+          "failed": 0,
+          "blocked": 0,
+          "skipped": 0,
+          "not_run": 0
+        },
+        "sha": "9abc67b3824b26eaa27905f723a8f362d28f859a",
+        "ref": "sprint3-file-fixed",
+        "source_hash": "26795e963b40920e704e8c063c98ad009de59442b5713eccb77c23e6b7cb048d",
+        "source": "PERCENT_SCALE = 100\n\ndef _remaining_percent(percent):\n    return PERCENT_SCALE - percent\n\ndef price_after_discount(price_cents, percent):\n    \"\"\"Return discounted cents, rounded down. price_cents >= 0, percent in [0, 100].\"\"\"\n    return price_cents * _remaining_percent(percent) // PERCENT_SCALE\n\ndef discount_amount(price_cents, percent):\n    \"\"\"Return original price minus discounted price, in integer cents.\"\"\"\n    return price_cents - price_after_discount(price_cents, percent)\n",
+        "test_hash": "b095a186308951be30b26efa5ad4795de758d087722734ca879735cceb0b4ab9",
+        "mode": "file",
+        "source_path": "pricing.py",
+        "runner_image": "sha256:69a3dde6ca384de901360225bc12cf181ed274cf25aae6b5519802ce84a05956",
+        "completed_at": "2026-11-04T11:03:14.304379+00:00"
+      }
+    ]
+  }
+}

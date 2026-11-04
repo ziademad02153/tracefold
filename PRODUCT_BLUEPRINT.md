@@ -1,6 +1,8 @@
 # Tracefold product blueprint
 
-Date 4 November 2026. This is the current product structure and proposal for the next milestone. Sprint 3 implementation has not started.
+Date 4 November 2026. Product structure and navigation baseline. Sprint 3 File Testing passed its bounded M1 acceptance; [SPRINT3.md](SPRINT3.md) is authoritative for its scope and verification. Diagrams below retain the earlier standalone-engine baseline where labeled.
+
+The broader direction is defined in [Language Expansion Roadmap](LANGUAGE_EXPANSION_ROADMAP.md). Python M1–M4 remains the current delivery scope.
 
 ## Purpose and primary unit
 
