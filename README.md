@@ -112,6 +112,7 @@ Open a project and choose **Run repository tests**. Inspect a revision/component
 For the real upstream acceptance example, add pallets/itsdangerous, choose tag 2.2.0 and root ., enable project installation, select requirements/tests.txt and requirements/build.txt, remove the default extra pytest pin, retain -q, save/approve/prepare and run. No local model is needed.
 
 - [Implementation, reproducibility and release limits](M2_M3.md)
+- [M3 Validation Report: current capabilities, AI role, evidence and pending company validation](M3_VALIDATION_REPORT.md)
 - [As-built Architecture Review and findings](ARCHITECTURE_REVIEW_M3.md)
 - [Saved upstream report](http://127.0.0.1:5173/#execution/b63e7e12cecf4b7f92527d20509a6669)
 
