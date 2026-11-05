@@ -34,6 +34,10 @@ No PR is required. Advisory PR analysis and earlier focused file/function workfl
 
 ## Navigation
 
+Project Overview starts with in-product onboarding: what can be done today, an eight-stage testing journey, a state-dependent next action and the distinction between existing tests, generated tests, execution history and optional PR review. The recommendation follows the most recently created execution profile and its draft/approval/run records; older versions remain accessible through Tests and Runs. It is a recommendation, not a completion checklist or a claim that the repository is fully tested. Failed guidance requests expose a retry instead of assuming an empty project.
+
+Tests, Runs and AI Review include short contextual orientation and a route back to the project guide. The existing-test path explains that a project without tests can proceed to generation after environment preparation. The guide explicitly separates advisory PR comments from test execution and explains that generated tests remain in Tracefold and code fixes happen outside it.
+
 | View | Canonical route |
 |---|---|
 | Projects / add project | `#projects`, `#connect` |

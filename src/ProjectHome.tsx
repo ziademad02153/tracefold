@@ -2,12 +2,13 @@ import {useEffect,useState} from 'react'
 import {api} from './api'
 import type {ExecutionActivity} from './executionTypes'
 import {StatusBadge,timeLabel} from './executionUi'
+import {ProjectOnboarding,ProjectOrientation} from './ProjectOnboarding'
 
 export type ProjectRun={id:string;session_id:string;status:string;completed_at:string;sha:string;summary?:{total:number;passed:number;failed:number;blocked:number;skipped:number;not_run:number}|null}
 export type ProjectSummary={repo:string;suite_count:number;test_count:number;run_count:number;latest_run:ProjectRun|null;suites:{id:string;function:string;path:string;test_count:number;created_at:string}[];runs:ProjectRun[]}
 export function ProjectNavigation({repo,active}:{repo:string;active:'overview'|'tests'|'runs'|'ai-review'}){
   const encoded=encodeURIComponent(repo)
-  return <nav className="project-tabs" aria-label="Project navigation">{[['overview','Overview','project'],['tests','Tests','tests'],['runs','Runs','runs'],['ai-review','AI Review','ai-review']].map(([key,label,route])=><a key={key} href={'#'+route+'/'+encoded} aria-current={active===key?'page':undefined}>{label}</a>)}</nav>
+  return <><nav className="project-tabs" aria-label="Project navigation">{[['overview','Overview','project'],['tests','Tests','tests'],['runs','Runs','runs'],['ai-review','AI Review','ai-review']].map(([key,label,route])=><a key={key} href={'#'+route+'/'+encoded} aria-current={active===key?'page':undefined}>{label}</a>)}</nav>{active!=='overview'&&<ProjectOrientation repo={repo} area={active}/>}</>
 }
 export function ProjectTestNavigation({repo,active}:{repo:string;active:'existing'|'generated'}){
   return <nav className="test-tabs" aria-label="Test type"><a href={'#tests/'+encodeURIComponent(repo)} aria-current={active==='existing'?'page':undefined}>Existing tests</a><a href={'#generated/'+encodeURIComponent(repo)} aria-current={active==='generated'?'page':undefined}>Generated tests</a></nav>
@@ -35,8 +36,7 @@ export function ProjectHome({repo}:{repo:string}){
     <ProjectNavigation repo={repo} active="overview"/>
     {loading&&<p role="status">Loading project activity…</p>}
     {!!errors.length&&<div className="error" role="alert">{errors.map(e=><p key={e}>{e}</p>)}<button className="button secondary" disabled={loading} onClick={()=>setVersion(v=>v+1)}>Retry activity</button></div>}
-    <section className="project-intro surface"><div><p className="eyebrow">Your next step</p><h2>{latest?'Review the result. Verify the next change.':'Start with the project environment.'}</h2><p>Prepare the repository, run its tests, then review AI-generated additions. Every result stays attached to the source and tests that produced it.</p></div><div className="action-group"><a className="button" href={'#tests/'+encoded}>Open Tests →</a>{(activity?.profile_count??0)>0&&<a className="button secondary" href={'#generated/'+encoded}>Generate tests →</a>}</div></section>
-    <p className="support-note">Execution support: Python 3.11 / Linux / pytest. Other languages and services need their own supported execution profile. No pull request is required.</p>
+    <ProjectOnboarding repo={repo}/>
     {activity&&<>
       <div className="project-metrics"><article><p>Saved repository suites</p><strong>{activity.suite_count??0}</strong></article><article><p>Test runs</p><strong>{activity.run_count}</strong></article><article><p>Environments</p><strong>{activity.profile_count}</strong></article></div>
       <section className="surface latest-project-result"><div className="section-heading"><div><p className="eyebrow">Repository test activity</p><h2>Latest execution</h2></div>{latest&&<StatusBadge status={latest.status}/>}</div>
