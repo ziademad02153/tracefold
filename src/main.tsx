@@ -13,6 +13,7 @@ import { ProjectRuns } from './ProjectRuns'
 import {ProjectGeneratedTests} from './ProjectGeneratedTests'
 import {StatusBadge} from './executionUi'
 import {ProjectActions} from './ProjectActions'
+import {downloadText} from './download'
 
 type Repo = {name:string; description:string}
 type Pull = {number:number; title:string; base:string; head:string}
@@ -35,6 +36,8 @@ function App() {
   const [error,setError] = useState('')
   const [loading,setLoading] = useState(true)
   const [pending,setPending] = useState(false)
+  const mutation=useRef(false)
+  const [projectSearch,setProjectSearch]=useState('')
   const [reviewing,setReviewing] = useState(false)
   const [rawPage, id='', focusRunId='', focusSuiteId=''] = hash.split('/')
   const aliases:Record<string,string> = {'results':'runs','repository-tests':'tests','pulls':'ai-review'}
@@ -148,6 +151,8 @@ function App() {
   }
 
   async function mutate(action: () => Promise<string>, key = 'connect') {
+    if(mutation.current)return
+    mutation.current=true
     const origin = location.hash
     setPendingKey(key)
     setPending(true)
@@ -158,6 +163,7 @@ function App() {
     } catch (failure) {
       if (location.hash === origin) setError(failure instanceof Error ? failure.message : String(failure))
     } finally {
+      mutation.current=false
       setPending(false)
     }
   }
@@ -177,6 +183,7 @@ function App() {
       {!invalidRoute && (page==='projects'||page==='connect') && <div className="workspace-intro"><p className="page-help">{page==='projects'?"Run the project. Review the tests. Keep the evidence. Open a repository workspace to establish a baseline or verify a repair.":"Connect your repository to start a testing workspace. No pull request is required."}</p><p className="support-note">Available execution: Python 3.11 / Linux / pytest · Public GitHub repositories · Company-hosted AI</p></div>}
       {pending && <p role="status">Working… Your repository or report is being prepared.</p>}
       {error && <p className="error" role="alert">{error}</p>}
+      {error&&['projects','report','history','ai-review'].includes(page)&&<button className="button secondary" disabled={loading||pending||reviewing} onClick={()=>setRefreshVersion(v=>v+1)}>Retry loading page</button>}
       {page==='projects'&&projectNotice&&<p className="notice" role="status">{projectNotice}</p>}
       {loading && <p role="status">Loading…</p>}
       {!loading && !error && (page === '' || page === 'projects' ) && repos.length === 0 && <p>No repositories connected. Use Connect repository to get started.</p>}
@@ -191,14 +198,15 @@ function App() {
         <p>Paste a repository URL or enter owner/repository. Private repository access is not available in this connector.</p>
         <label htmlFor="repo-url">GitHub repository</label>
         <div className="row"><input id="repo-url" disabled={pending} required placeholder="https://github.com/owner/repo" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
-        <button className="button" disabled={pending}>{pending ? 'Connecting…' : 'Add repository'}</button></div>
+        <button className="button" disabled={pending||!repoInput.trim()}>{pending ? 'Connecting…' : 'Add repository'}</button><a href="#projects">Cancel</a></div>
       </form>}
       {!invalidRoute && page==='generated'&&<ProjectGeneratedTests key={hash} repo={project} views={providerViews}/>}
       {!invalidRoute && (page === 'testing' || page === 'test-session') && <Workbench key={hash} repo={page === 'testing' ? project : undefined} sessionId={page === 'test-session' ? id : undefined} focusRunId={focusRunId}/>}
-      {!invalidRoute && (page==='tests'||page==='execution') && <RepositoryExecution key={hash} repo={page==='tests'?project:undefined} profileId={page==='execution'?id:undefined} views={providerViews} focusRunId={focusRunId} focusSuiteId={focusSuiteId}/>}
-      {page==='projects'&&repos.map(repo => {
+      {!invalidRoute && (page==='tests'||page==='execution') && <RepositoryExecution key={hash} repo={page==='tests'?project:undefined} profileId={page==='execution'?id:undefined} views={providerViews} focusRunId={focusRunId} focusSuiteId={focusSuiteId} templateId={page==='tests'&&focusRunId==='copy'?focusSuiteId:undefined}/>}
+      {page==='projects'&&<div className="surface management-search"><label htmlFor="project-search">Find a project</label><div className="row"><input id="project-search" type="search" value={projectSearch} onChange={e=>setProjectSearch(e.target.value)} placeholder="Repository name"/>{projectSearch&&<button className="button secondary" onClick={()=>setProjectSearch('')}>Clear project search</button>}<button className="button secondary" disabled={loading||pending} onClick={()=>setRefreshVersion(v=>v+1)}>Refresh projects</button></div>{!loading&&!error&&repos.length>0&&!repos.some(r=>r.name.toLowerCase().includes(projectSearch.toLowerCase()))&&<p>No projects match this search. Clear the search to show your connected projects.</p>}</div>}
+      {page==='projects'&&repos.filter(repo=>repo.name.toLowerCase().includes(projectSearch.toLowerCase())).map(repo => {
         const repoActivity=executionActivity?.find(item=>item.repo===repo.name)
-        return <article className="surface project-card" key={repo.name}><div><p className="eyebrow">Repository workspace</p><h2>{repo.name}</h2><p>{repo.description||'Connected public GitHub repository'}</p>{executionActivity?<p className="project-card-meta">{repoActivity?.suite_count??0} repository suites · {repoActivity?.run_count??0} test runs</p>:<p className="notice">Repository activity is unavailable. Open the project to retry.</p>}</div><div className="project-card-actions">{repoActivity?.latest_run?<StatusBadge status={repoActivity.latest_run.status}/>:<span className="badge">No repository run yet</span>}<a className="button secondary" href={projectLink(repo.name)}>Open project →</a><ProjectActions repo={repo.name}/></div></article>
+        return <article className="surface project-card" key={repo.name}><div><p className="eyebrow">Repository workspace</p><h2>{repo.name}</h2><p>{repo.description||'Connected public GitHub repository'}</p>{executionActivity?<p className="project-card-meta">{repoActivity?.suite_count??0} repository suites · {repoActivity?.run_count??0} test runs</p>:<p className="notice">Repository activity is unavailable. Refresh projects to retry.</p>}</div><div className="project-card-actions">{repoActivity?.latest_run?<StatusBadge status={repoActivity.latest_run.status}/>:<span className="badge">{executionActivity?'No repository run yet':'Activity unavailable'}</span>}<a className="button secondary" href={projectLink(repo.name)}>Open project →</a><ProjectActions repo={repo.name}/></div></article>
       })}
       {!invalidRoute && page==='project' && <ProjectHome key={project} repo={project}/>}
       {!invalidRoute && page==='runs' && <ProjectRuns key={project} repo={project}/>}
@@ -214,7 +222,7 @@ function App() {
         <p className="page-help">Ask the local model to review a saved pull request change. Findings are advisory and separate from executed test results.</p>
         <div className="row section"><div><h2>{project}</h2><p>Up to 30 recently updated pull requests, including closed changes.</p></div><button className="button secondary" disabled={pending || loading} onClick={() => setRefreshVersion(value => value + 1)}>Refresh list</button></div>
         {pullError && <p className="error" role="alert">{pullError} Saved reports remain available below.</p>}
-        {!loading && !error && !pullError && pulls.length === 0 && <div className="surface empty"><h2>No pull requests to review yet</h2><p>Create a pull request on GitHub and return here, or use another repository with an existing PR.</p><a className="button secondary" href={"https://github.com/" + project + "/pulls"} target="_blank" rel="noreferrer">View pull requests on GitHub ↗</a></div>}
+        {!loading && !pullError && pulls.length === 0 && <div className="surface empty"><h2>No pull requests to review yet</h2><p>AI Review needs a pull request. Repository testing does not: use Tests to run existing tests or generate new ones.</p><div className="action-group"><a className="button" href={'#tests/'+encodeURIComponent(project)}>Test repository without a PR →</a><a className="button secondary" href={"https://github.com/" + project + "/pulls"} target="_blank" rel="noreferrer">View pull requests on GitHub ↗</a></div></div>}
         {pulls.map(pull => <article className="surface row" key={pull.number}><div><h2>#{pull.number} · {pull.title}</h2><p>Base {pull.base.slice(0,7)} / Head {pull.head.slice(0,7)}</p></div>
           <button className="button" disabled={pending} onClick={() => void mutate(async () => {
             const created = await api<Report>('reports',{repo:project,number:pull.number})
@@ -222,12 +230,13 @@ function App() {
           }, String(pull.number))}>{pending && pendingKey === String(pull.number) ? 'Preparing report…' : 'Open change report →'}</button>
         </article>)}
         <h2 className="section">Saved reports</h2>
-        {!loading && saved.length === 0 && <p>No saved reports for this repository yet.</p>}
+        {!loading && !error && saved.length === 0 && <p>No saved reports for this repository yet.</p>}
         {saved.map(item => <article className="surface row" key={item.id}><div><h2>#{item.number} · {item.title}</h2><p>Snapshot {item.head?.slice(0,7) || item.id.slice(0,8)} · Report {item.id.slice(0,8)}</p></div><a href={'#report/' + item.id}>Open report →</a></article>)}
       </>}
       {report && <>
         <ProjectNavigation repo={report.repo} active="ai-review"/>
         <p className="section"><a href={projectLink(report.repo)}>{report.repo}</a> / PR #{report.number}</p>
+        <div className="action-group"><a className="button secondary" href={'#ai-review/'+encodeURIComponent(report.repo)}>Back to PR reviews →</a><button className="button secondary" onClick={()=>downloadText('tracefold-review-'+report.id+'.json',JSON.stringify(report,null,2),'application/json')}>Download AI review report</button><a className="button secondary" href={'#tests/'+encodeURIComponent(report.repo)}>Run repository tests →</a></div>
         <div className="row"><h2 className="report-title">{report.title}</h2><span className="badge">Saved · {report.source}</span></div>
 
         <section className="surface ai-section" aria-labelledby="ai-title">

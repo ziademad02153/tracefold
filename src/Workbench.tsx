@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api } from './api'
 import { ProjectNavigation, ProjectTestNavigation } from './ProjectHome'
 
@@ -35,6 +35,8 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
   const [error,setError] = useState('')
   const [runner,setRunner] = useState<{ready:boolean;message:string}>()
   const [initializing,setInitializing] = useState(true)
+  const [loadVersion,setLoadVersion]=useState(0)
+  const operation=useRef(false)
   useEffect(()=>{
     if(!focusRunId||!session?.runs.some(run=>run.id===focusRunId))return
     const timer=setTimeout(()=>document.getElementById('run-'+focusRunId)?.scrollIntoView({block:'start'}),0)
@@ -43,6 +45,7 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
 
   useEffect(() => {
     let active=true
+    setInitializing(true);setError('')
     async function load() {
       try {
         if (sessionId) {
@@ -59,6 +62,7 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
               setBranches(names);setRef(names.includes('main')?'main':names[0]||'')
             } else setError('Could not load branch names. Enter a branch name or commit ID to continue.')
             if(results[1].status==='fulfilled')setHistory(results[1].value)
+            else setError(current=>(current?current+' ':'')+'Saved focused-file sessions could not be loaded. Retry to restore the complete history.')
           }
         }
         const status=await api<{ready:boolean;message:string}>('testing/runner')
@@ -68,7 +72,7 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
     }
     void load()
     return()=>{active=false}
-  },[repo,sessionId])
+  },[repo,sessionId,loadVersion])
 
   useEffect(()=>{
     if(!sessionId||session?.state!=='running')return
@@ -82,9 +86,11 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
   },[sessionId,session?.state])
 
   async function action(name:string, work:()=>Promise<void>){
+    if(operation.current)return
+    operation.current=true
     setBusy(name);setError('')
     try{await work()}catch(failure){setError(failure instanceof Error?failure.message:String(failure))}
-    finally{setBusy('')}
+    finally{operation.current=false;setBusy('')}
   }
 
   if(initializing)return <p role="status">Loading testing workspace…</p>
@@ -96,6 +102,7 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
     <p className="page-help">{session?(session.mode!=='file'?'This saved session uses the earlier standalone-function runner. Its approved tests and evidence are preserved.':'Review this saved file test suite, run it against a selected revision, then rerun the same tests after your fix. Results are saved below.'):'Test a Python file in context: choose up to five public functions, define expected behavior, review 3–5 generated tests and run them against the original module.'}</p>
     {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={session?.runs.length?'runs':'tests'}/>{!session&&<><ProjectTestNavigation repo={activeRepo} active="generated"/><p className="muted">Focused file suites use a separate limited environment. Use repository testing for project imports and dependencies.</p></>}</>}
     {error&&<p className="error" role="alert">{error}</p>}
+    {error&&<button className="button secondary" disabled={!!busy} onClick={()=>setLoadVersion(v=>v+1)}>Retry focused workspace</button>}
     {busy&&<p className="progress" role="status">{busy==='generate'?'Gemma is generating your test. This may take a few minutes.':busy==='run'?'Running the approved test in Docker…':'Loading…'}</p>}
     {!session&&repo&&<>
       <form className="surface" onSubmit={event=>{event.preventDefault();void action('files',async()=>{

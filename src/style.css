@@ -363,6 +363,10 @@ h3 { font-size:18px; line-height:1.45; margin:0; overflow-wrap:anywhere; }
 .project-delete-dialog::backdrop { background:rgb(15 30 24 / 65%); }
 .project-delete-dialog h2 { margin-top:0; font-size:24px; }
 .project-delete-dialog input { width:100%; box-sizing:border-box; }
+.repository-execution form > .button { margin:12px 10px 12px 0; max-width:100%; }
+.repository-execution form > a { display:inline-flex; align-items:center; min-height:44px; }
+.management-search input { flex:1; min-width:0; }
+.management-search .row { flex-wrap:wrap; }
 .project-delete-dialog .action-group { margin-top:24px; }
 .deletion-counts { display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; padding:14px; background:#f4f6f1; border-radius:8px; }
 .deletion-counts dt { font-size:13px; }

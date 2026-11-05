@@ -57,6 +57,10 @@ Earlier routes and stored reports remain readable. Reports/evidence are destinat
 
 Within an execution environment, Run existing tests, Generate & review and Results are separate views. Completing execution opens its exact saved verdict, with per-test outcomes and same-suite repair comparison when available. Generation uses searchable module checkboxes and explicit expected behavior. Draft edits are retained within the browser tab and require an explicit server save before approval; they are not shared drafts or server autosave. Environment recovery and native artifacts remain available in expandable details.
 
+Change configuration opens a copy of the saved setup pinned to its source revision. Inspection exposes editable settings; saving creates a new environment profile, preserving previous profiles and evidence. Reset detected defaults is confirmed, and Cancel returns to the original setup. Suite editing provides confirmed discard of unsaved changes and download of the saved source (never silently exporting an unsaved editor buffer). Execution reports and advisory reports can be downloaded as JSON; execution reports link directly to their approved suite for repair verification. No automatic GitHub write occurs.
+
+Projects provide search/reset/refresh. Load failures provide retry at the affected workspace, including saved history and legacy focused tools. Unavailable counts are labeled unavailable rather than zero. A successful execution containing skipped/expected-failure cases does not claim that all collected cases passed. Runtime cancellation is not implemented; the progress message explicitly distinguishes leaving the page from stopping work.
+
 ## Support boundary
 
 The implemented repository profile is public GitHub + Python 3.11/Linux/pip/pytest. It preserves supported project installation, internal imports, fixtures/configuration, selected plugins and full native case IDs. Generation is bounded: up to three modules and 3–8 test functions in one reserved file. It is not automatic exhaustive generation for an entire repository.

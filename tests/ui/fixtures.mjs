@@ -8,6 +8,7 @@ const suite=id=>({id,repo,state:'draft',origin_profile_id:profile.id,origin_sour
 export const suites=[suite('draft-one'),suite('draft-two'),{...suite('approved'),state:'approved'}]
 export const catalog={targets:Array.from({length:5},(_,i)=>({id:'src/module'+i+'.py',label:'module'+i,description:'price calculation '+i})),max_selection:3,options:{test_directories:['tests'],default_test_directory:'tests'},environment_ready:true,limits:['Select up to three modules.']}
 export const discovery={source,provider_id:'python-pytest',provider_version:'1',discovery:{component_root:'.',project_name:'Example package',runtime_profiles:['3.11'],requires_python:'>=3.11',installable:true,layout:'src',requirements_files:['requirements-tests.txt'],pytest_dependency_files:['requirements-tests.txt'],python_files:4,test_files:1,limits:[]}}
+export const report={id:'review-one',repo,number:1,title:'Adjust discount',base:'a'.repeat(40),head:'b'.repeat(40),diff:'- return price + percent\n+ return price - percent',source:'GitHub public repository',checks:[]}
 export function clone(v){return structuredClone(v)}
 export async function fixture(page,override){
   const state={profile:clone(profile),suites:clone(suites),catalog:clone(catalog),discovery:clone(discovery),posts:[],activityFails:false}
@@ -20,6 +21,7 @@ export async function fixture(page,override){
     let data
     if(path==='projects/deletion-preview')data={repo,inventory:'delete-inventory',busy:false,counts:{execution_profiles:1,execution_suites:3,execution_runs:2,reports:1,test_sessions:0,test_runs:0,ai_reviews:1}}
     else if(path==='projects'&&method==='DELETE'){state.deleted=true;data={deleted:repo}}
+    else if(path==='projects'&&method==='POST')data={name:repo,description:'Example project'}
     else if(path==='projects')data=state.deleted?[]:[{name:repo,description:'Example project'},{name:'tracefold-demo/retry-service',description:'Hidden fixture'}]
     else if(path==='executions/providers')data=[{id:'python-pytest',version:'1'}]
     else if(path==='executions/activity')data=[{repo,profile_count:1,run_count:2,suite_count:3,latest_run:{...run2,profile_id:profile.id}}]
@@ -39,6 +41,7 @@ export async function fixture(page,override){
     else if(path.endsWith('/runs')){state.profile.runs.push({...run2,id:'run-three',status:'passed',summary:{...run2.summary,passed:2,failed:0},tests:run2.tests.map(t=>({...t,status:'passed'}))});data=state.profile}
     else if(path==='reports'||path==='pulls'||path==='testing/sessions'||path==='testing/branches')data=[]
     else if(path==='testing/runner')data={ready:true,message:'Ready'}
+    else if(path==='reports/review-one')data=report
     else{await route.fulfill({status:404,json:{detail:'Controlled fixture: route not found'}});return}
     await route.fulfill({json:data})
   })
