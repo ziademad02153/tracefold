@@ -2,10 +2,14 @@ import {chromium} from 'playwright-core'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import {createRequire} from 'node:module'
+import path from 'node:path'
+import {fileURLToPath,pathToFileURL} from 'node:url'
 import {fixture,profile,suites,catalog,repo,encoded,run1,run2,clone} from './fixtures.mjs'
 
 const require=createRequire(import.meta.url),base=process.env.TRACEFOLD_TEST_BASE_URL||'http://127.0.0.1:5173'
-const output=new URL('../../.tracefold/ui-regression/',import.meta.url);fs.mkdirSync(output,{recursive:true})
+const sourceDir=fileURLToPath(new URL('../../',import.meta.url))
+const dataDir=process.env.TRACEFOLD_DATA_DIR||path.resolve(sourceDir,'..',path.basename(sourceDir)+'-data')
+const output=pathToFileURL(path.join(dataDir,'ui-regression')+path.sep);fs.mkdirSync(output,{recursive:true})
 const browser=await chromium.launch({headless:true,...(process.env.TRACEFOLD_BROWSER_PATH?{executablePath:process.env.TRACEFOLD_BROWSER_PATH}:{channel:'msedge'})})
 const outcomes=[]
 async function go(p,route){await p.goto(base+'/#'+route);await p.locator('main h1').waitFor();await p.waitForFunction(()=>![...document.querySelectorAll('[role=status]')].some(n=>n.textContent.includes('Loading')))}

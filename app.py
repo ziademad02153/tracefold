@@ -36,7 +36,10 @@ PULL_REQUESTS = {
 }
 
 root = Path(__file__).resolve().parent
-engine = create_engine(os.getenv("DATABASE_URL") or f"sqlite:///{root / 'tracefold.db'}")
+from runtime_paths import runtime_directory, snapshot_directory
+data_root = runtime_directory(root, os.getenv('TRACEFOLD_DATA_DIR'))
+data_root.mkdir(parents=True, exist_ok=True)
+engine = create_engine(os.getenv("DATABASE_URL") or f"sqlite:///{data_root / 'tracefold.db'}")
 metadata = MetaData()
 projects = Table("projects", metadata, Column("repo", String, primary_key=True))
 reports = Table(
@@ -245,7 +248,7 @@ from snapshot_store import GithubSnapshots
 from providers.python_repository import PythonRepositoryProvider
 
 execution_service = ExecutionService(engine, {'python-pytest': PythonRepositoryProvider()},
-    GithubSnapshots(root / '.tracefold' / 'snapshots', github, connected))
+    GithubSnapshots(snapshot_directory(root, data_root), github, connected))
 app.include_router(create_execution_router(execution_service, connected))
 
 
