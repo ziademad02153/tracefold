@@ -17,7 +17,7 @@ The root [README](../README.md) presents the product. This directory contains it
 - `tests/` contains automated regressions. Root `test_runner.py` is a runtime module imported by the application, not a discovered test suite.
 - `docs/assets/` contains README artwork and attributed technology icons.
 - `docs/validation/evidence/` contains reviewed, static validation capsules. It is not a runtime storage directory.
-- `.tracefold/`, `tracefold.db`, dependencies and build output are ignored local runtime artifacts. Prepared environments live in Docker.
+- Runtime database/snapshots live outside source for new installations; this checkout uses E:\Tracefold-data. Legacy `.tracefold/` and root tracefold.db remain ignored/compatible until migration. Dependencies and build output are not application source. Prepared environments live in Docker.
 
 ## Historical records
 

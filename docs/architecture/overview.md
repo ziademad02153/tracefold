@@ -40,6 +40,10 @@ A profile fixes source, provider/version, configuration and policy. A suite inde
 
 SQLite is the local default through SQLAlchemy. PostgreSQL configuration exists but migration/integration/recovery acceptance remains open. Tables are created on startup; there is no established production migration service.
 
+Application data now resolves through [runtime_paths.py](../../runtime_paths.py). New checkouts default to a sibling data directory; this local E:\Tracefold installation uses E:\Tracefold-data for its database and snapshots. TRACEFOLD_DATA_DIR overrides the location and DATABASE_URL independently selects a database. Legacy locations remain compatible until explicitly migrated. Moving local data outside source is housekeeping, not distributed storage, a backup system or multi-user deployment acceptance.
+
+There is currently no authenticated user/project membership boundary. The connected-repository check verifies that a repository exists in the local workspace, not that a particular user is authorized. Consequently, binding the existing API to a shared address or adding DNS/login UI is insufficient. The [ordered delivery gates](../roadmap.md#local-mvp-to-company-service-ordered-delivery-plan) own the required authorization, migration, worker and operational work.
+
 ## Preparation and execution
 
 The downloader receives approved registry wheel specifications without repository source or application credentials. Installation/build hooks run offline in an isolated container. The prepared image pins the native executor and records runtime, package and script identities.
