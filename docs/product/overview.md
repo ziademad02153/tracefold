@@ -21,6 +21,10 @@ Tracefold connects project context, reviewed tests, native execution evidence an
 
 ## Implemented experience
 
+Project management is available from both the Projects cards and project navigation: open the workspace, view its original GitHub repository, or delete its saved Tracefold records. Deletion previews the exact inventory and requires the full repository name. It removes the connection, repository profiles/suites/runs, earlier focused sessions/runs and advisory reports/reviews in one database transaction. It never calls GitHub deletion APIs. Downloaded source caches and prepared Docker images are explicitly retained; this action does not claim to reclaim disk space. Reconnecting a deleted project starts with no saved records.
+
+An active local mutation blocks deletion, deletion blocks new mutations, and unfinished saved operations or a changed preview block confirmation. This guard is for the single-process local application, not a substitute for distributed authorization/locking. A stale unfinished operation must be recovered through its existing workflow before deletion.
+
 1. Connect a public GitHub repository and open its Project.
 2. Select a branch/tag/commit and component, review configuration and approve preparation.
 3. Run existing tests and inspect the baseline; zero tests is not a baseline pass.

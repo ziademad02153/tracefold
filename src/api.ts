@@ -1,6 +1,6 @@
-export async function api<T>(path:string, body?:object):Promise<T> {
+export async function api<T>(path:string, body?:object, method='POST'):Promise<T> {
   const response = await fetch('/api/' + path, body && {
-    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body),
+    method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body),
   })
   if (!response.ok) {
     const detail = await response.json().catch(() => null)

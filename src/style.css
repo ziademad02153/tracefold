@@ -353,6 +353,21 @@ h3 { font-size:18px; line-height:1.45; margin:0; overflow-wrap:anywhere; }
 .guide-route li:not(:last-child)::after { content:' →'; margin-left:12px; }
 .guide-route li[aria-current=step] { color:var(--ink); font-weight:750; }
 .guide-route li span { font-variant-numeric:tabular-nums; font-weight:700; }
+.project-toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.project-toolbar .project-tabs { flex:1; margin-bottom:0; min-width:0; }
+.project-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; font-size:13px; }
+.project-actions > a { display:inline-flex; align-items:center; min-height:44px; text-decoration:underline; }
+.button.danger-outline { color:#92302a; border:1px solid #c59a96; background:transparent; }
+.button.danger { color:#fff; background:#9d302a; border-color:#9d302a; }
+.project-delete-dialog { width:600px; max-width:calc(100vw - 32px); max-height:85vh; overflow:auto; box-sizing:border-box; border:1px solid var(--border); border-radius:12px; padding:28px; color:var(--ink); background:#fff; }
+.project-delete-dialog::backdrop { background:rgb(15 30 24 / 65%); }
+.project-delete-dialog h2 { margin-top:0; font-size:24px; }
+.project-delete-dialog input { width:100%; box-sizing:border-box; }
+.project-delete-dialog .action-group { margin-top:24px; }
+.deletion-counts { display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; padding:14px; background:#f4f6f1; border-radius:8px; }
+.deletion-counts dt { font-size:13px; }
+.deletion-counts dd { margin:4px 0 8px; font-weight:700; }
+@media(max-width:650px) { .project-toolbar { align-items:flex-start; } .project-toolbar .project-tabs { flex-basis:100%; } .project-delete-dialog { padding:18px; } .project-delete-dialog .action-group { flex-direction:column; align-items:stretch; } }
 .journey-guide > summary,.project-orientation summary { min-height:44px; padding:10px 0; cursor:pointer; font-weight:650; }
 .onboarding-stages { list-style:none; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
 .onboarding-stages li { display:flex; gap:12px; border:1px solid var(--border); border-radius:8px; padding:16px; }

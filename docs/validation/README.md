@@ -36,6 +36,8 @@ Earlier acceptance recorded 51 passing automated checks and a successful fronten
 
 ## UI and usability review
 
+[Project management completion](project-management-2026-11-05.md) records deletion/confirmation/cancellation, scoped transactional cleanup, active-work protection, reconnect behavior and history retry. Source-cache/image retention and the single-process limit are explicit.
+
 [In-product onboarding](product-onboarding-2026-11-05.md) records the visible guided journey, state-dependent next actions and contextual area explanations. First-minute comprehension remains a user-study target rather than an automated-test claim.
 
 [5 November remediation](ui-ux-remediation-2026-11-05.md) resolves the eight baseline findings, adds twenty repeatable browser scenarios and repeats real Gemma generation, approval, failing execution and unchanged-suite repair through the corrected interface. The record distinguishes controlled tests from live execution and documents GitHub rate limiting and remaining acceptance limits.

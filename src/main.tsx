@@ -12,6 +12,7 @@ import { ProjectHome, ProjectNavigation } from './ProjectHome'
 import { ProjectRuns } from './ProjectRuns'
 import {ProjectGeneratedTests} from './ProjectGeneratedTests'
 import {StatusBadge} from './executionUi'
+import {ProjectActions} from './ProjectActions'
 
 type Repo = {name:string; description:string}
 type Pull = {number:number; title:string; base:string; head:string}
@@ -48,6 +49,8 @@ function App() {
   const heading = useRef<HTMLHeadingElement>(null)
   const [refreshVersion,setRefreshVersion] = useState(0)
   const [pullError,setPullError] = useState('')
+  const [projectNotice,setProjectNotice]=useState('')
+  useEffect(()=>{const refresh=(event:Event)=>{setProjectNotice('Deleted '+String((event as CustomEvent).detail)+' from Tracefold. The GitHub repository was not changed.');setRefreshVersion(v=>v+1)};window.addEventListener('tracefold:projects-changed',refresh);return()=>window.removeEventListener('tracefold:projects-changed',refresh)},[])
   const [pendingKey,setPendingKey] = useState('')
   const repoPath = 'repo=' + encodeURIComponent(project)
 
@@ -174,6 +177,7 @@ function App() {
       {!invalidRoute && (page==='projects'||page==='connect') && <div className="workspace-intro"><p className="page-help">{page==='projects'?"Run the project. Review the tests. Keep the evidence. Open a repository workspace to establish a baseline or verify a repair.":"Connect your repository to start a testing workspace. No pull request is required."}</p><p className="support-note">Available execution: Python 3.11 / Linux / pytest · Public GitHub repositories · Company-hosted AI</p></div>}
       {pending && <p role="status">Working… Your repository or report is being prepared.</p>}
       {error && <p className="error" role="alert">{error}</p>}
+      {page==='projects'&&projectNotice&&<p className="notice" role="status">{projectNotice}</p>}
       {loading && <p role="status">Loading…</p>}
       {!loading && !error && (page === '' || page === 'projects' ) && repos.length === 0 && <p>No repositories connected. Use Connect repository to get started.</p>}
       {page === 'connect' && !invalidRoute && <form className="surface" onSubmit={event => {
@@ -194,7 +198,7 @@ function App() {
       {!invalidRoute && (page==='tests'||page==='execution') && <RepositoryExecution key={hash} repo={page==='tests'?project:undefined} profileId={page==='execution'?id:undefined} views={providerViews} focusRunId={focusRunId} focusSuiteId={focusSuiteId}/>}
       {page==='projects'&&repos.map(repo => {
         const repoActivity=executionActivity?.find(item=>item.repo===repo.name)
-        return <article className="surface project-card" key={repo.name}><div><p className="eyebrow">Repository workspace</p><h2>{repo.name}</h2><p>{repo.description||'Connected public GitHub repository'}</p>{executionActivity?<p className="project-card-meta">{repoActivity?.suite_count??0} repository suites · {repoActivity?.run_count??0} test runs</p>:<p className="notice">Repository activity is unavailable. Open the project to retry.</p>}</div><div className="project-card-actions">{repoActivity?.latest_run?<StatusBadge status={repoActivity.latest_run.status}/>:<span className="badge">No repository run yet</span>}<a className="button secondary" href={projectLink(repo.name)}>Open project →</a></div></article>
+        return <article className="surface project-card" key={repo.name}><div><p className="eyebrow">Repository workspace</p><h2>{repo.name}</h2><p>{repo.description||'Connected public GitHub repository'}</p>{executionActivity?<p className="project-card-meta">{repoActivity?.suite_count??0} repository suites · {repoActivity?.run_count??0} test runs</p>:<p className="notice">Repository activity is unavailable. Open the project to retry.</p>}</div><div className="project-card-actions">{repoActivity?.latest_run?<StatusBadge status={repoActivity.latest_run.status}/>:<span className="badge">No repository run yet</span>}<a className="button secondary" href={projectLink(repo.name)}>Open project →</a><ProjectActions repo={repo.name}/></div></article>
       })}
       {!invalidRoute && page==='project' && <ProjectHome key={project} repo={project}/>}
       {!invalidRoute && page==='runs' && <ProjectRuns key={project} repo={project}/>}

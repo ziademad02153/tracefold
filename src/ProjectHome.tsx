@@ -3,12 +3,13 @@ import {api} from './api'
 import type {ExecutionActivity} from './executionTypes'
 import {StatusBadge,timeLabel} from './executionUi'
 import {ProjectOnboarding,ProjectOrientation} from './ProjectOnboarding'
+import {ProjectActions} from './ProjectActions'
 
 export type ProjectRun={id:string;session_id:string;status:string;completed_at:string;sha:string;summary?:{total:number;passed:number;failed:number;blocked:number;skipped:number;not_run:number}|null}
 export type ProjectSummary={repo:string;suite_count:number;test_count:number;run_count:number;latest_run:ProjectRun|null;suites:{id:string;function:string;path:string;test_count:number;created_at:string}[];runs:ProjectRun[]}
 export function ProjectNavigation({repo,active}:{repo:string;active:'overview'|'tests'|'runs'|'ai-review'}){
   const encoded=encodeURIComponent(repo)
-  return <><nav className="project-tabs" aria-label="Project navigation">{[['overview','Overview','project'],['tests','Tests','tests'],['runs','Runs','runs'],['ai-review','AI Review','ai-review']].map(([key,label,route])=><a key={key} href={'#'+route+'/'+encoded} aria-current={active===key?'page':undefined}>{label}</a>)}</nav>{active!=='overview'&&<ProjectOrientation repo={repo} area={active}/>}</>
+  return <><div className="project-toolbar"><nav className="project-tabs" aria-label="Project navigation">{[['overview','Overview','project'],['tests','Tests','tests'],['runs','Runs','runs'],['ai-review','AI Review','ai-review']].map(([key,label,route])=><a key={key} href={'#'+route+'/'+encoded} aria-current={active===key?'page':undefined}>{label}</a>)}</nav><ProjectActions repo={repo}/></div>{active!=='overview'&&<ProjectOrientation repo={repo} area={active}/>}</>
 }
 export function ProjectTestNavigation({repo,active}:{repo:string;active:'existing'|'generated'}){
   return <nav className="test-tabs" aria-label="Test type"><a href={'#tests/'+encodeURIComponent(repo)} aria-current={active==='existing'?'page':undefined}>Existing tests</a><a href={'#generated/'+encodeURIComponent(repo)} aria-current={active==='generated'?'page':undefined}>Generated tests</a></nav>

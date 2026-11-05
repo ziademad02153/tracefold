@@ -13,12 +13,14 @@ export async function fixture(page,override){
   const state={profile:clone(profile),suites:clone(suites),catalog:clone(catalog),discovery:clone(discovery),posts:[],activityFails:false}
   await page.route('**/api/**',async route=>{
     const req=route.request(),url=new URL(req.url()),path=url.pathname.replace('/api/',''),method=req.method()
-    const body=method==='POST'?req.postDataJSON():undefined
-    if(method==='POST')state.posts.push({path,body})
+    const body=['POST','DELETE'].includes(method)?req.postDataJSON():undefined
+    if(['POST','DELETE'].includes(method))state.posts.push({path,body,method})
     const custom=await override?.({path,method,body,state,page})
     if(custom){await route.fulfill(custom);return}
     let data
-    if(path==='projects')data=[{name:repo,description:'Example project'},{name:'tracefold-demo/retry-service',description:'Hidden fixture'}]
+    if(path==='projects/deletion-preview')data={repo,inventory:'delete-inventory',busy:false,counts:{execution_profiles:1,execution_suites:3,execution_runs:2,reports:1,test_sessions:0,test_runs:0,ai_reviews:1}}
+    else if(path==='projects'&&method==='DELETE'){state.deleted=true;data={deleted:repo}}
+    else if(path==='projects')data=state.deleted?[]:[{name:repo,description:'Example project'},{name:'tracefold-demo/retry-service',description:'Hidden fixture'}]
     else if(path==='executions/providers')data=[{id:'python-pytest',version:'1'}]
     else if(path==='executions/activity')data=[{repo,profile_count:1,run_count:2,suite_count:3,latest_run:{...run2,profile_id:profile.id}}]
     else if(path==='testing/overview')data=[{repo,suite_count:200,test_count:500,run_count:100,suites:[],runs:[],latest_run:null}]

@@ -11,8 +11,9 @@ from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from sqlalchemy import JSON, Column, MetaData, String, Table, create_engine, select, update
+from sqlalchemy import JSON, Column, MetaData, String, Table, create_engine, select, update, func
 from sqlalchemy.exc import IntegrityError
 
 REPOSITORIES = {
@@ -57,6 +58,19 @@ reviews = Table(
 metadata.create_all(engine)
 
 app = FastAPI(title="Tracefold")
+from project_management import WorkspaceWriteGate
+workspace_writes = WorkspaceWriteGate()
+
+
+@app.middleware('http')
+async def protect_workspace_deletion(request, call_next):
+    if request.url.path.startswith('/api/') and request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        try:
+            with workspace_writes.enter(exclusive=request.method == 'DELETE'):
+                return await call_next(request)
+        except HTTPException as error:
+            return JSONResponse(status_code=error.status_code, content={'detail': error.detail})
+    return await call_next(request)
 
 
 class ConnectRepository(BaseModel):
@@ -120,6 +134,10 @@ def list_projects():
 @app.post("/api/projects")
 def connect_repository(request: ConnectRepository):
     repo = repository_name(request.repo)
+    with engine.connect() as connection:
+        existing = connection.scalar(select(projects.c.repo).where(func.lower(projects.c.repo) == repo.lower()))
+    if existing:
+        return REPOSITORIES.get(existing, {'name': existing, 'description': 'Public GitHub repository'})
     if repo not in REPOSITORIES:
         repo = github(repo)["full_name"]
     try:
@@ -250,6 +268,8 @@ from providers.python_repository import PythonRepositoryProvider
 execution_service = ExecutionService(engine, {'python-pytest': PythonRepositoryProvider()},
     GithubSnapshots(snapshot_directory(root, data_root), github, connected))
 app.include_router(create_execution_router(execution_service, connected))
+from project_management import create_project_management_router
+app.include_router(create_project_management_router(engine))
 
 
 if (root / "dist").is_dir():

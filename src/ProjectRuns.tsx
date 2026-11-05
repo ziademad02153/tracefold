@@ -9,8 +9,10 @@ export function ProjectRuns({repo}:{repo:string}){
   const [rows,setRows]=useState<Row[]>([])
   const [errors,setErrors]=useState<string[]>([])
   const [loading,setLoading]=useState(true)
+  const [version,setVersion]=useState(0)
   useEffect(()=>{
     let active=true
+    setLoading(true);setErrors([])
     async function load(){
       const results=await Promise.allSettled([
         api<ProjectSummary[]>('testing/overview?repo='+encodeURIComponent(repo)),
@@ -28,10 +30,10 @@ export function ProjectRuns({repo}:{repo:string}){
       setRows(merged);setErrors(failures);setLoading(false)
     }
     void load();return()=>{active=false}
-  },[repo])
+  },[repo,version])
   return <div><h2 className="section">{repo}</h2><ProjectNavigation repo={repo} active="runs"/>
     <p className="page-help">Every row is one saved execution. Open its report to inspect the tests and evidence. Repeated runs can execute the same tests; the row count is not a count of unique tests.</p>
-    {loading&&<p role="status">Loading saved runs…</p>}{errors.map(message=><p className="error" role="alert" key={message}>{message}</p>)}
+    {loading&&<p role="status">Loading saved runs…</p>}{errors.map(message=><p className="error" role="alert" key={message}>{message}</p>)}{!!errors.length&&<button className="button secondary" disabled={loading} onClick={()=>setVersion(v=>v+1)}>Retry saved runs</button>}
     {!loading&&!rows.length&&!errors.length&&<section className="surface"><h2>No runs yet</h2><p>Open Tests to prepare an environment or review a generated suite before running it.</p><a className="button" href={'#tests/'+encodeURIComponent(repo)}>Open Tests →</a></section>}
     {rows.map(run=><article className="surface row" key={run.key}><div><p className="eyebrow">{run.kind}</p><h2 className={run.status==='passed'?'passed':run.status==='failed'?'failed':''}>{run.status.replaceAll('_',' ').toUpperCase()}</h2><p>{new Date(run.date).toLocaleString()} · Revision {run.revision.slice(0,12)}</p>{run.total!==undefined?<p>{run.total} tests · {run.passed??0} passed · {run.failed??0} failed</p>:<p>Test counts were not recorded for this run.</p>}</div><a className="button secondary" href={run.href}>Open run report →</a></article>)}
   </div>
