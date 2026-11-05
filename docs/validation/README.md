@@ -33,3 +33,7 @@ Runtime database/snapshots remain ignored in their original locations. New compa
 Use [Developer guide](../development.md#verification) for current commands. Test discovery targets `tests/` explicitly and excludes runtime `test_runner.py`. Container checks require Docker and the bootstrap image; a skipped container test is not a passing execution check.
 
 Earlier acceptance recorded 51 passing automated checks and a successful frontend build. Cleanup verification is recorded separately in [repository cleanup](repository-cleanup.md), so historical execution evidence is not presented as a newly repeated model/company run.
+
+## UI and usability review
+
+[5 November UI/UX review](ui-ux-review-2026-11-05.md) records thirteen screens, controlled error/pending states, a new live Gemma/Docker defect-and-repair journey, advisory review, 53 regression tests and open interaction findings. Functional success is not a declaration that the UX is ready for daily team use.
