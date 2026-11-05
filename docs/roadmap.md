@@ -83,4 +83,23 @@ Host, simulator and hardware outcomes are distinct. Binary/large artifacts and n
 
 ## Other product scope
 
+## Test-type expansion within Python
+
+Test types are distinct from workflow actions: Existing tests means execution of supplied tests; Generated tests means AI-assisted creation. Neither label by itself promises unit, service, UI, performance, security or model-quality coverage. Regression replay is a purpose of reusing tests after change, not a separate generation engine.
+
+| Order / status | Test type | Supported or proposed scope | Acceptance gate |
+|---|---|---|---|
+| Available, bounded | Unit / behavior tests | Reviewable pytest assertions for selected Python modules, explicit outputs, boundaries and expected exceptions. Three to eight test functions in one reserved file. | Independent requirement review; real source import/execution; clean and defective controls. Generation does not guarantee all relevant cases. |
+| Available, bounded | Internal module interaction | Actual package imports, local helpers and approved external Python dependencies in the selected execution environment. Not service/database/browser orchestration. | Demonstrate dependency-sensitive behavior against the real installed package; preserve native evidence. |
+| Available | Regression replay | Same approved suite after a code repair, with source/environment identity and native-case comparison. | Failing-before/passing-after without silently rewriting expected values or changing the suite. |
+| Next testing-depth gate | Broader Python unit scenarios | Classes/state, fixtures and mocks where required by the first accepted real project; define support instead of promising arbitrary Python code. | Named pilot workflows, meaningful assertions and measured accepted/rejected generated tests. Scope after the actual project assessment. |
+| Later, scoped pilot | API / database integration | A named Python web framework, explicitly provided test database/services, credentials and network policy; isolated test data and cleanup. | Repeatable seeded service/database scenarios; correct cleanup, failures and secrets isolation. Not enabled by allowing arbitrary network access. |
+| Later | Browser end-to-end | A deployed test application, browser runtime, test accounts and journeys spanning multiple screens. | Reproducible actual browser actions, failure artifacts and test-data recovery. |
+| Separate future scope | Performance / load | Declared workload, concurrent users, latency/error thresholds and a target test environment. | Repeatable load runs with observed resource/latency evidence. Unit timings are not load testing. |
+| Separate future scope | Security analysis/testing | Explicitly scoped checks and appropriate analysis/testing tools. | Named supported checks and validated findings; AI code comments alone are not security testing. |
+| Separate future scope | AI/ML evaluation | Fixed datasets, declared metrics/thresholds, model/runtime identities and accelerator support if needed. | Reproducible evaluation including stochastic semantics. Gemma generating a Python test is not evaluation of the user's ML model. |
+| Separate provider scope | Embedded / hardware | Named simulator or physical-device harness with controlled device lifecycle. | Host unit tests, simulation and real-device outcomes are recorded distinctly. See provider expansion above. |
+
+These are capability gates, not delivery-date commitments or authorization to implement all types now. Immediate work remains the local Python user journey and a real-project fit assessment; multi-user release gates still apply when shared deployment is chosen.
+
 Measured coverage/test-gap analysis, CI/PR automation, team integrations and notifications remain separate scope decisions after core acceptance. No coverage percentage, feature maturity score, release date or new runtime support is assumed by this document.
