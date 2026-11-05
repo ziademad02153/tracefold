@@ -39,14 +39,14 @@ class ExecutionService:
         return {"source": snapshot.public(), "provider_id": provider.id, "provider_version": provider.version,
                 "capabilities": list(provider.capabilities), "discovery": provider.discover(snapshot, component)}
 
-    def create(self, repo, ref, provider_id, config):
+    def create(self, repo, ref, provider_id, config, requested_ref=None):
         provider = self.provider(provider_id)
         snapshot = self.snapshots(repo, ref)
         validated = checked_payload(provider.validate(snapshot, config), self.policy.output_bytes)
         profile_id = uuid4().hex
         definition = {"contract_version": 1, "provider_id": provider.id, "provider_version": provider.version,
                       "source": snapshot.public(), "config": validated, "policy": asdict(self.policy)}
-        payload = {**definition, "profile_hash": identity(definition), "created_at": now(), "environment": None}
+        payload = {**definition, "profile_hash": identity(definition), "created_at": now(), "environment": None, "requested_ref": requested_ref or ref}
         with self.engine.begin() as connection:
             connection.execute(self.profiles.insert().values(id=profile_id, repo=repo, payload=payload, state="draft"))
         return self.get(profile_id)

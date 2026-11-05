@@ -8,9 +8,10 @@ import { RepositoryExecution } from './RepositoryExecution'
 import { PythonEnvironmentForm, pythonDefaults } from './providers/PythonEnvironmentForm'
 import {PythonGenerationOptions} from './providers/PythonGenerationOptions'
 const providerViews = {'python-pytest': {label:'Python / pytest', Editor:PythonEnvironmentForm, defaults:pythonDefaults,supportsGeneration:true,GenerationOptions:PythonGenerationOptions}}
-import { ProjectHome, ProjectNavigation, type ProjectSummary } from './ProjectHome'
+import { ProjectHome, ProjectNavigation } from './ProjectHome'
 import { ProjectRuns } from './ProjectRuns'
 import {ProjectGeneratedTests} from './ProjectGeneratedTests'
+import {StatusBadge} from './executionUi'
 
 type Repo = {name:string; description:string}
 type Pull = {number:number; title:string; base:string; head:string}
@@ -25,7 +26,6 @@ type Report = Pull & {id:string; repo:string; diff:string; ai_review?:AIReview; 
 function App() {
   const [repoInput,setRepoInput] = useState('')
   const [hash,setHash] = useState(location.hash.slice(1))
-  const [summaries,setSummaries] = useState<ProjectSummary[]>()
   const [executionActivity,setExecutionActivity]=useState<ExecutionActivity[]>()
   const [repos,setRepos] = useState<Repo[]>([])
   const [pulls,setPulls] = useState<Pull[]>([])
@@ -87,11 +87,10 @@ function App() {
             else setError('Could not load saved reports. Try refreshing the list.')
           }
         } else if (page === 'projects') {
-          const [projects,stats,activity] = await Promise.allSettled([api<Repo[]>('projects'),api<ProjectSummary[]>('testing/overview'),api<ExecutionActivity[]>('executions/activity')])
+          const [projects,activity] = await Promise.allSettled([api<Repo[]>('projects'),api<ExecutionActivity[]>('executions/activity')])
           if (projects.status==='rejected') throw projects.reason
           if (active) {
             setRepos(projects.value.filter(repo => repo.name !== 'tracefold-demo/retry-service'))
-            setSummaries(stats.status==='fulfilled'?stats.value:undefined)
             setExecutionActivity(activity.status==='fulfilled'?activity.value:undefined)
           }
         }
@@ -161,7 +160,7 @@ function App() {
   }
 
   const projectLink = (repo:string) => '#project/' + encodeURIComponent(repo)
-  const title = (page === 'tests'||page === 'generated') ? 'Tests' : page === 'execution' ? 'Repository execution report' : page === 'testing' ? 'Generated tests' : page === 'test-session' ? 'Test suite and evidence' : page === 'connect' ? 'Add a project' :
+  const title = (page === 'tests'||page === 'generated') ? 'Tests' : page === 'execution' ? (focusRunId==='generate'?'Generated tests':focusRunId?'Test results':'Test environment') : page === 'testing' ? 'Focused file testing' : page === 'test-session' ? 'Test suite and evidence' : page === 'connect' ? 'Add a project' :
     page === 'history' ? 'Saved code reviews' : page === 'ai-review' ? 'AI Review' : page === 'project' ? 'Project overview' : page === 'runs' ? 'Runs' : page === 'report' ? 'AI review report' : 'Projects'
 
   return <>
@@ -172,7 +171,7 @@ function App() {
       <div className="row hero"><h1 tabIndex={-1} ref={heading}>{invalidRoute ? "Page not found" : title}</h1>{(page === '' || page === 'projects') && <a className="button" href="#connect">Add project →</a>}</div>
       {!invalidRoute && (page==='ai-review'||page==='history') && <ProjectNavigation repo={project} active="ai-review"/>}
       {invalidRoute && <p className="error">This page address is invalid. <a href="#projects">Return to repositories</a>.</p>}
-      {!invalidRoute && (page==='projects'||page==='connect') && <p className="page-help">{page==='projects'?"Run your project's existing tests, review AI-generated file tests, and keep execution evidence in one workspace. Open a project to get started.":"Add a public GitHub repository. Testing and AI review stay inside its project workspace."}</p>}
+      {!invalidRoute && (page==='projects'||page==='connect') && <div className="workspace-intro"><p className="page-help">{page==='projects'?"Run the project. Review the tests. Keep the evidence. Open a repository workspace to establish a baseline or verify a repair.":"Connect your repository to start a testing workspace. No pull request is required."}</p><p className="support-note">Available execution: Python 3.11 / Linux / pytest · Public GitHub repositories · Company-hosted AI</p></div>}
       {pending && <p role="status">Working… Your repository or report is being prepared.</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {loading && <p role="status">Loading…</p>}
@@ -185,21 +184,17 @@ function App() {
         })
       }}>
         <h2>Connect a public GitHub repository</h2>
-        <p>Paste a repository URL or enter owner/repository. Private repository access requires a GitHub App.</p>
+        <p>Paste a repository URL or enter owner/repository. Private repository access is not available in this connector.</p>
         <label htmlFor="repo-url">GitHub repository</label>
         <div className="row"><input id="repo-url" disabled={pending} required placeholder="https://github.com/owner/repo" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
         <button className="button" disabled={pending}>{pending ? 'Connecting…' : 'Add repository'}</button></div>
       </form>}
-      {!invalidRoute && page==='generated'&&<ProjectGeneratedTests key={hash} repo={project}/>}
+      {!invalidRoute && page==='generated'&&<ProjectGeneratedTests key={hash} repo={project} views={providerViews}/>}
       {!invalidRoute && (page === 'testing' || page === 'test-session') && <Workbench key={hash} repo={page === 'testing' ? project : undefined} sessionId={page === 'test-session' ? id : undefined} focusRunId={focusRunId}/>}
       {!invalidRoute && (page==='tests'||page==='execution') && <RepositoryExecution key={hash} repo={page==='tests'?project:undefined} profileId={page==='execution'?id:undefined} views={providerViews} focusRunId={focusRunId} focusSuiteId={focusSuiteId}/>}
-      {repos.map(repo => {
-        const stats=summaries?.find(item=>item.repo===repo.name)
+      {page==='projects'&&repos.map(repo => {
         const repoActivity=executionActivity?.find(item=>item.repo===repo.name)
-        return <article className="surface row" key={repo.name}><div><h2>{repo.name}</h2><p>{repo.description}</p>
-          {summaries?<p className="muted">{stats?.suite_count??0} file suites · {stats?.run_count??0} file runs · Latest file run: {stats?.latest_run?stats.latest_run.status.toUpperCase():'Not run yet'}</p>:<p>Activity summary unavailable.</p>}
-          {executionActivity&&<p className="muted">{repoActivity?.suite_count??0} repository suites · {repoActivity?.run_count??0} repository runs · Latest repository run: {repoActivity?.latest_run?.status.toUpperCase()||'Not run yet'}</p>}
-        </div><a className="button" href={projectLink(repo.name)}>Open project →</a></article>
+        return <article className="surface project-card" key={repo.name}><div><p className="eyebrow">Repository workspace</p><h2>{repo.name}</h2><p>{repo.description||'Connected public GitHub repository'}</p>{executionActivity?<p className="project-card-meta">{repoActivity?.suite_count??0} repository suites · {repoActivity?.run_count??0} test runs</p>:<p className="notice">Repository activity is unavailable. Open the project to retry.</p>}</div><div className="project-card-actions">{repoActivity?.latest_run?<StatusBadge status={repoActivity.latest_run.status}/>:<span className="badge">No repository run yet</span>}<a className="button secondary" href={projectLink(repo.name)}>Open project →</a></div></article>
       })}
       {!invalidRoute && page==='project' && <ProjectHome key={project} repo={project}/>}
       {!invalidRoute && page==='runs' && <ProjectRuns key={project} repo={project}/>}

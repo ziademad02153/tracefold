@@ -1,120 +1,65 @@
-import {useEffect,useState} from 'react'
+import {useEffect,useRef,useState} from 'react'
 import {api} from './api'
 import {ProjectNavigation,ProjectTestNavigation} from './ProjectHome'
 import type {Discovery,ExecutionProfile,ProviderView} from './executionTypes'
 import {RepositorySuiteFlow} from './RepositorySuiteFlow'
+import {ExecutionResults} from './ExecutionResults'
+import {StatusBadge,showRun,timeLabel} from './executionUi'
 
 export function RepositoryExecution({repo,profileId,views,focusRunId,focusSuiteId}:{repo?:string;profileId?:string;views:Record<string,ProviderView>;focusRunId?:string;focusSuiteId?:string}){
-  const [providers,setProviders]=useState<{id:string;version:string}[]>([])
-  const [provider,setProvider]=useState('')
-  const [ref,setRef]=useState('main')
-  const [component,setComponent]=useState('.')
-  const [discovery,setDiscovery]=useState<Discovery>()
-  const [config,setConfig]=useState<Record<string,unknown>>({})
-  const [profiles,setProfiles]=useState<ExecutionProfile[]>([])
-  const [profile,setProfile]=useState<ExecutionProfile>()
-  const [busy,setBusy]=useState('')
-  const [loading,setLoading]=useState(true)
-  const [error,setError]=useState('')
+  const [providers,setProviders]=useState<{id:string;version:string}[]>([]),[provider,setProvider]=useState('')
+  const [ref,setRef]=useState('main'),[component,setComponent]=useState('.')
+  const [discovery,setDiscovery]=useState<Discovery>(),[config,setConfig]=useState<Record<string,unknown>>({})
+  const [profiles,setProfiles]=useState<ExecutionProfile[]>([]),[profile,setProfile]=useState<ExecutionProfile>()
+  const [busy,setBusy]=useState(''),[childBusy,setChildBusy]=useState(''),[loading,setLoading]=useState(true),[error,setError]=useState(''),[version,setVersion]=useState(0)
+  const operation=useRef(false)
   useEffect(()=>{
-    if(focusRunId==='generate'&&profile?.environment){const timer=setTimeout(()=>document.getElementById('repository-generation')?.scrollIntoView({block:'start'}),50);return()=>clearTimeout(timer)}
-    if(!focusRunId||!profile?.runs.some(run=>run.id===focusRunId))return
-    const timer=setTimeout(()=>document.getElementById('run-'+focusRunId)?.scrollIntoView({block:'start'}),0)
-    return()=>clearTimeout(timer)
-  },[focusRunId,profile?.id])
-  useEffect(()=>{
-    let active=true
+    let active=true;setLoading(true);setError('')
     async function load(){try{
       if(profileId){const item=await api<ExecutionProfile>('executions/profiles/'+profileId);if(active)setProfile(item)}
-      else if(repo){
-        const [items,history]=await Promise.all([api<{id:string;version:string}[]>('executions/providers'),api<ExecutionProfile[]>('executions/profiles?repo='+encodeURIComponent(repo))])
-        if(active){setProviders(items);setProvider(items[0]?.id||'');setProfiles(history.reverse())}
-      }
-    }catch(failure){if(active)setError(failure instanceof Error?failure.message:String(failure))}finally{if(active)setLoading(false)}}
+      else if(repo){const [items,history]=await Promise.all([api<{id:string;version:string}[]>('executions/providers'),api<ExecutionProfile[]>('executions/profiles?repo='+encodeURIComponent(repo))]);if(active){setProviders(items);setProvider(items[0]?.id||'');setProfiles(history.reverse())}}
+    }catch(f){if(active)setError(f instanceof Error?f.message:String(f))}finally{if(active)setLoading(false)}}
     void load();return()=>{active=false}
-  },[repo,profileId])
+  },[repo,profileId,version])
   useEffect(()=>{
     if(!profileId||!profile||!['running','preparing','generating'].includes(profile.state))return
     let active=true
-    const timer=setInterval(()=>{void api<ExecutionProfile>('executions/profiles/'+profileId).then(item=>{if(active)setProfile(item)}).catch(()=>{if(active)setError('Could not refresh the saved operation. Reload this page to reconnect.')})},2500)
+    const timer=setInterval(()=>{void api<ExecutionProfile>('executions/profiles/'+profileId).then(p=>{if(active)setProfile(p)}).catch(()=>{if(active)setError('Could not refresh the operation. Retry loading to reconnect; saved results are retained.')})},2000)
     return()=>{active=false;clearInterval(timer)}
   },[profileId,profile?.state])
-  async function action(name:string,work:()=>Promise<void>){setBusy(name);setError('');try{await work()}catch(failure){setError(failure instanceof Error?failure.message:String(failure))}finally{setBusy('')}}
-  const activeRepo=profile?.repo||repo
-  const view=views[provider]
-  const Editor=view?.Editor
-  const latest=profile?.runs.at(-1)
-  const labels:Record<string,string>={total:'tests',passed:'passed',failed:'failed',error:'execution errors',skipped:'skipped',xfailed:'expected failures',xpassed:'unexpected passes',not_run:'not run'}
-  const running=!!busy||!!profile&&['running','preparing','generating'].includes(profile.state)
+  const running=!!busy||!!childBusy||!!profile&&['running','preparing','generating'].includes(profile.state)
+  async function action(label:string,work:()=>Promise<void>){if(operation.current||running)return;operation.current=true;setBusy(label);setError('');try{await work()}catch(f){setError(f instanceof Error?f.message:String(f))}finally{operation.current=false;setBusy('')}}
+  function completedRun(updated:ExecutionProfile){setProfile(updated);const latest=updated.runs.at(-1);if(latest)showRun(updated.id,latest.id)}
+  const activeRepo=profile?.repo||repo,view=views[provider],Editor=view?.Editor
+  const generating=focusRunId==='generate',resultId=focusRunId&&!generating?focusRunId:undefined
+  const latest=profile?.runs.at(-1),progress=busy||childBusy||(['preparing','running','generating'].includes(profile?.state||'')?'Operation in progress':'')
   return <div className="repository-execution">
-    <p className="page-help">Run existing tests, generate additional tests inside the same project environment, review the code and keep the evidence. Results apply to the recorded revision and execution profile.</p>
-    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={focusRunId==='generate'?'tests':profile?.runs.length?'runs':'tests'}/><ProjectTestNavigation repo={activeRepo} active={focusRunId==='generate'?'generated':'existing'}/></>}
+    {activeRepo&&<><div className="project-identity"><p className="eyebrow">{resultId?'Execution report':generating?'Generated tests':'Repository tests'}</p><h2><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a></h2></div><ProjectNavigation repo={activeRepo} active={resultId?'runs':'tests'}/>{!resultId&&<ProjectTestNavigation repo={activeRepo} active={generating?'generated':'existing'}/>}</>}
     {loading&&<p role="status">Loading execution workspace…</p>}
-    {error&&<p className="error" role="alert">{error}</p>}
-    {busy&&<p className="progress" role="status">{busy==='prepare'?'Preparing approved dependencies and installing the project. This can take several minutes.':busy==='run'?'Collecting and running existing tests…':'Preparing the repository snapshot…'}</p>}
+    {error&&<div className="error" role="alert"><p>{error}</p><button className="button secondary" disabled={running} onClick={()=>setVersion(v=>v+1)}>Retry loading workspace</button></div>}
+    {progress&&<p className="progress" role="status">{progress}… Controls are locked for this environment. Saved operations can be reopened after refresh.</p>}
     {!loading&&!profile&&repo&&<>
-      <form className="surface" onSubmit={event=>{event.preventDefault();void action('discover',async()=>{
-        setDiscovery(undefined)
-        const result=await api<Discovery>('executions/discover',{repo,ref,provider_id:provider,component})
-        setDiscovery(result);setConfig(views[provider]?.defaults(result.discovery)||{})
-      })}}><h2>1. Inspect repository</h2>
-        <label htmlFor="repository-runtime-provider">Execution provider</label><select id="repository-runtime-provider" value={provider} disabled={running} onChange={e=>{setProvider(e.target.value);setDiscovery(undefined)}}>{providers.map(item=><option key={item.id} value={item.id}>{views[item.id]?.label||item.id} · v{item.version}</option>)}</select>
-        <label htmlFor="repository-revision">Branch, tag or commit</label><input id="repository-revision" required value={ref} disabled={running} onChange={e=>{setRef(e.target.value);setDiscovery(undefined)}}/>
-        <label htmlFor="repository-component">Component root</label><input id="repository-component" required value={component} disabled={running} onChange={e=>{setComponent(e.target.value);setDiscovery(undefined)}}/>
-        <p className="muted">Use . for the repository root. Separately packaged components need separate profiles.</p>
-        <button className="button" disabled={running||!provider}>Inspect repository</button>
+      <section className="workflow-intro"><p className="eyebrow">Establish the baseline</p><h2>Prepare the project. Run its existing tests.</h2><p>Choose a revision and component. Review the detected configuration before the isolated environment is built.</p><p className="support-note">Available execution profile: {providers.map(p=>views[p.id]?.label||p.id).join(', ')||'loading'}. Repository connection does not imply support for every language.</p></section>
+      <form className="surface setup-form" onSubmit={e=>{e.preventDefault();void action('Inspecting repository',async()=>{setDiscovery(undefined);const d=await api<Discovery>('executions/discover',{repo,ref:ref.trim(),provider_id:provider,component:component.trim()});setDiscovery(d);setConfig(views[provider]?.defaults(d.discovery)||{})})}}>
+        <div className="section-heading"><div><p className="eyebrow">Step 1</p><h2>Inspect repository</h2></div></div>
+        <div className="form-columns"><div><label htmlFor="repository-revision">Branch, tag or commit</label><input id="repository-revision" required maxLength={200} value={ref} disabled={running} onChange={e=>{setRef(e.target.value);setDiscovery(undefined)}}/></div><div><label htmlFor="repository-component">Component root</label><input id="repository-component" required value={component} disabled={running} onChange={e=>{setComponent(e.target.value);setDiscovery(undefined)}}/><p className="field-help">Use . for the repository root, or a package directory such as services/api.</p></div></div>
+        <label htmlFor="repository-runtime-provider">Execution provider</label><select id="repository-runtime-provider" value={provider} disabled={running} onChange={e=>{setProvider(e.target.value);setDiscovery(undefined)}}>{providers.map(p=><option key={p.id} value={p.id}>{views[p.id]?.label||p.id} · v{p.version}</option>)}</select>
+        <button className="button" disabled={running||!provider||!ref.trim()||!component.trim()}>Inspect repository</button>
       </form>
-      {discovery&&<form className="surface" onSubmit={event=>{event.preventDefault();void action('save',async()=>{
-        const item=await api<ExecutionProfile>('executions/profiles',{repo,ref:discovery.source.revision,provider_id:discovery.provider_id,config})
-        location.hash='#execution/'+item.id
-      })}}><h2>2. Configure environment</h2><p>Snapshot {discovery.source.revision.slice(0,12)} · {discovery.source.file_count} files retained.</p>
-        {Editor?<Editor value={config} onChange={setConfig} disabled={running} discovery={discovery.discovery}/>:<p>This provider requires a registered configuration view.</p>}
-        <button className="button" disabled={running||!Editor}>Save configuration for review</button>
-      </form>}
-      <section className="surface"><h2>Saved execution profiles</h2>{!profiles.length&&<p>No repository execution profiles yet.</p>}
-        {profiles.map(item=><article className="row history-row" key={item.id}><div><strong>{item.provider_id} · {item.state}</strong><p>{item.source.revision.slice(0,12)} · {item.runs.length} saved runs · {new Date(item.created_at).toLocaleString()}</p></div><a className="button secondary" href={'#execution/'+item.id}>Open environment and results →</a></article>)}
-      </section>
+      {discovery&&<form className="surface" onSubmit={e=>{e.preventDefault();void action('Saving environment configuration',async()=>{const item=await api<ExecutionProfile>('executions/profiles',{repo,ref:discovery.source.revision,requested_ref:ref.trim(),provider_id:discovery.provider_id,config});location.hash='#execution/'+item.id})}}><p className="eyebrow">Step 2</p><h2>Review environment setup</h2><p>Source {discovery.source.revision.slice(0,12)} · {discovery.source.file_count} files retained.</p>{Editor?<Editor value={config} onChange={setConfig} disabled={running} discovery={discovery.discovery}/>:<p className="notice">This provider has no registered configuration view.</p>}<button className="button" disabled={running||!Editor}>Save configuration for review</button></form>}
+      <section className="surface"><div className="section-heading"><h2>Saved environments</h2><span>{profiles.length} configurations</span></div>{!profiles.length&&<p className="empty-state">No environments yet. Inspect the repository above to prepare its first execution profile.</p>}{profiles.map(p=><article className="environment-row" key={p.id}><div><h3>{p.requested_ref||'Snapshot '+p.source.revision.slice(0,12)}</h3><p>{views[p.provider_id]?.label||p.provider_id} · {p.runs.length} runs · {timeLabel(p.created_at)}</p><p className="muted">Source {p.source.revision.slice(0,12)} · Environment {p.id.slice(0,8)}</p></div><StatusBadge status={p.state}/><a className="button secondary" href={'#execution/'+p.id}>Open environment →</a></article>)}</section>
     </>}
     {profile&&<>
-      <section className="surface"><h2>Execution profile</h2>
-        {latest&&<div className="suite-counts"><strong>Latest run: {latest.status.replaceAll('_',' ').toUpperCase()}</strong><span>{latest.summary?.passed??0} passed</span><span>{latest.summary?.failed??0} failed</span><button className="button secondary" onClick={()=>document.getElementById('repository-evidence')?.scrollIntoView({behavior:'smooth'})}>View test results ↓</button></div>}
-        <p>{profile.provider_id} · v{profile.provider_version} · <strong>{profile.state.toUpperCase()}</strong></p>
-        <p className="hash">Revision {profile.source.revision}</p><p className="muted">Source content hash: {profile.source.content_hash}</p>
-        <details open={!profile.environment}><summary>Review environment configuration</summary><pre>{JSON.stringify(profile.config,null,2)}</pre></details>
-        <p>Review the exact provider configuration before preparing this environment. Runs retain the source, profile and environment identities shown here.</p>
-        {profile.error&&<pre className="error" role="alert">{profile.error}</pre>}
-        {!profile.environment&&<button className="button" disabled={running} onClick={()=>void action('prepare',async()=>{setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash}))})}>Approve environment and prepare</button>}
-        {profile.environment&&<><p className="passed"><strong>Environment ready</strong></p><p className="hash">{profile.environment.id}</p>
-          <details><summary>Recorded environment manifest</summary><pre>{JSON.stringify(profile.environment.manifest,null,2)}</pre></details>
-          <details><summary>Environment preparation log</summary><pre>{profile.environment.log}</pre></details>
-          <button className="button" disabled={running} onClick={()=>void action('run',async()=>{setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/runs',{profile_hash:profile.profile_hash}));setTimeout(()=>document.getElementById('repository-evidence')?.scrollIntoView({behavior:'smooth'}),0)})}>{profile.runs.length?'Re-run existing tests':'Run existing tests'}</button>
-          <details><summary>Environment recovery</summary><p>Rebuild the approved environment if its worker image is unavailable or preparation needs to be repeated. Earlier runs retain their original environment manifest.</p><button className="button secondary" disabled={running} onClick={()=>void action('prepare',async()=>{setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash}))})}>Rebuild approved environment</button></details>
-        </>}
-        {['preparing','running','generating'].includes(profile.state)&&<p role="status">Operation in progress. Saved state refreshes automatically.</p>}
-        {profile.state==='interrupted'&&<p className="error">The earlier operation was interrupted. Retry preparation or execution; previous evidence is retained.</p>}
-      </section>
-      {profile.environment&&views[profile.provider_id]?.supportsGeneration&&<RepositorySuiteFlow profile={profile} view={views[profile.provider_id]} onProfile={setProfile} focusSuiteId={focusSuiteId}/>}
-      <section className="surface" id="repository-evidence"><h2>Saved repository test reports</h2>{!profile.runs.length&&<p>No tests have been executed for this environment yet.</p>}
-        {profile.runs.map((run,index)=><article className="run-evidence" id={'run-'+run.id} key={run.id}>
-          <h3>Repository run {index+1} · <span className={run.status==='passed'?'passed':run.status==='failed'?'failed':''}>{run.status.replaceAll('_',' ').toUpperCase()}</span></h3>
-          <p><strong>{run.suite_id?'Existing + approved generated tests':'Existing tests'}</strong></p>
-          {run.suite_hash&&<p className="hash">Approved suite SHA256 {run.suite_hash}</p>}
-          {run.baseline_empty&&<p>No existing tests were collected. This report verifies only the approved generated suite.</p>}
-          {run.comparison&&<div className="surface"><h4>Same-suite comparison</h4><p>{run.comparison.complete?'Both executions completed':'Incomplete comparison'} · {run.comparison.source_changed?'Source revision changed':'Same source'} · {run.comparison.same_environment?'Same environment':'Environment changed'}</p>{run.comparison.changes.map(c=><p key={c.id}>{c.id}: <strong>{c.before} → {c.after}</strong></p>)}<p>{run.comparison.added.length} generated cases added · {run.comparison.removed.length} removed</p></div>}
-          {run.suite_id&&<p>Existing: {run.tests.filter(t=>t.origin==='existing').length} cases · Generated: {run.tests.filter(t=>t.origin==='generated').length} cases. Each phase uses a fresh source copy in the recorded environment.</p>}
-          <p>{new Date(run.completed_at).toLocaleString()} · {run.profile_hash===profile.profile_hash?'Same approved profile':'Different profile'} · {run.environment_id===profile.environment?.id?'Same prepared environment':'Different environment'}</p>
-          {run.summary&&<div className="suite-counts">{Object.entries(run.summary).map(([key,value])=><span key={key} className={key==='passed'?'passed':key==='failed'?'failed':''}><strong>{value}</strong> {labels[key]||key.replaceAll('_',' ')}</span>)}</div>}
-          {run.error&&<p className="error">{run.error}</p>}
-          <p className="muted">This result covers collected tests. Skips, expected failures and incomplete execution are shown separately; success does not certify untested code.</p>
-          {run.tests.filter(test=>test.status!=='passed').map(test=><details className="test-result" key={test.id} open><summary><strong>{test.status.toUpperCase()}</strong> · {test.origin||'existing'} · {test.id}</summary><pre>{test.detail}</pre></details>)}
-          <details><summary>Passed cases · {run.tests.filter(test=>test.status==='passed').length}</summary>{run.tests.filter(test=>test.status==='passed').map(test=><p className="location" key={test.id}>{test.id} · {test.seconds??0}s</p>)}</details>
-          <details><summary>Effective provider configuration</summary><pre>{JSON.stringify(run.effective_config,null,2)}</pre></details>
-          {!!run.collection_errors?.length&&<details open><summary>Collection errors</summary><pre>{JSON.stringify(run.collection_errors,null,2)}</pre></details>}
-          {!!run.collection_skips?.length&&<details><summary>Modules skipped during collection</summary><pre>{JSON.stringify(run.collection_skips,null,2)}</pre></details>}
-          <details><summary>Execution output</summary><pre>{run.log}</pre></details>
-          {run.artifacts?.map(artifact=><details key={artifact.name}><summary>{artifact.name} · {artifact.media_type}</summary><p className="hash">SHA256 {artifact.sha256}</p><pre>{artifact.content}</pre></details>)}
-        </article>)}
-      </section>
+      <section className="environment-strip"><div><span className="eyebrow">Execution environment</span><h3>{profile.requested_ref||'Source '+profile.source.revision.slice(0,12)}</h3><p>{views[profile.provider_id]?.label||profile.provider_id} · {profile.source.revision.slice(0,12)} · Created {timeLabel(profile.created_at)}</p></div><StatusBadge status={profile.state}/>{latest&&<a className="button secondary" href={'#execution/'+profile.id+'/'+latest.id}>View latest result →</a>}</section>
+      {profile.error&&<p className="error" role="alert">{profile.error}</p>}
+      {profile.state==='interrupted'&&<p className="notice">The last operation was interrupted. Earlier evidence is retained; retry preparation or execution.</p>}
+      {!profile.environment?<section className="surface"><p className="eyebrow">Review before preparation</p><h2>Approve this project environment</h2><p>Review the dependencies and configuration below. Preparation builds an isolated environment and does not install project packages into Tracefold.</p><pre>{JSON.stringify(profile.config,null,2)}</pre><button className="button" disabled={running} onClick={()=>void action('Preparing approved environment',async()=>setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash})))}>Approve environment and prepare</button></section>:<>
+        <nav className="environment-tabs" aria-label="Environment views"><a href={'#execution/'+profile.id} aria-current={!generating&&!resultId?'page':undefined}>Run existing tests</a>{views[profile.provider_id]?.supportsGeneration&&<a href={'#execution/'+profile.id+'/generate'} aria-current={generating?'page':undefined}>Generate & review</a>}{latest&&<a href={'#execution/'+profile.id+'/'+latest.id} aria-current={resultId?'page':undefined}>Results</a>}</nav>
+        {!generating&&!resultId&&<section className="surface baseline-action"><div><p className="eyebrow">Environment ready</p><h2>Run the repository baseline</h2><p>Collect and execute the configured existing tests. No model request is required.</p></div><div className="action-group"><button className="button" disabled={running} onClick={()=>void action('Running existing tests',async()=>completedRun(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/runs',{profile_hash:profile.profile_hash})))}>{profile.runs.some(r=>!r.suite_id)?'Re-run existing tests':'Run existing tests'}</button>{views[profile.provider_id]?.supportsGeneration&&<a className="button secondary" href={'#execution/'+profile.id+'/generate'}>Generate tests →</a>}</div></section>}
+        {generating&&views[profile.provider_id]?.supportsGeneration&&<RepositorySuiteFlow profile={profile} view={views[profile.provider_id]} onProfile={completedRun} focusSuiteId={focusSuiteId} disabled={!!busy||!!childBusy||['preparing','running','generating'].includes(profile.state)} onBusyChange={setChildBusy}/>}
+        {(!generating||resultId)&&<ExecutionResults profile={profile} runId={resultId}/>}
+        <details className="surface environment-details"><summary>Environment configuration and recovery</summary><p>Environment ready · {views[profile.provider_id]?.label||profile.provider_id}</p><details><summary>Approved configuration</summary><pre>{JSON.stringify(profile.config,null,2)}</pre></details><details><summary>Recorded environment manifest</summary><p className="hash">{profile.environment.id}</p><pre>{JSON.stringify(profile.environment.manifest,null,2)}</pre></details><details><summary>Environment preparation log</summary><pre>{profile.environment.log}</pre></details><section className="environment-recovery"><h3>Environment recovery</h3><p>Rebuild only if the worker image is unavailable or needs a runner update. Existing reports retain their original environment identities.</p><button className="button secondary" disabled={running} onClick={()=>void action('Rebuilding approved environment',async()=>setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash})))}>Rebuild approved environment</button></section></details>
+      </>}
     </>}
   </div>
 }

@@ -45,12 +45,15 @@ The app reads process variables, not automatically loaded .env files. Earlier fi
 ```powershell
 .venv\Scripts\python.exe -m unittest discover -s tests -t . -v
 npm run build
+npm run test:ui
 .venv\Scripts\python.exe scripts/check_documentation.py
 .venv\Scripts\python.exe scripts/check_validation_evidence.py
 git diff --check
 ```
 
 `tests/` is a package; `-t .` keeps application imports and shared test helpers explicit. A focused example is `python -m unittest tests.test_execution_core -v` using the project virtual environment.
+
+The browser regression suite requires the frontend/backend to be running. It uses controlled API fixtures and does not alter live projects or request model/container execution. It launches installed Microsoft Edge; set `TRACEFOLD_BROWSER_PATH` to another Chromium executable when needed. `TRACEFOLD_TEST_BASE_URL` overrides http://127.0.0.1:5173. Results remain ignored under `.tracefold/ui-regression/`. Real-model/container acceptance is recorded separately in the validation index.
 
 Eight tests depend on Docker readiness. Start Docker and build the bootstrap before full execution acceptance; report skips explicitly. Container preparation requires registry access. The suite is not a real-model accuracy benchmark or company-project acceptance. An existing SQLite cleanup ResourceWarning is a known non-failing finding.
 

@@ -64,7 +64,9 @@ class GithubSnapshots:
         if not re.fullmatch(r'[A-Za-z0-9-]+/[A-Za-z0-9_.-]+', repo):
             raise ProviderError("Choose a real connected GitHub repository.")
         from urllib.parse import quote
-        sha = self.github(repo + '/commits/' + quote(ref, safe=''))['sha']
+        # Immutable commit IDs need no branch-resolution request. Cached snapshots
+        # are still rehashed below, so replay remains verified when GitHub is busy.
+        sha = ref if re.fullmatch(r'[0-9a-f]{40}', ref) else self.github(repo + '/commits/' + quote(ref, safe=''))['sha']
         if not re.fullmatch(r'[0-9a-f]{40}', sha):
             raise ProviderError("GitHub did not return an immutable revision.")
         key = hashlib.sha256((repo + ':' + sha).encode()).hexdigest()

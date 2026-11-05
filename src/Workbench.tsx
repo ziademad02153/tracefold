@@ -94,7 +94,7 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
   const latest=session?.runs.at(-1)
   return <div className="testing-workspace">
     <p className="page-help">{session?(session.mode!=='file'?'This saved session uses the earlier standalone-function runner. Its approved tests and evidence are preserved.':'Review this saved file test suite, run it against a selected revision, then rerun the same tests after your fix. Results are saved below.'):'Test a Python file in context: choose up to five public functions, define expected behavior, review 3–5 generated tests and run them against the original module.'}</p>
-    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={session?.runs.length?'runs':'tests'}/>{!session&&<><ProjectTestNavigation repo={activeRepo} active="generated"/><p className="muted">Generated file suites use isolated file context. They are not automatically added to the repository's existing test runs.</p></>}</>}
+    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={session?.runs.length?'runs':'tests'}/>{!session&&<><ProjectTestNavigation repo={activeRepo} active="generated"/><p className="muted">Focused file suites use a separate limited environment. Use repository testing for project imports and dependencies.</p></>}</>}
     {error&&<p className="error" role="alert">{error}</p>}
     {busy&&<p className="progress" role="status">{busy==='generate'?'Gemma is generating your test. This may take a few minutes.':busy==='run'?'Running the approved test in Docker…':'Loading…'}</p>}
     {!session&&repo&&<>
@@ -103,7 +103,7 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
         setFiles(await api<Files>('testing/files?repo='+encodeURIComponent(repo)+'&ref='+encodeURIComponent(ref)))
       })}}>
         <h2>1. Select code</h2>
-        <p>The full file is executed with its helpers, constants and supported standard-library imports. Cross-file imports, package initializers and external dependencies require the later repository environment milestone.</p>
+        <p>The full file is executed with its helpers, constants and supported standard-library imports. For cross-file imports, package initializers and external dependencies, use the repository environment under Existing tests.</p>
         <label htmlFor="test-ref">Branch or commit ID</label>
         <div className="row"><input id="test-ref" list="test-branches" value={ref} required disabled={!!busy}
           onChange={event=>{setRef(event.target.value);setFiles(undefined);setFunctions(undefined);setFn('')}}/>
@@ -156,7 +156,7 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
         <p>{session.path} · {session.mode==='file'?'Original file context':'Legacy standalone function'} · Initial revision {session.sha.slice(0,12)}</p>
         {session.runs.length > 0 && <p className="session-verdict"><strong>Latest result: {session.runs[session.runs.length-1].status.toUpperCase()}</strong> · {session.runs.length} saved runs using the same approved {isSuite?'suite':'test'}</p>}
         {latest?.summary&&<div className="suite-counts"><strong>Latest run</strong><span className="passed">{latest.summary.passed} passed</span><span className="failed">{latest.summary.failed} failed</span><span>{latest.summary.blocked+latest.summary.skipped+latest.summary.not_run} incomplete</span>
-          <button className="button secondary" onClick={()=>document.getElementById('execution-evidence')?.scrollIntoView({behavior:'smooth'})}>View per-test results ↓</button></div>}
+          <button className="button secondary" onClick={()=>document.getElementById('run-'+(session.runs.at(-1)?.id||''))?.scrollIntoView({block:'start'})}>View per-test results ↓</button></div>}
         <h3>Expected behavior</h3><p>{session.expected}</p>
         <details><summary>Source used to generate the test</summary><pre>{session.source}</pre></details>
       </section>
@@ -174,8 +174,9 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
         <details><summary>Saved {isSuite?'suite':'test'} identity</summary><p className="hash">{session.test_hash}</p></details>
       </section>
       <form className="surface" onSubmit={event=>{event.preventDefault();void action('run',async()=>{
-        setSession(await api<Session>('testing/sessions/'+session.id+'/run',{ref:runRef,test_hash:session.test_hash}))
-        window.setTimeout(()=>document.getElementById('execution-evidence')?.scrollIntoView({behavior:'smooth'}),0)
+        const updated=await api<Session>('testing/sessions/'+session.id+'/run',{ref:runRef,test_hash:session.test_hash})
+        setSession(updated)
+        const latest=updated.runs.at(-1);if(latest)location.hash='#test-session/'+updated.id+'/'+latest.id
       })}}>
         <h2>4. Run the same {isSuite?'test suite':'test'}</h2>
         <p>Run against the initial revision, then enter the branch or commit containing your fix. The approved code stays unchanged across runs.</p>

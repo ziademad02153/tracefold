@@ -1,65 +1,48 @@
-import { useEffect, useState } from 'react'
-import { api } from './api'
+import {useEffect,useState} from 'react'
+import {api} from './api'
 import type {ExecutionActivity} from './executionTypes'
+import {StatusBadge,timeLabel} from './executionUi'
 
-export type ProjectRun = {
-  id:string; session_id:string; status:string; completed_at:string; sha:string;
-  summary?:{total:number;passed:number;failed:number;blocked:number;skipped:number;not_run:number}|null;
-}
-export type ProjectSummary = {
-  repo:string; suite_count:number; test_count:number; run_count:number; latest_run:ProjectRun|null;
-  suites:{id:string;function:string;path:string;test_count:number;created_at:string}[];
-  runs:ProjectRun[];
-}
-export function ProjectNavigation({repo,active}:{repo:string;active:'overview'|'tests'|'runs'|'ai-review'}) {
+export type ProjectRun={id:string;session_id:string;status:string;completed_at:string;sha:string;summary?:{total:number;passed:number;failed:number;blocked:number;skipped:number;not_run:number}|null}
+export type ProjectSummary={repo:string;suite_count:number;test_count:number;run_count:number;latest_run:ProjectRun|null;suites:{id:string;function:string;path:string;test_count:number;created_at:string}[];runs:ProjectRun[]}
+export function ProjectNavigation({repo,active}:{repo:string;active:'overview'|'tests'|'runs'|'ai-review'}){
   const encoded=encodeURIComponent(repo)
-  return <nav className="project-tabs" aria-label="Project navigation">
-    <a href={'#project/'+encoded} aria-current={active==='overview'?'page':undefined}>Overview</a>
-    <a href={'#tests/'+encoded} aria-current={active==='tests'?'page':undefined}>Tests</a>
-    <a href={'#runs/'+encoded} aria-current={active==='runs'?'page':undefined}>Runs</a>
-    <a href={'#ai-review/'+encoded} aria-current={active==='ai-review'?'page':undefined}>AI Review</a>
-  </nav>
+  return <nav className="project-tabs" aria-label="Project navigation">{[['overview','Overview','project'],['tests','Tests','tests'],['runs','Runs','runs'],['ai-review','AI Review','ai-review']].map(([key,label,route])=><a key={key} href={'#'+route+'/'+encoded} aria-current={active===key?'page':undefined}>{label}</a>)}</nav>
 }
 export function ProjectTestNavigation({repo,active}:{repo:string;active:'existing'|'generated'}){
-  const encoded=encodeURIComponent(repo)
-  return <nav className="test-tabs" aria-label="Test type">
-    <a href={'#tests/'+encoded} aria-current={active==='existing'?'page':undefined}>Existing tests</a>
-    <a href={'#generated/'+encoded} aria-current={active==='generated'?'page':undefined}>Generated tests</a>
-  </nav>
+  return <nav className="test-tabs" aria-label="Test type"><a href={'#tests/'+encodeURIComponent(repo)} aria-current={active==='existing'?'page':undefined}>Existing tests</a><a href={'#generated/'+encodeURIComponent(repo)} aria-current={active==='generated'?'page':undefined}>Generated tests</a></nav>
 }
-export function ProjectHome({repo}:{repo:string}) {
-  const [data,setData]=useState<ProjectSummary>()
-  const [error,setError]=useState('')
-  const [repositoryActivity,setRepositoryActivity]=useState<ExecutionActivity>()
+export function ProjectHome({repo}:{repo:string}){
+  const [activity,setActivity]=useState<ExecutionActivity>()
+  const [legacy,setLegacy]=useState<ProjectSummary>()
+  const [loading,setLoading]=useState(true)
+  const [errors,setErrors]=useState<string[]>([])
+  const [version,setVersion]=useState(0)
   useEffect(()=>{
-    let active=true
-    setData(undefined);setError('')
-    api<ExecutionActivity[]>('executions/activity?repo='+encodeURIComponent(repo)).then(items=>{if(active)setRepositoryActivity(items[0])}).catch(()=>{if(active)setRepositoryActivity(undefined)})
-    api<ProjectSummary[]>('testing/overview?repo='+encodeURIComponent(repo))
-      .then(items=>{if(active)setData(items[0])})
-      .catch(failure=>{if(active)setError(failure instanceof Error?failure.message:String(failure))})
-    return()=>{active=false}
-  },[repo])
-  return <div>
-    <h2 className="section">{repo}</h2>
+    let active=true;setLoading(true);setErrors([])
+    Promise.allSettled([api<ExecutionActivity[]>('executions/activity?repo='+encodeURIComponent(repo)),api<ProjectSummary[]>('testing/overview?repo='+encodeURIComponent(repo))]).then(([current,earlier])=>{
+      if(!active)return
+      const messages=[]
+      if(current.status==='fulfilled')setActivity(current.value[0]||{repo,profile_count:0,run_count:0,suite_count:0,latest_run:null})
+      else{setActivity(undefined);messages.push('Repository activity could not be loaded. Counts and the latest result are unavailable.')}
+      if(earlier.status==='fulfilled')setLegacy(earlier.value[0]);else{setLegacy(undefined);messages.push('Focused-file history could not be loaded. Repository activity is shown separately.')}
+      setErrors(messages);setLoading(false)
+    });return()=>{active=false}
+  },[repo,version])
+  const encoded=encodeURIComponent(repo),latest=activity?.latest_run
+  return <div className="project-home">
+    <div className="project-identity"><span className="eyebrow">Project</span><h2>{repo}</h2><p>Repository testing · Python / pytest execution</p></div>
     <ProjectNavigation repo={repo} active="overview"/>
-    {error&&<p className="error" role="alert">{error}</p>}
-    {!data&&!error&&<p role="status">Loading project activity…</p>}
-    {data&&<>
-      <>
-        <section className="surface row"><div><p className="eyebrow">Your project workspace</p><h2>Test this project and keep the evidence</h2><p>Inside Tests, run the project's existing tests or generate a focused suite for a supported source file. Open Runs to inspect saved results and verify a repair.</p></div><a className="button" href={'#tests/'+encodeURIComponent(repo)}>Open Tests →</a></section>
-        <div className="project-metrics">
-          <article className="surface"><p>Earlier file suites</p><strong>{data.suite_count}</strong></article>
-          <article className="surface"><p>Tests in earlier file suites</p><strong>{data.test_count}</strong></article>
-          <article className="surface"><p>Earlier file test runs</p><strong>{data.run_count}</strong></article>
-        </div>
-        {repositoryActivity&&<section className="surface"><div className="row"><h2>Repository test activity</h2><a href={'#tests/'+encodeURIComponent(repo)}>Open test environments →</a></div><p>{repositoryActivity.suite_count??0} repository suites · {repositoryActivity.profile_count} saved configurations · {repositoryActivity.run_count} saved runs</p>{repositoryActivity.latest_run&&<p><strong>{repositoryActivity.latest_run.status.toUpperCase()}</strong> · {repositoryActivity.latest_run.summary?.passed??0} passed · {repositoryActivity.latest_run.summary?.failed??0} failed · <a href={'#execution/'+repositoryActivity.latest_run.profile_id}>Open latest repository report →</a></p>}</section>}
-        <section className="surface"><div className="row"><h2>Latest file execution</h2>{data.latest_run&&<a href={'#test-session/'+data.latest_run.session_id}>Open execution evidence →</a>}</div>
-          {data.latest_run?<><p><strong className={data.latest_run.status==='passed'?'passed':data.latest_run.status==='failed'?'failed':''}>{data.latest_run.status.toUpperCase()}</strong> · {new Date(data.latest_run.completed_at).toLocaleString()}</p>
-            {data.latest_run.summary&&<p>{data.latest_run.summary.passed} passed · {data.latest_run.summary.failed} failed · {data.latest_run.summary.blocked+data.latest_run.summary.skipped+data.latest_run.summary.not_run} incomplete</p>}</>
-            :<p>No file test suites have been executed yet. Repository execution appears separately above.</p>}
-        </section>
-      </>
+    {loading&&<p role="status">Loading project activity…</p>}
+    {!!errors.length&&<div className="error" role="alert">{errors.map(e=><p key={e}>{e}</p>)}<button className="button secondary" disabled={loading} onClick={()=>setVersion(v=>v+1)}>Retry activity</button></div>}
+    <section className="project-intro surface"><div><p className="eyebrow">Your next step</p><h2>{latest?'Review the result. Verify the next change.':'Start with the project environment.'}</h2><p>Prepare the repository, run its tests, then review AI-generated additions. Every result stays attached to the source and tests that produced it.</p></div><div className="action-group"><a className="button" href={'#tests/'+encoded}>Open Tests →</a>{(activity?.profile_count??0)>0&&<a className="button secondary" href={'#generated/'+encoded}>Generate tests →</a>}</div></section>
+    <p className="support-note">Execution support: Python 3.11 / Linux / pytest. Other languages and services need their own supported execution profile. No pull request is required.</p>
+    {activity&&<>
+      <div className="project-metrics"><article><p>Saved repository suites</p><strong>{activity.suite_count??0}</strong></article><article><p>Test runs</p><strong>{activity.run_count}</strong></article><article><p>Environments</p><strong>{activity.profile_count}</strong></article></div>
+      <section className="surface latest-project-result"><div className="section-heading"><div><p className="eyebrow">Repository test activity</p><h2>Latest execution</h2></div>{latest&&<StatusBadge status={latest.status}/>}</div>
+        {latest?<><p className="result-numbers"><strong>{latest.summary?.passed??'—'}</strong> passed <span>·</span> <strong>{latest.summary?.failed??'—'}</strong> failed</p><p>{timeLabel(latest.completed_at)} · Results apply to collected cases, not all code.</p><a className="button secondary" href={'#execution/'+latest.profile_id+'/'+latest.id}>Open latest repository report →</a></>:<div className="empty-state"><p>No repository tests have been run yet. Prepare an environment in Tests to create the first baseline.</p><a href={'#tests/'+encoded}>Set up repository tests →</a></div>}
+      </section>
     </>}
+    <details className="surface legacy-tools"><summary>Focused file tools and earlier history</summary><p>These limited file-only tools use a separate environment. Their results are not part of repository runs.</p>{legacy&&<p>{legacy.suite_count} file suites · {legacy.run_count} file runs</p>}<div className="action-group"><a href={'#testing/'+encoded}>Open focused file testing →</a>{legacy?.latest_run&&<a href={'#test-session/'+legacy.latest_run.session_id+'/'+legacy.latest_run.id}>Open latest focused-file result →</a>}</div></details>
   </div>
 }

@@ -17,6 +17,7 @@ class CreateProfile(BaseModel):
     ref: str = Field(min_length=1, max_length=200)
     provider_id: str
     config: dict
+    requested_ref: str|None = Field(default=None,min_length=1,max_length=200)
 
 
 class ApproveProfile(BaseModel):
@@ -117,7 +118,7 @@ def create_execution_router(service, connected):
     @router.post('/profiles',status_code=201)
     def create(request:CreateProfile):
         connected(request.repo)
-        return perform(lambda:service.create(request.repo,request.ref,request.provider_id,request.config))
+        return perform(lambda:service.create(request.repo,request.ref,request.provider_id,request.config,requested_ref=request.requested_ref))
 
     @router.get('/profiles')
     def list_profiles(repo:str):

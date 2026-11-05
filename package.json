@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node scripts/start.mjs",
     "dev": "vite",
-    "build": "tsc --noEmit && vite build"
+    "build": "tsc --noEmit && vite build",
+    "test:ui": "node tests/ui/run.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -14,6 +15,8 @@
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "axe-core": "4.10.3",
+    "playwright-core": "1.58.2",
     "typescript": "~5.8.0",
     "vite": "^6.4.5"
   }

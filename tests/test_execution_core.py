@@ -47,6 +47,13 @@ class CoreTests(unittest.TestCase):
     def create(self):
         return self.service.create('owner/repo','main',self.provider.id,{'device_suite':'submit'})
 
+    def test_requested_revision_label_does_not_replace_execution_identity(self):
+        labeled=self.service.create('owner/repo','a'*40,self.provider.id,{'device_suite':'submit'},requested_ref='feature/review')
+        plain=self.service.create('owner/repo','a'*40,self.provider.id,{'device_suite':'submit'})
+        self.assertEqual(labeled['requested_ref'],'feature/review')
+        self.assertEqual(labeled['source']['revision'],'a'*40)
+        self.assertEqual(labeled['profile_hash'],plain['profile_hash'])
+
     def test_non_python_lifecycle_and_evidence_survive_reopening(self):
         profile=self.create()
         prepared=self.service.prepare(profile['id'],profile['profile_hash'])
@@ -124,6 +131,19 @@ class CoreTests(unittest.TestCase):
 
 
 class SnapshotTests(unittest.TestCase):
+    def test_pinned_snapshot_replay_needs_no_github_resolution_and_checks_integrity(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            def unavailable(path):
+                raise AssertionError('Pinned commits must not resolve a branch')
+            store=GithubSnapshots(temporary,unavailable,lambda repo:None)
+            with patch('snapshot_store.urlopen',return_value=io.BytesIO(self.archive([('root/src/a.py','x=1')]))):
+                snapshot=store('owner/repo','a'*40)
+            with patch('snapshot_store.urlopen',side_effect=AssertionError('Cached replay must not download')):
+                self.assertEqual(store('owner/repo','a'*40).content_hash,snapshot.content_hash)
+                (snapshot.path/'src/a.py').write_text('x=2')
+                with self.assertRaises(ProviderError):
+                    store('owner/repo','a'*40)
+
     def archive(self,names):
         buffer=io.BytesIO()
         with zipfile.ZipFile(buffer,'w') as archive:
@@ -155,6 +175,16 @@ class SnapshotTests(unittest.TestCase):
 
 
 class PythonProfileTests(unittest.TestCase):
+    def test_discovery_identifies_pytest_inputs_without_loading_project_code(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            (root/'requirements-tests.txt').write_text('pytest==8.1.1\npytest-mock==3.14.0\n',encoding='utf-8')
+            (root/'requirements-runtime.txt').write_text('packaging==24.0\n# pytest is only a comment\n',encoding='utf-8')
+            (root/'module.py').write_text('raise RuntimeError("Do not import for discovery")\n',encoding='utf-8')
+            info=PythonRepositoryProvider().discover(Snapshot('owner/repo','a'*40,root,'hash',3),'.')
+            self.assertEqual(info['python_files'],1)
+            self.assertEqual(info['pytest_dependency_files'],['requirements-tests.txt'])
+
     def test_profile_preserves_project_configuration_and_rejects_direct_urls(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)

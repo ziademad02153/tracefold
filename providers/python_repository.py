@@ -138,12 +138,22 @@ class PythonRepositoryProvider:
             except (ValueError,UnicodeError) as failure:
                 raise ProviderError('pyproject.toml could not be parsed.') from failure
         names=[p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()]
+        requirement_files=sorted(name for name in names if 'requirement' in name.lower() and name.endswith(('.txt','.in')))
+        pytest_files=[]
+        for name in requirement_files:
+            path=root/name
+            try:
+                if path.stat().st_size<=100000 and any(re.match(r'^\s*pytest(?:[\s\[<>=!~]|$)',line,re.I) for line in path.read_text(encoding='utf-8').splitlines()):
+                    pytest_files.append(name)
+            except (OSError,UnicodeError):
+                pass
         return {'component_root':component,'runtime_profiles':['3.11'],
                 'project_name':manifest.get('project',{}).get('name'),
                 'requires_python':manifest.get('project',{}).get('requires-python'),
                 'installable':any((root/name).is_file() for name in ['pyproject.toml','setup.py','setup.cfg']),
                 'layout':'src' if (root/'src').is_dir() else 'flat',
-                'requirements_files':[name for name in names if ('requirement' in name.lower() and name.endswith(('.txt','.in')))],
+                'requirements_files':requirement_files,'pytest_dependency_files':pytest_files,
+                'python_files':sum(name.endswith('.py') for name in names),
                 'configuration_files':[name for name in ['pytest.ini','.pytest.ini','pyproject.toml','setup.cfg','tox.ini','pytest.toml','.pytest.toml'] if (root/name).is_file()],
                 'build_requires':manifest.get('build-system',{}).get('requires',[]),
                 'optional_extras':list(manifest.get('project',{}).get('optional-dependencies',{})),

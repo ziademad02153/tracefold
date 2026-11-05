@@ -1,0 +1,4 @@
+export function statusText(status:string){return ({ready:'Ready',draft:'Draft',approved:'Approved',passed:'Passed',failed:'Failed',blocked:'Blocked',error:'Error',completed_with_exceptions:'Completed with exceptions',interrupted:'Interrupted',preparing:'Preparing',running:'Running',generating:'Generating',not_run:'Not run',skipped:'Skipped',xfailed:'Expected failure',xpassed:'Unexpected pass'} as Record<string,string>)[status]||status.replaceAll('_',' ')}
+export function StatusBadge({status}:{status:string}){return <span className={'status-badge status-'+status}>{statusText(status)}</span>}
+export function showRun(profileId:string,runId:string){location.hash='#execution/'+profileId+'/'+runId}
+export function timeLabel(value:string){return new Date(value).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'})}

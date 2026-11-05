@@ -47,6 +47,8 @@ No PR is required. Advisory PR analysis and earlier focused file/function workfl
 
 Earlier routes and stored reports remain readable. Reports/evidence are destinations inside the project, not extra primary navigation tabs.
 
+Within an execution environment, Run existing tests, Generate & review and Results are separate views. Completing execution opens its exact saved verdict, with per-test outcomes and same-suite repair comparison when available. Generation uses searchable module checkboxes and explicit expected behavior. Draft edits are retained within the browser tab and require an explicit server save before approval; they are not shared drafts or server autosave. Environment recovery and native artifacts remain available in expandable details.
+
 ## Support boundary
 
 The implemented repository profile is public GitHub + Python 3.11/Linux/pip/pytest. It preserves supported project installation, internal imports, fixtures/configuration, selected plugins and full native case IDs. Generation is bounded: up to three modules and 3–8 test functions in one reserved file. It is not automatic exhaustive generation for an entire repository.

@@ -36,4 +36,6 @@ Earlier acceptance recorded 51 passing automated checks and a successful fronten
 
 ## UI and usability review
 
+[5 November remediation](ui-ux-remediation-2026-11-05.md) resolves the eight baseline findings, adds twenty repeatable browser scenarios and repeats real Gemma generation, approval, failing execution and unchanged-suite repair through the corrected interface. The record distinguishes controlled tests from live execution and documents GitHub rate limiting and remaining acceptance limits.
+
 [5 November UI/UX review](ui-ux-review-2026-11-05.md) records thirteen screens, controlled error/pending states, a new live Gemma/Docker defect-and-repair journey, advisory review, 53 regression tests and open interaction findings. Functional success is not a declaration that the UX is ready for daily team use.
