@@ -10,16 +10,20 @@ export function ExecutionResults({profile,runId}:{profile:ExecutionProfile;runId
   const [search,setSearch]=useState(''),[limit,setLimit]=useState(50)
   useEffect(()=>{setLimit(50)},[search,filter,run?.id])
   useEffect(()=>{setFilter(run?.tests.some(t=>t.status!=='passed')?'attention':'all');if(runId&&run)document.getElementById('run-'+run.id)?.scrollIntoView({block:'start'})},[run?.id,runId])
-  if(!run)return <section className="surface empty-state" style={{padding:'36px 28px',textAlign:'center',maxWidth:'780px',margin:'24px auto'}}>
-    <div style={{fontSize:'44px',marginBottom:'12px'}}>📊</div>
-    <h2 style={{fontSize:'22px',fontWeight:700,margin:'0 0 10px 0'}}>{runId?'Execution Run Not Found':'No Execution Evidence Yet'}</h2>
-    <p style={{color:'var(--muted, #64748b)',fontSize:'15px',maxWidth:'580px',margin:'0 auto 24px auto',lineHeight:'1.6'}}>
-      {runId?'This execution does not belong to this environment snapshot. You can open the latest saved result or return to the environment.':'To record verified execution evidence, run the existing repository test baseline or generate and approve a new AI test suite.'}
+  if(!run)return <section className="surface empty-state">
+    <div className="section-heading">
+      <div>
+        <p className="eyebrow">Execution inventory</p>
+        <h2>{runId ? 'Execution not found' : 'No execution evidence recorded'}</h2>
+      </div>
+    </div>
+    <p>
+      {runId ? 'This execution does not belong to this environment snapshot.' : 'Run the automated project pipeline or execute baseline tests to record verified evidence.'}
     </p>
-    <div style={{display:'flex',gap:'14px',justifyContent:'center',flexWrap:'wrap'}}>
-      <a className="button" href={'#execution/'+profile.id}>⚡ Run Existing Baseline Tests</a>
-      <a className="button secondary" href={'#execution/'+profile.id+'/generate'}>✨ Generate & Review Tests</a>
-      {profile.runs.length>0&&<a className="button secondary" href={'#execution/'+profile.id+'/'+profile.runs.at(-1)!.id}>Open Latest Saved Result →</a>}
+    <div className="action-group" style={{marginTop:'16px'}}>
+      <a className="button" href={'#execution/'+profile.id}>Go to pipeline</a>
+      <a className="button secondary" href={'#execution/'+profile.id+'/generate'}>Custom test designer</a>
+      {profile.runs.length>0&&<a className="button secondary" href={'#execution/'+profile.id+'/'+profile.runs.at(-1)!.id}>Open latest saved result →</a>}
     </div>
   </section>
   const summary=run.summary,attention=run.tests.filter(t=>t.status!=='passed')
@@ -31,30 +35,27 @@ export function ExecutionResults({profile,runId}:{profile:ExecutionProfile;runId
       <div className="section-heading"><div><p className="eyebrow">{run.id===profile.runs.at(-1)?.id?'Latest execution':'Saved execution'} · {run.suite_id?'Existing + approved tests':'Existing tests'}</p><h2>Repository run {index} · {statusText(run.status).toUpperCase()}</h2></div><StatusBadge status={run.status}/></div>
       
       <div style={{
-        background: run.status==='passed' ? 'linear-gradient(135deg, #14532d 0%, #166534 100%)' : run.status==='failed' ? 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)' : 'var(--surface-raised, #1e293b)',
-        color: '#ffffff',
-        padding: '18px 22px',
-        borderRadius: '10px',
+        background: run.status==='passed' ? '#eef6ec' : run.status==='failed' ? '#fbeae5' : '#f8f7f4',
+        border: `1px solid ${run.status==='passed' ? '#b8dab1' : run.status==='failed' ? '#f2b8af' : 'var(--border)'}`,
+        color: run.status==='passed' ? '#1b4332' : run.status==='failed' ? '#842029' : 'inherit',
+        padding: '14px 18px',
+        borderRadius: '6px',
         margin: '14px 0',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
+        alignItems: 'center'
       }}>
         <div>
-          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'4px'}}>
-            <span style={{fontSize:'22px'}}>{run.status==='passed' ? '✓' : '✕'}</span>
-            <h3 style={{margin:0,fontSize:'18px',color:'#ffffff',fontWeight:700}}>
-              {run.status==='passed' ? `All ${summary?.total??run.tests.length} Tests Passed · Verified in Isolated Sandbox` : `${summary?.failed??1} Test Assertion Failures Detected`}
-            </h3>
-          </div>
-          <p style={{margin:0,fontSize:'14px',color:run.status==='passed'?'#dcfce7':'#fee2e2'}}>
-            {run.suite_id ? 'Approved Generated Suite · pytest in Linux Container' : 'Baseline Existing Tests'} · {timeLabel(run.completed_at)} · Source {profile.source.revision.slice(0,12)}
+          <h3 style={{margin:0,fontSize:'16px',fontWeight:700}}>
+            {run.status==='passed' ? `All ${summary?.total??run.tests.length} tests passed · Verified in isolated sandbox` : `${summary?.failed??1} test failure${(summary?.failed??1)>1?'s':''} detected`}
+          </h3>
+          <p style={{margin:'4px 0 0 0',fontSize:'13px',color:'var(--muted)'}}>
+            {run.suite_id ? 'Approved suite · pytest in Linux container' : 'Baseline tests'} · {timeLabel(run.completed_at)} · Revision {profile.source.revision.slice(0,12)}
           </p>
         </div>
-        <div style={{textAlign:'right'}}>
-          <span style={{display:'inline-block',background:'rgba(255,255,255,0.2)',padding:'6px 14px',borderRadius:'20px',fontSize:'13px',fontWeight:700}}>
-            {run.status==='passed' ? '100% Pass Rate' : `${Math.round(((summary?.passed||0)/(summary?.total||1))*100)}% Pass Rate`}
+        <div>
+          <span className="badge" style={{fontWeight:700}}>
+            {run.status==='passed' ? '100% Pass rate' : `${Math.round(((summary?.passed||0)/(summary?.total||1))*100)}% Pass rate`}
           </span>
         </div>
       </div>

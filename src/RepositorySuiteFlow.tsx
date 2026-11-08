@@ -77,7 +77,7 @@ export function RepositorySuiteFlow({profile,view,onProfile,focusSuiteId,disable
       {catalog?.targets.length?<>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
           <label htmlFor="module-search" style={{margin:0}}>Find a source module</label>
-          <button type="button" className="button secondary" style={{padding:'4px 10px',fontSize:'12px'}} onClick={()=>setSelected(catalog?.targets.slice(0,max).map(t=>t.id)||[])}>⚡ Select All ({Math.min(catalog?.targets.length||0,max)})</button>
+          <button type="button" className="button secondary" style={{padding:'4px 10px',fontSize:'12px'}} onClick={()=>setSelected(catalog?.targets.slice(0,max).map(t=>t.id)||[])}>Select all ({Math.min(catalog?.targets.length||0,max)})</button>
         </div>
         <input id="module-search" type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by path, module or symbol"/>
         <p className="selection-count" role="status">{selected.length} of {max} modules selected{selected.length===max?' · Selection limit reached':''}</p>
@@ -86,12 +86,12 @@ export function RepositorySuiteFlow({profile,view,onProfile,focusSuiteId,disable
       </>:<div className="empty-state"><strong>No eligible source modules</strong><p>Check the component root and provider support. This generator needs supported source modules; it cannot generate tests from an empty or unsupported component.</p><a href={'#tests/'+encodeURIComponent(profile.repo)}>Inspect another revision or component →</a></div>}
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:'16px',marginBottom:'4px'}}>
         <label htmlFor="suite-intent" style={{margin:0}}>2. Expected behavior</label>
-        <button type="button" className="button secondary" style={{padding:'4px 10px',fontSize:'12px'}} onClick={()=>setIntent('Thoroughly test all public methods, state machine transitions, normal outputs, invalid inputs, edge cases and boundary exceptions.')}>✨ Auto-Infer Behavior</button>
+        <button type="button" className="button secondary" style={{padding:'4px 10px',fontSize:'12px'}} onClick={()=>setIntent('Thoroughly test all public methods, state machine transitions, normal outputs, invalid inputs, edge cases and boundary exceptions.')}>Infer expected behavior</button>
       </div>
       <textarea id="suite-intent" maxLength={5000} rows={5} value={intent} onChange={e=>setIntent(e.target.value)} placeholder="Leave blank to auto-infer behavior, or describe specific requirements (e.g. For price 10000 and discount 20%, return 8000)."/>
-      <p className="field-help">Optional: Leave blank for automatic AI behavior inference, or type custom rules (up to 5,000 characters).</p>
+      <p className="field-help">Optional: Leave blank for automatic behavior inference, or specify functional requirements (up to 5,000 characters).</p>
       {catalog&&Options&&<Options catalog={catalog} value={options} onChange={setOptions} disabled={locked}/>}
-      <button className="button" disabled={!selected.length||selected.length>max}>⚡ One-Click Generate Test Suite</button>
+      <button className="button" disabled={!selected.length||selected.length>max}>Generate test suite</button>
     </fieldset>
   </form>
   return <section className="surface suite-workspace" id="repository-generation" aria-busy={locked}>
