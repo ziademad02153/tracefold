@@ -62,19 +62,36 @@ export function RepositorySuiteFlow({profile,view,onProfile,focusSuiteId,disable
   }
   const scenarios=Array.isArray(suite?.metadata.scenarios)?suite.metadata.scenarios as {name:string;description:string}[]:[]
   const targets=catalog?.targets.filter(t=>(t.id+' '+t.label+' '+t.description).toLowerCase().includes(search.toLowerCase()))||[]
-  const generationForm=<form onSubmit={e=>{e.preventDefault();if(!selected.length||selected.length>max||intent.trim().length<10)return;if(edited&&!window.confirm('Create another suite while these edits are unsaved? A local copy remains in this tab when storage is available.'))return;void action('Generating test suite',async()=>{const item=await api<RepositorySuite>('executions/profiles/'+profile.id+'/suites',{profile_hash:profile.profile_hash,request:{selection:selected,intent,options}});if(mounted.current)adopt(item);await load()})}}>
+  async function submitGeneration(){
+    if(!selected.length||selected.length>max)return
+    const effectiveIntent = intent.trim() || 'Verify expected functional behavior, edge cases, state transitions, inputs and boundary exceptions for all public symbols.'
+    await action('Generating test suite',async()=>{
+      const item=await api<RepositorySuite>('executions/profiles/'+profile.id+'/suites',{profile_hash:profile.profile_hash,request:{selection:selected,intent:effectiveIntent,options}})
+      if(mounted.current)adopt(item)
+      await load()
+    })
+  }
+  const generationForm=<form onSubmit={e=>{e.preventDefault();if(!selected.length||selected.length>max)return;if(edited&&!window.confirm('Create another suite while these edits are unsaved? A local copy remains in this tab when storage is available.'))return;void submitGeneration()}}>
     <fieldset disabled={locked||loading||!catalog?.environment_ready}><legend>1. Select source modules</legend>
-      <p>Choose up to {max} related modules. Tests import the real project code.</p>
+      <p>Choose up to {max} modules. Tests import the real project code in an isolated sandbox.</p>
       {catalog?.targets.length?<>
-        <label htmlFor="module-search">Find a source module</label><input id="module-search" type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by path, module or symbol"/>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
+          <label htmlFor="module-search" style={{margin:0}}>Find a source module</label>
+          <button type="button" className="button secondary" style={{padding:'4px 10px',fontSize:'12px'}} onClick={()=>setSelected(catalog?.targets.slice(0,max).map(t=>t.id)||[])}>⚡ Select All ({Math.min(catalog?.targets.length||0,max)})</button>
+        </div>
+        <input id="module-search" type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by path, module or symbol"/>
         <p className="selection-count" role="status">{selected.length} of {max} modules selected{selected.length===max?' · Selection limit reached':''}</p>
         <div className="module-options">{targets.map(t=><label className="module-choice" key={t.id}><input type="checkbox" aria-label={'Select '+t.id} checked={selected.includes(t.id)} disabled={!selected.includes(t.id)&&selected.length>=max} onChange={e=>setSelected(old=>e.target.checked?[...old,t.id]:old.filter(id=>id!==t.id))}/><span><strong>{t.id}</strong><small>{t.description||t.label}</small></span></label>)}{!targets.length&&<p>No modules match this search. Clear the search to see available source.</p>}</div>
         {!!selected.length&&<div className="selected-modules" aria-label="Selected modules">{selected.map(id=><button type="button" key={id} onClick={()=>setSelected(old=>old.filter(v=>v!==id))} aria-label={'Remove '+id}>{id}<span aria-hidden="true"> ×</span></button>)}</div>}
       </>:<div className="empty-state"><strong>No eligible source modules</strong><p>Check the component root and provider support. This generator needs supported source modules; it cannot generate tests from an empty or unsupported component.</p><a href={'#tests/'+encodeURIComponent(profile.repo)}>Inspect another revision or component →</a></div>}
-      <label htmlFor="suite-intent">2. Expected behavior</label><textarea id="suite-intent" required minLength={10} maxLength={5000} rows={5} value={intent} onChange={e=>setIntent(e.target.value)} placeholder="For a price of 10000 cents and discount of 20%, return 8000 cents. Include boundaries and expected exceptions."/>
-      <p className="field-help">Describe correct outputs, not just what the implementation does. Use 10–5,000 characters.</p>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:'16px',marginBottom:'4px'}}>
+        <label htmlFor="suite-intent" style={{margin:0}}>2. Expected behavior</label>
+        <button type="button" className="button secondary" style={{padding:'4px 10px',fontSize:'12px'}} onClick={()=>setIntent('Thoroughly test all public methods, state machine transitions, normal outputs, invalid inputs, edge cases and boundary exceptions.')}>✨ Auto-Infer Behavior</button>
+      </div>
+      <textarea id="suite-intent" maxLength={5000} rows={5} value={intent} onChange={e=>setIntent(e.target.value)} placeholder="Leave blank to auto-infer behavior, or describe specific requirements (e.g. For price 10000 and discount 20%, return 8000)."/>
+      <p className="field-help">Optional: Leave blank for automatic AI behavior inference, or type custom rules (up to 5,000 characters).</p>
       {catalog&&Options&&<Options catalog={catalog} value={options} onChange={setOptions} disabled={locked}/>}
-      <button className="button" disabled={!selected.length||selected.length>max||intent.trim().length<10}>Generate test suite</button>
+      <button className="button" disabled={!selected.length||selected.length>max}>⚡ One-Click Generate Test Suite</button>
     </fieldset>
   </form>
   return <section className="surface suite-workspace" id="repository-generation" aria-busy={locked}>
@@ -82,7 +99,14 @@ export function RepositorySuiteFlow({profile,view,onProfile,focusSuiteId,disable
     <p>Define the behavior, review the assertions, then approve the exact tests you want to execute.</p>
     {loading&&<p role="status">Loading source modules and saved suites…</p>}
     {!!loadErrors.length&&<div className="error" role="alert">{loadErrors.map(t=><p key={t}>{t}</p>)}<button className="button secondary" disabled={locked||loading} onClick={()=>void load()}>Retry loading tests</button></div>}
-    {error&&<p role="alert" className="error">{error} Your saved suite and local edits have not been discarded.</p>}
+    {error&&<div className="error recovery-box" role="alert">
+      <p><strong>Test generation could not be completed.</strong> The AI generator could not produce a structurally valid suite for this request. No invalid suite was saved, and your module selections and expected behavior are preserved.</p>
+      <details style={{margin:'8px 0'}}>
+        <summary style={{cursor:'pointer',fontWeight:600}}>Technical details</summary>
+        <pre style={{whiteSpace:'pre-wrap',wordBreak:'break-word',fontSize:'13px',margin:'6px 0 0',padding:'8px',background:'rgba(0,0,0,0.05)',borderRadius:'4px'}}>{error}</pre>
+      </details>
+      <button type="button" className="button secondary" disabled={locked||loading||!selected.length||selected.length>max||intent.trim().length<10} onClick={()=>void submitGeneration()}>Retry generation</button>
+    </div>}
     {busy&&<p className="progress" aria-live="polite">{busy}… The operation is saved on the server; returning to this environment reconnects to its state.</p>}
     {catalog&&!catalog.environment_ready&&<p className="notice">This environment needs a runner update before generation. Open Environment recovery to rebuild the approved environment; previous results remain saved.</p>}
     {focusSuiteId&&!initialFocus.current&&!loading&&!suite&&!loadErrors.length&&<p role="alert" className="error">The linked suite is not available for this project and provider. Choose a saved suite below.</p>}
