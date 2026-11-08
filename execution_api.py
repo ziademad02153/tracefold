@@ -144,4 +144,9 @@ def create_execution_router(service, connected):
         profile(key)
         return perform(lambda:service.auto_pipeline(key,request.profile_hash))
 
+    @router.post('/profiles/{key}/unlock')
+    def unlock(key:str):
+        profile(key)
+        return perform(lambda:service.unlock_profile(key))
+
     return router

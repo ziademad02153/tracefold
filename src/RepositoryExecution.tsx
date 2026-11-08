@@ -36,9 +36,18 @@ export function RepositoryExecution({repo,profileId,views,focusRunId,focusSuiteI
   const generating=!!profileId&&focusRunId==='generate',resultId=profileId&&focusRunId&&!generating?focusRunId:undefined
   const latest=profile?.runs.at(-1),progress=busy||childBusy||(['preparing','running','generating'].includes(profile?.state||'')?'Operation in progress':'')
   return <div className="repository-execution">
-    {activeRepo&&<><div className="project-identity"><p className="eyebrow">{resultId?'Execution report':generating?'Generated tests':'Repository tests'}</p><h2><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a></h2></div><ProjectNavigation repo={activeRepo} active={resultId?'runs':'tests'}/>{!resultId&&<ProjectTestNavigation repo={activeRepo} active={generating?'generated':'existing'}/>}</>}
+    {activeRepo&&<><div className="project-identity"><p className="eyebrow">{resultId?'Execution report':generating?'Generated tests':'Repository tests'}</p><h2><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a></h2></div><ProjectNavigation repo={activeRepo} active={resultId?'runs':'tests'}/></>}
     {loading&&<p role="status">Loading execution workspace…</p>}
-    {error&&<div className="error" role="alert"><p>{error}</p><button className="button secondary" disabled={loading} onClick={()=>setVersion(v=>v+1)}>Retry loading workspace</button></div>}
+    {error&&<div className="error" role="alert" style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'10px'}}>
+      <p style={{margin:0}}>{error}</p>
+      <div style={{display:'flex',gap:'8px'}}>
+        <button className="button secondary" disabled={loading} onClick={()=>setVersion(v=>v+1)}>Retry</button>
+        {profileId&&<button className="button secondary" onClick={()=>void action('Unlocking environment',async()=>{
+          await api('executions/profiles/'+profileId+'/unlock',{},'POST').catch(()=>null);
+          setVersion(v=>v+1);
+        })}>Unlock environment</button>}
+      </div>
+    </div>}
     {progress&&<p className="progress" role="status">{progress}… Controls are locked for this environment. Leaving this page does not stop the operation; reopen it to check progress. Stopping a running operation is not available in this local version.</p>}
     {!loading&&!profile&&repo&&<>
       <section className="workflow-intro"><p className="eyebrow">Establish the baseline</p><h2>Prepare the project. Run its existing tests.</h2><p>Choose a revision and component. Review the detected configuration before the isolated environment is built.</p><p className="support-note">Available execution profile: {providers.map(p=>views[p.id]?.label||p.id).join(', ')||'not available — retry loading'}. Repository connection does not imply support for every language.</p></section>
@@ -57,7 +66,7 @@ export function RepositoryExecution({repo,profileId,views,focusRunId,focusSuiteI
       {profile.error&&<p className="error" role="alert">{profile.error}</p>}
       {profile.state==='interrupted'&&<p className="notice">The last operation was interrupted. Earlier evidence is retained; retry preparation or execution.</p>}
       {!profile.environment?<section className="surface"><p className="eyebrow">Review before preparation</p><h2>Approve this project environment</h2><p>Review the dependencies and configuration below. Preparation builds an isolated environment and does not install project packages into Tracefold.</p><pre>{JSON.stringify(profile.config,null,2)}</pre><button className="button" disabled={running} onClick={()=>void action('Preparing approved environment',async()=>setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash})))}>Approve environment and prepare</button></section>:<>
-        <nav className="environment-tabs" aria-label="Environment views"><a href={'#execution/'+profile.id} aria-current={!generating&&!resultId?'page':undefined}>Run existing tests</a>{views[profile.provider_id]?.supportsGeneration&&<a href={'#execution/'+profile.id+'/generate'} aria-current={generating?'page':undefined}>Generate & review</a>}{latest&&<a href={'#execution/'+profile.id+'/'+latest.id} aria-current={resultId?'page':undefined}>Results</a>}</nav>
+        {(generating||resultId)&&<div style={{marginBottom:'16px'}}><a className="button secondary" href={'#execution/'+profile.id}>← Back to pipeline</a></div>}
         {!generating&&!resultId&&<>
           {views[profile.provider_id]?.supportsGeneration&&<section className="surface auto-pipeline-card">
             <div className="section-heading">

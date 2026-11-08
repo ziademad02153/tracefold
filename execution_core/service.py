@@ -306,3 +306,9 @@ class ExecutionService:
         approved = self.approve_suite(suite["id"], suite["suite_hash"])
         return self.run(profile_id, profile["profile_hash"], approved["id"], approved["suite_hash"])
 
+    def unlock_profile(self, profile_id):
+        with self.engine.begin() as connection:
+            connection.execute(update(self.profiles).where(self.profiles.c.id == profile_id).values(state="ready"))
+        return self.get(profile_id)
+
+
