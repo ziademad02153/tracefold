@@ -139,4 +139,9 @@ def create_execution_router(service, connected):
         profile(key)
         return perform(lambda:service.run(key,request.profile_hash,request.suite_id,request.suite_hash))
 
+    @router.post('/profiles/{key}/auto-pipeline')
+    def auto_pipeline(key:str,request:ApproveProfile):
+        profile(key)
+        return perform(lambda:service.auto_pipeline(key,request.profile_hash))
+
     return router

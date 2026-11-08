@@ -58,7 +58,45 @@ export function RepositoryExecution({repo,profileId,views,focusRunId,focusSuiteI
       {profile.state==='interrupted'&&<p className="notice">The last operation was interrupted. Earlier evidence is retained; retry preparation or execution.</p>}
       {!profile.environment?<section className="surface"><p className="eyebrow">Review before preparation</p><h2>Approve this project environment</h2><p>Review the dependencies and configuration below. Preparation builds an isolated environment and does not install project packages into Tracefold.</p><pre>{JSON.stringify(profile.config,null,2)}</pre><button className="button" disabled={running} onClick={()=>void action('Preparing approved environment',async()=>setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash})))}>Approve environment and prepare</button></section>:<>
         <nav className="environment-tabs" aria-label="Environment views"><a href={'#execution/'+profile.id} aria-current={!generating&&!resultId?'page':undefined}>Run existing tests</a>{views[profile.provider_id]?.supportsGeneration&&<a href={'#execution/'+profile.id+'/generate'} aria-current={generating?'page':undefined}>Generate & review</a>}{latest&&<a href={'#execution/'+profile.id+'/'+latest.id} aria-current={resultId?'page':undefined}>Results</a>}</nav>
-        {!generating&&!resultId&&<section className="surface baseline-action"><div><p className="eyebrow">Environment ready</p><h2>Run the repository baseline</h2><p>Collect and execute the configured existing tests. No model request is required.</p></div><div className="action-group"><button className="button" disabled={running} onClick={()=>void action('Running existing tests',async()=>completedRun(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/runs',{profile_hash:profile.profile_hash})))}>{profile.runs.some(r=>!r.suite_id)?'Re-run existing tests':'Run existing tests'}</button>{views[profile.provider_id]?.supportsGeneration&&<a className="button secondary" href={'#execution/'+profile.id+'/generate'}>Generate tests →</a>}</div></section>}
+        {!generating&&!resultId&&<>
+          {views[profile.provider_id]?.supportsGeneration&&<section className="surface auto-pipeline-card" style={{
+            background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.09) 0%, rgba(22, 101, 52, 0.16) 100%)',
+            border: '1.5px solid rgba(22, 101, 52, 0.4)',
+            borderRadius: '12px',
+            padding: '24px 28px',
+            margin: '20px 0',
+            boxShadow: '0 4px 18px rgba(0,0,0,0.06)'
+          }}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'18px'}}>
+              <div style={{maxWidth:'640px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
+                  <span style={{background:'#166534',color:'#ffffff',fontSize:'11px',fontWeight:700,padding:'2px 8px',borderRadius:'12px',textTransform:'uppercase',letterSpacing:'0.5px'}}>1-Click Automation</span>
+                  <span style={{color:'var(--muted,#64748b)',fontSize:'13px',fontWeight:500}}>Enterprise Auto-Pipeline</span>
+                </div>
+                <h2 style={{fontSize:'22px',fontWeight:700,margin:'0 0 8px 0',color:'var(--foreground,#0f172a)'}}>
+                  🚀 Auto-Generate & Run Full Project Test Suite
+                </h2>
+                <p style={{margin:0,fontSize:'14px',color:'var(--muted,#475569)',lineHeight:'1.55'}}>
+                  Automatically scans project modules, creates balanced unit and integration tests covering logic and state transitions, and executes the suite in an isolated Docker sandbox with zero manual setup.
+                </p>
+              </div>
+              <div>
+                <button
+                  className="button"
+                  style={{padding:'12px 24px',fontSize:'15px',fontWeight:700,display:'flex',alignItems:'center',gap:'8px',background:'#166534',borderColor:'#14532d'}}
+                  disabled={running}
+                  onClick={()=>void action('Running 1-Click Automated Project Pipeline (Scan → Generate → Execute)',async()=>{
+                    const updated=await api<ExecutionProfile>('executions/profiles/'+profile.id+'/auto-pipeline',{profile_hash:profile.profile_hash})
+                    completedRun(updated)
+                  })}
+                >
+                  ⚡ Launch 1-Click Auto-Test
+                </button>
+              </div>
+            </div>
+          </section>}
+          <section className="surface baseline-action"><div><p className="eyebrow">Targeted testing & baseline</p><h2>Manual and Baseline Actions</h2><p>Collect and execute preexisting project tests or design a custom targeted test suite.</p></div><div className="action-group"><button className="button secondary" disabled={running} onClick={()=>void action('Running existing tests',async()=>completedRun(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/runs',{profile_hash:profile.profile_hash})))}>{profile.runs.some(r=>!r.suite_id)?'Re-run baseline tests':'Run baseline tests'}</button>{views[profile.provider_id]?.supportsGeneration&&<a className="button secondary" href={'#execution/'+profile.id+'/generate'}>🎯 Custom Scenario Generator →</a>}</div></section>
+        </>}
         {generating&&views[profile.provider_id]?.supportsGeneration&&<RepositorySuiteFlow profile={profile} view={views[profile.provider_id]} onProfile={completedRun} focusSuiteId={focusSuiteId} disabled={!!busy||!!childBusy||['preparing','running','generating'].includes(profile.state)} onBusyChange={setChildBusy}/>}
         {(!generating||resultId)&&<ExecutionResults profile={profile} runId={resultId}/>}
         <details className="surface environment-details"><summary>Environment configuration and recovery</summary><p>Environment ready · {views[profile.provider_id]?.label||profile.provider_id}</p><details><summary>Approved configuration</summary><pre>{JSON.stringify(profile.config,null,2)}</pre></details><details><summary>Recorded environment manifest</summary><p className="hash">{profile.environment.id}</p><pre>{JSON.stringify(profile.environment.manifest,null,2)}</pre></details><details><summary>Environment preparation log</summary><pre>{profile.environment.log}</pre></details><section className="environment-recovery"><h3>Environment recovery</h3><p>Rebuild only if the worker image is unavailable or needs a runner update. Existing reports retain their original environment identities.</p><button className="button secondary" disabled={running} onClick={()=>void action('Rebuilding approved environment',async()=>setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash})))}>Rebuild approved environment</button></section></details>

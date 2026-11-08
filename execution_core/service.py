@@ -279,3 +279,30 @@ class ExecutionService:
             connection.execute(self.runs.insert().values(id=uuid4().hex, profile_id=profile_id, payload=payload))
             connection.execute(update(self.profiles).where(self.profiles.c.id == profile_id, self.profiles.c.token == token).values(state="ready"))
         return self.get(profile_id)
+
+    def auto_pipeline(self, profile_id, profile_hash):
+        profile = self.get(profile_id)
+        if not profile.get("environment"):
+            profile = self.prepare(profile_id, profile_hash)
+            if not profile.get("environment"):
+                raise ProviderError(profile.get("error") or "Environment preparation failed.")
+            profile_hash = profile["profile_hash"]
+        provider = self._provider_for(profile)
+        if "generate-suites" not in provider.capabilities:
+            return self.run(profile_id, profile_hash)
+        source = self.snapshots(profile["repo"], profile["source"]["revision"])
+        context_data = provider.generation_context(source, profile["config"], profile["environment"])
+        targets = context_data.get("targets", [])
+        if not targets:
+            return self.run(profile_id, profile_hash)
+        selection = [t["id"] for t in targets][:4]
+        default_dir = context_data.get("options", {}).get("default_test_directory", ".")
+        intent = "Auto-generate comprehensive unit and integration tests covering core classes, functions, and state transitions."
+        suite = self.generate_suite(profile_id, profile_hash, {
+            "selection": selection,
+            "intent": intent,
+            "options": {"test_directory": default_dir}
+        })
+        approved = self.approve_suite(suite["id"], suite["suite_hash"])
+        return self.run(profile_id, profile["profile_hash"], approved["id"], approved["suite_hash"])
+

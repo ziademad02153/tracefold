@@ -47,6 +47,18 @@ class SuiteCoreTests(unittest.TestCase):
     def draft(self):
         return self.service.generate_suite(self.profile['id'],self.profile['profile_hash'],{'selection':['screen'],'intent':'Expected total is 80'})
 
+    def test_auto_pipeline_scans_generates_approves_and_executes(self):
+        self.provider.failing = False
+        result = self.service.auto_pipeline(self.profile['id'], self.profile['profile_hash'])
+        self.assertEqual(len(result['runs']), 1)
+        run = result['runs'][0]
+        self.assertEqual(run['status'], 'passed')
+        self.assertIsNotNone(run.get('suite_id'))
+        self.assertTrue(any(t['origin'] == 'generated' for t in run['tests']))
+        suites = self.service.list_suites('owner/repo')
+        self.assertEqual(len(suites), 1)
+        self.assertEqual(suites[0]['state'], 'approved')
+
     def test_generic_suite_review_edit_approval_and_fixed_version_replay(self):
         suite=self.draft()
         self.assertEqual(self.service.activity('owner/repo')[0]['suite_count'],1)
