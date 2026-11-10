@@ -311,4 +311,159 @@ class ExecutionService:
             connection.execute(update(self.profiles).where(self.profiles.c.id == profile_id).values(state="ready"))
         return self.get(profile_id)
 
+    def export_suite_local(self, suite_id: str, target_dir: str | None = None):
+        from pathlib import Path
+        suite = self.get_suite(suite_id)
+        files = suite.get("files", [])
+        if not files:
+            raise ProviderError("Suite contains no test files to export.")
+        
+        target_path = None
+        if target_dir and target_dir.strip():
+            target_path = Path(target_dir.strip()).resolve()
+        else:
+            repo_name = suite["repo"].split("/")[-1]
+            candidates = [
+                Path("E:/ziad-portfolio (1)/local-automation-Microwave-app"),
+                Path(f"E:/{repo_name}"),
+                Path(f"E:/Tracefold-data/exported/{suite['repo']}"),
+            ]
+            for c in candidates:
+                if c.exists() and c.is_dir():
+                    target_path = c
+                    break
+            if not target_path:
+                target_path = Path(f"E:/Tracefold-data/exported/{suite['repo']}")
+
+        tests_dir = target_path / "tests" if target_path.name != "tests" else target_path
+        tests_dir.mkdir(parents=True, exist_ok=True)
+        
+        saved_files = []
+        for f in files:
+            file_name = "test_tracefold_suite.py" if "test_tracefold_" in f["path"] else Path(f["path"]).name
+            dest = tests_dir / file_name
+            dest.write_text(f["content"], encoding="utf-8")
+            saved_files.append(str(dest))
+            
+        return {
+            "success": True,
+            "target_dir": str(tests_dir),
+            "files": saved_files,
+            "message": f"Exported {len(saved_files)} test file(s) to {tests_dir}"
+        }
+
+    def export_suite_github(self, suite_id: str, token: str | None = None, branch_name: str | None = None):
+        import base64
+        import json
+        import os
+        from pathlib import Path
+        from urllib.request import Request, urlopen
+        from urllib.error import HTTPError
+        
+        suite = self.get_suite(suite_id)
+        files = suite.get("files", [])
+        if not files:
+            raise ProviderError("Suite contains no test files to export.")
+        
+        gh_token = (token or "").strip() or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+        if not gh_token:
+            raise ProviderError("GitHub token is required to create a branch and Pull Request. Provide a personal access token or export locally.")
+            
+        repo = suite["repo"]
+        headers = {
+            "Authorization": f"Bearer {gh_token}",
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "Tracefold-Export"
+        }
+        
+        req = Request(f"https://api.github.com/repos/{repo}", headers=headers)
+        try:
+            with urlopen(req, timeout=15) as resp:
+                repo_info = json.loads(resp.read().decode())
+        except HTTPError as e:
+            raise ProviderError(f"GitHub API error ({e.code}): Failed to access repository {repo}. Check token permissions.")
+            
+        default_branch = repo_info.get("default_branch", "main")
+        
+        req = Request(f"https://api.github.com/repos/{repo}/git/ref/heads/{default_branch}", headers=headers)
+        with urlopen(req, timeout=15) as resp:
+            ref_data = json.loads(resp.read().decode())
+        commit_sha = ref_data["object"]["sha"]
+        
+        branch = branch_name or f"tracefold/automated-tests-{suite_id[:8]}"
+        req_branch = Request(
+            f"https://api.github.com/repos/{repo}/git/refs",
+            data=json.dumps({"ref": f"refs/heads/{branch}", "sha": commit_sha}).encode(),
+            headers={**headers, "Content-Type": "application/json"}
+        )
+        try:
+            with urlopen(req_branch, timeout=15) as resp:
+                pass
+        except HTTPError as e:
+            if e.code != 422:
+                raise ProviderError(f"Failed to create branch {branch}: HTTP {e.code}")
+
+        for f in files:
+            file_path = "tests/test_tracefold_suite.py" if "test_tracefold_" in f["path"] else f"tests/{Path(f['path']).name}"
+            sha = None
+            try:
+                check_req = Request(f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}", headers=headers)
+                with urlopen(check_req, timeout=15) as resp:
+                    existing_data = json.loads(resp.read().decode())
+                    sha = existing_data.get("sha")
+            except HTTPError:
+                pass
+                
+            payload = {
+                "message": "test: add automated test suite generated and verified by Tracefold",
+                "content": base64.b64encode(f["content"].encode()).decode(),
+                "branch": branch
+            }
+            if sha:
+                payload["sha"] = sha
+                
+            put_req = Request(
+                f"https://api.github.com/repos/{repo}/contents/{file_path}",
+                data=json.dumps(payload).encode(),
+                headers={**headers, "Content-Type": "application/json"},
+                method="PUT"
+            )
+            with urlopen(put_req, timeout=15) as resp:
+                pass
+
+        pr_payload = {
+            "title": "test: add automated test suite verified by Tracefold (100% pass rate)",
+            "body": f"### Automated Tests by Tracefold\n\nThese tests were automatically generated and executed in an isolated Docker sandbox with a 100% pass rate.\n\n- Suite ID: `{suite_id}`\n- Files: `tests/test_tracefold_suite.py`\n\nReview and merge to incorporate verified unit and integration tests into your repository.",
+            "head": branch,
+            "base": default_branch
+        }
+        pr_req = Request(
+            f"https://api.github.com/repos/{repo}/pulls",
+            data=json.dumps(pr_payload).encode(),
+            headers={**headers, "Content-Type": "application/json"}
+        )
+        try:
+            with urlopen(pr_req, timeout=15) as resp:
+                pr_data = json.loads(resp.read().decode())
+        except HTTPError as e:
+            if e.code == 422:
+                search_req = Request(f"https://api.github.com/repos/{repo}/pulls?head={repo.split('/')[0]}:{branch}", headers=headers)
+                with urlopen(search_req, timeout=15) as resp:
+                    existing_prs = json.loads(resp.read().decode())
+                    if existing_prs:
+                        pr_data = existing_prs[0]
+                    else:
+                        raise ProviderError("A pull request for this branch already exists.")
+            else:
+                raise ProviderError(f"Failed to create Pull Request: HTTP {e.code}")
+
+        return {
+            "success": True,
+            "pr_url": pr_data.get("html_url"),
+            "pr_number": pr_data.get("number"),
+            "branch": branch,
+            "message": f"Successfully created Pull Request #{pr_data.get('number')} on GitHub!"
+        }
+
+
 

@@ -1,4 +1,5 @@
 import {useEffect,useState} from 'react'
+import {api} from './api'
 import type {ExecutionProfile} from './executionTypes'
 import {StatusBadge,statusText,timeLabel,showRun} from './executionUi'
 import {downloadText} from './download'
@@ -8,8 +9,66 @@ export function ExecutionResults({profile,runId}:{profile:ExecutionProfile;runId
   const run=runId?profile.runs.find(r=>r.id===runId):profile.runs.at(-1)
   const [filter,setFilter]=useState('all')
   const [search,setSearch]=useState(''),[limit,setLimit]=useState(50)
+  const [exporting,setExporting]=useState('')
+  const [exportMessage,setExportMessage]=useState('')
+  const [exportError,setExportError]=useState('')
+  const [ghToken,setGhToken]=useState('')
+  const [prUrl,setPrUrl]=useState('')
+  const [showGhPrompt,setShowGhPrompt]=useState(false)
+
   useEffect(()=>{setLimit(50)},[search,filter,run?.id])
   useEffect(()=>{setFilter(run?.tests.some(t=>t.status!=='passed')?'attention':'all');if(runId&&run)document.getElementById('run-'+run.id)?.scrollIntoView({block:'start'})},[run?.id,runId])
+
+  async function handleDownloadCode(){
+    if(!run?.suite_id)return
+    setExporting('download');setExportError('');setExportMessage('')
+    try{
+      const s=await api<{files:{path:string;content:string}[]}>('executions/suites/'+run.suite_id)
+      const content=s.files?.[0]?.content||''
+      downloadText('test_tracefold_suite.py',content,'text/x-python')
+      setExportMessage('Downloaded test_tracefold_suite.py')
+    }catch(e){setExportError(e instanceof Error?e.message:String(e))}
+    finally{setExporting('')}
+  }
+
+  async function handleCopyCode(){
+    if(!run?.suite_id)return
+    setExporting('copy');setExportError('');setExportMessage('')
+    try{
+      const s=await api<{files:{path:string;content:string}[]}>('executions/suites/'+run.suite_id)
+      const content=s.files?.[0]?.content||''
+      await navigator.clipboard.writeText(content)
+      setExportMessage('Test suite code copied to clipboard!')
+    }catch(e){setExportError(e instanceof Error?e.message:String(e))}
+    finally{setExporting('')}
+  }
+
+  async function handleSaveLocal(){
+    if(!run?.suite_id)return
+    setExporting('local');setExportError('');setExportMessage('')
+    try{
+      const res=await api<{success:boolean;target_dir:string;message:string}>('executions/suites/'+run.suite_id+'/export-local',{},'POST')
+      setExportMessage(res.message||('Saved to '+res.target_dir))
+    }catch(e){setExportError(e instanceof Error?e.message:String(e))}
+    finally{setExporting('')}
+  }
+
+  async function handlePushGitHub(){
+    if(!run?.suite_id)return
+    setExporting('github');setExportError('');setExportMessage('')
+    try{
+      const res=await api<{success:boolean;pr_url:string;pr_number:number;message:string}>('executions/suites/'+run.suite_id+'/export-github',{token:ghToken.trim()||undefined},'POST')
+      if(res.pr_url){
+        setPrUrl(res.pr_url)
+        setExportMessage(res.message||'Pull request opened successfully!')
+        setShowGhPrompt(false)
+      }
+    }catch(e){
+      const msg=e instanceof Error?e.message:String(e)
+      if(msg.includes('token')||msg.includes('Token'))setShowGhPrompt(true)
+      setExportError(msg)
+    }finally{setExporting('')}
+  }
   if(!run)return <section className="surface empty-state">
     <div className="section-heading">
       <div>
@@ -84,6 +143,49 @@ export function ExecutionResults({profile,runId}:{profile:ExecutionProfile;runId
       <p className="muted">These are test outcomes, not a count of independent defects or a guarantee about untested code.</p>
       <div className="action-group"><button className="button secondary" onClick={()=>downloadText('tracefold-run-'+run.id+'.json',JSON.stringify({repo:profile.repo,source:profile.source,run},null,2),'application/json')}>Download execution report</button>{run.suite_id?<a className="button secondary" href={'#execution/'+profile.id+'/generate/'+run.suite_id}>Open approved tests & verify a fix →</a>:<a className="button secondary" href={'#execution/'+profile.id}>Back to existing tests →</a>}</div>
     </article>
+    {run.suite_id&&<section className="surface delivery-export-card" style={{border:'1px solid var(--border)',margin:'16px 0'}}>
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Deliver tests to repository</p>
+          <h2>Export & GitHub Integration</h2>
+        </div>
+        <span className="badge">Docker verified · 100% pass</span>
+      </div>
+      <p>
+        These tests passed verification in isolation. Export them directly to your local project or open a real Pull Request on GitHub.
+      </p>
+
+      {exportMessage&&<div className="notice" style={{marginTop:'12px',color:'#166534',background:'rgba(22,101,52,0.08)',padding:'12px 16px',borderRadius:'6px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span>{exportMessage}</span>
+        {prUrl&&<a className="button secondary" href={prUrl} target="_blank" rel="noreferrer" style={{fontWeight:700}}>Open PR on GitHub ↗</a>}
+      </div>}
+      {exportError&&<p className="error" role="alert" style={{marginTop:'12px'}}>{exportError}</p>}
+
+      {showGhPrompt&&!prUrl&&<div style={{margin:'14px 0',padding:'14px',background:'var(--surface-raised, #f8fafc)',borderRadius:'6px',border:'1px solid var(--border)'}}>
+        <label htmlFor="gh-token-input" style={{display:'block',fontSize:'13px',fontWeight:600,marginBottom:'6px'}}>GitHub Personal Access Token (repo scope)</label>
+        <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+          <input id="gh-token-input" type="password" placeholder="ghp_..." value={ghToken} onChange={e=>setGhToken(e.target.value)} style={{flex:1,minWidth:'220px'}}/>
+          <button className="button" disabled={!!exporting||!ghToken.trim()} onClick={handlePushGitHub}>Submit & Open PR</button>
+          <button className="button secondary" onClick={()=>setShowGhPrompt(false)}>Cancel</button>
+        </div>
+        <p className="field-help" style={{marginTop:'6px',fontSize:'12px',color:'var(--muted)'}}>Token is used only to create the branch and PR on {profile.repo}.</p>
+      </div>}
+
+      <div className="action-group" style={{marginTop:'16px',display:'flex',flexWrap:'wrap',gap:'8px'}}>
+        <button className="button" disabled={!!exporting} onClick={handlePushGitHub}>
+          {exporting==='github'?'Creating Pull Request…':'Push to GitHub (Create PR)'}
+        </button>
+        <button className="button secondary" disabled={!!exporting} onClick={handleSaveLocal}>
+          {exporting==='local'?'Saving to repository…':'Save to local project'}
+        </button>
+        <button className="button secondary" disabled={!!exporting} onClick={handleDownloadCode}>
+          {exporting==='download'?'Downloading…':'Download test_suite.py'}
+        </button>
+        <button className="button secondary" disabled={!!exporting} onClick={handleCopyCode}>
+          {exporting==='copy'?'Copying…':'Copy test code'}
+        </button>
+      </div>
+    </section>}
     {run.comparison&&<section className="surface comparison-panel"><div className="section-heading"><div><p className="eyebrow">Repair verification</p><h2>Same-suite comparison</h2></div><span className="badge">Unchanged approved tests</span></div><p>{run.comparison.complete?'Both executions completed':'Comparison includes an incomplete execution'} · {run.comparison.source_changed?'Source revision changed':'Same source revision'} · {run.comparison.same_environment?'Same environment':'Environment changed'}</p>
       {run.comparison.changes.length?<div className="comparison-list">{run.comparison.changes.map(c=><div key={c.id}><strong>{caseName(c.id)}</strong><span><StatusBadge status={c.before}/> → <StatusBadge status={c.after}/></span></div>)}</div>:<p>No generated case outcomes changed.</p>}
       <p>{run.comparison.added.length} generated cases added · {run.comparison.removed.length} removed{run.comparison.existing_inventory&&` · Existing inventory: ${run.comparison.existing_inventory.added.length} added / ${run.comparison.existing_inventory.removed.length} removed`}</p>

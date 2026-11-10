@@ -45,6 +45,15 @@ class SuiteRevision(SuiteApproval):
     files: list[dict]
 
 
+class ExportLocal(BaseModel):
+    target_dir: str | None = None
+
+
+class ExportGithub(BaseModel):
+    token: str | None = None
+    branch_name: str | None = None
+
+
 def create_execution_router(service, connected):
     router=APIRouter(prefix='/api/executions')
 
@@ -72,6 +81,19 @@ def create_execution_router(service, connected):
     @router.get('/suites/{key}')
     def read_suite(key:str):
         return suite(key)
+
+    @router.post('/suites/{key}/export-local')
+    def export_local(key:str, request:ExportLocal = None):
+        suite(key)
+        target = request.target_dir if request else None
+        return perform(lambda:service.export_suite_local(key, target))
+
+    @router.post('/suites/{key}/export-github')
+    def export_github(key:str, request:ExportGithub = None):
+        suite(key)
+        token = request.token if request else None
+        branch = request.branch_name if request else None
+        return perform(lambda:service.export_suite_github(key, token, branch))
 
     @router.post('/suites/{key}/approve')
     def approve_suite(key:str,request:SuiteApproval):
