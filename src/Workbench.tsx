@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from './api'
-import { ProjectNavigation, ProjectTestNavigation } from './ProjectHome'
+import { ProjectNavigation } from './ProjectHome'
 
 type TestEvidence = {name:string; status:'passed'|'failed'|'blocked'|'skipped'|'not_run'; detail:string; seconds:number}
 type TestCase = {name:string;scenario:string}
@@ -100,7 +100,7 @@ export function Workbench({repo,sessionId,focusRunId}:{repo?:string;sessionId?:s
   const latest=session?.runs.at(-1)
   return <div className="testing-workspace">
     <p className="page-help">{session?(session.mode!=='file'?'This saved session uses the earlier standalone-function runner. Its approved tests and evidence are preserved.':'Review this saved file test suite, run it against a selected revision, then rerun the same tests after your fix. Results are saved below.'):'Test a Python file in context: choose up to five public functions, define expected behavior, review 3–5 generated tests and run them against the original module.'}</p>
-    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={session?.runs.length?'runs':'tests'}/>{!session&&<><ProjectTestNavigation repo={activeRepo} active="generated"/><p className="muted">Focused file suites use a separate limited environment. Use repository testing for project imports and dependencies.</p></>}</>}
+    {activeRepo&&<><a href={'#project/'+encodeURIComponent(activeRepo)}>{activeRepo}</a><ProjectNavigation repo={activeRepo} active={session?.runs.length?'runs':'tests'}/>{!session&&<p className="muted">Focused file suites use a separate limited environment. Use repository testing for project imports and dependencies.</p>}</>}
     {error&&<p className="error" role="alert">{error}</p>}
     {error&&<button className="button secondary" disabled={!!busy} onClick={()=>setLoadVersion(v=>v+1)}>Retry focused workspace</button>}
     {busy&&<p className="progress" role="status">{busy==='generate'?'Gemma is generating your test. This may take a few minutes.':busy==='run'?'Running the approved test in Docker…':'Loading…'}</p>}

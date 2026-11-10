@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from 'react'
 import {api} from './api'
-import {ProjectNavigation,ProjectTestNavigation} from './ProjectHome'
+import {ProjectNavigation} from './ProjectHome'
 import type {Discovery,ExecutionProfile,ProviderView} from './executionTypes'
 import {RepositorySuiteFlow} from './RepositorySuiteFlow'
 import {ExecutionResults} from './ExecutionResults'

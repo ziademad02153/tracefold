@@ -146,7 +146,7 @@ def validate_proposal(snapshot,config,proposal,key):
     if (root/expected).exists():
         raise ProviderError('The generated test path already exists in this source revision; no file was overwritten.')
     code=files[0].get('content','')
-    if not isinstance(code,str) or len(code)>25000:
+    if not isinstance(code,str) or len(code)>100000:
         raise ProviderError('Generated code exceeds the supported test-file limit.')
     try:
         tree=ast.parse(code)
@@ -154,14 +154,14 @@ def validate_proposal(snapshot,config,proposal,key):
         raise ProviderError('Generated tests are not valid Python.') from failure
     functions=[node for node in tree.body if isinstance(node,ast.FunctionDef)]
     names=[node.name for node in functions]
-    if not 3<=len(names)<=8:
-        raise ProviderError(f'Use 3–8 distinct test functions with unique test_ names. Found {len(names)} functions.')
+    if not 2<=len(names)<=35:
+        raise ProviderError(f'Suite must contain between 2 and 35 distinct test functions. Found {len(names)} functions.')
     duplicates=sorted(set(n for n in names if names.count(n)>1))
     if duplicates:
-        raise ProviderError(f'Use 3–8 distinct test functions with unique test_ names. Duplicate definitions found: {", ".join(duplicates)}.')
+        raise ProviderError(f'Functions must have unique test_ names. Duplicate definitions found: {", ".join(duplicates)}.')
     if any(not name.startswith('test_') for name in names):
         bad=sorted(set(n for n in names if not n.startswith('test_')))
-        raise ProviderError(f'Use 3–8 distinct test functions with unique test_ names. Functions must start with "test_": {", ".join(bad)}.')
+        raise ProviderError(f'Functions must start with "test_": {", ".join(bad)}.')
     allowed=(ast.Import,ast.ImportFrom,ast.FunctionDef)
     invalid=[node for node in tree.body if not isinstance(node,allowed) and not (isinstance(node,ast.Expr) and isinstance(node.value,ast.Constant) and isinstance(node.value.value,str))]
     if invalid:
@@ -204,8 +204,8 @@ def generate(snapshot,config,environment,request,key,policy):
     model=os.getenv('TRACEFOLD_TEST_MODEL','gemma4:e4b')
     packages=environment['manifest'].get('packages',[])[:60]
     messages=[{'role':'system','content':
-        'Generate 3 to 7 focused, concise pytest functions for selected modules inside a REAL installed project. '
-        'Aim for exactly 5 or 6 test functions. Under no circumstances generate more than 7 functions. '
+        'Generate focused, high-value pytest functions for selected modules inside a REAL installed project. '
+        'Exercise each selected module thoroughly, covering initialization, core methods, state transitions, and edge cases. '
         'CRITICAL TOP-LEVEL SYNTAX RULE: The test file must ONLY contain import statements, an optional module docstring, and def test_...() functions. '
         'NEVER define any class (NO class statements anywhere in the file). NEVER declare module-level variables or constants outside functions. '
         'If a mock, dummy object, or test data is needed, define it INSIDE the test function body or use unittest.mock.MagicMock. '
@@ -294,14 +294,14 @@ def generate(snapshot,config,environment,request,key,policy):
                 if dups else ""
             )
             count_guidance = (
-                f" Function count violation: You produced {len(names_in_code)} functions, but the strict maximum is 8 functions! "
-                "Drop redundant functions and output exactly 5 or 6 unique test functions."
-                if len(names_in_code) > 8 else ""
+                f" Function count violation: You produced {len(names_in_code)} functions. "
+                "Output between 2 and 35 unique test functions."
+                if len(names_in_code) < 2 or len(names_in_code) > 35 else ""
             )
             structural_feedback = (
                 f"Validation failed: {failure}.{dup_guidance}{count_guidance} "
                 "Explicit structural requirements: "
-                "1. Generate exactly 5 or 6 test functions (must be between 3 and 8 total). "
+                "1. Generate between 2 and 35 distinct test functions. "
                 "2. Every function must have a completely UNIQUE name starting with 'test_' (e.g. test_01_idle, test_02_run, test_03_pause). "
                 "3. Never reuse or duplicate any test function name. "
                 "4. The 'scenarios' list must have the exact same unique names in the exact same order. "
