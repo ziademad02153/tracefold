@@ -65,7 +65,35 @@ export function RepositoryExecution({repo,profileId,views,focusRunId,focusSuiteI
       <section className="environment-strip"><div><span className="eyebrow">Execution environment</span><h3>{profile.requested_ref||'Source '+profile.source.revision.slice(0,12)}</h3><p>{views[profile.provider_id]?.label||profile.provider_id} · {profile.source.revision.slice(0,12)} · Created {timeLabel(profile.created_at)}</p></div><StatusBadge status={profile.state}/>{latest&&<a className="button secondary" href={'#execution/'+profile.id+'/'+latest.id}>View latest result →</a>}<a className="button secondary" href={'#tests/'+encodeURIComponent(profile.repo)+'/copy/'+profile.id}>Change configuration →</a><a className="button secondary" href={'#tests/'+encodeURIComponent(profile.repo)+'/new'}>+ New configuration</a></section>
       {profile.error&&<p className="error" role="alert">{profile.error}</p>}
       {profile.state==='interrupted'&&<p className="notice">The last operation was interrupted. Earlier evidence is retained; retry preparation or execution.</p>}
-      {!profile.environment?<section className="surface"><p className="eyebrow">Review before preparation</p><h2>Approve this project environment</h2><p>Review the dependencies and configuration below. Preparation builds an isolated environment and does not install project packages into Tracefold.</p><pre>{JSON.stringify(profile.config,null,2)}</pre><button className="button" disabled={running} onClick={()=>void action('Preparing approved environment',async()=>setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash})))}>Approve environment and prepare</button></section>:<>
+      {!profile.environment&&!generating&&!resultId&&views[profile.provider_id]?.supportsGeneration&&<section className="surface auto-pipeline-card">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Automated verification</p>
+            <h2>Project test pipeline</h2>
+          </div>
+          <span className="badge">Awaiting 1-click preparation</span>
+        </div>
+        <p>
+          Approves configuration, builds isolated Docker sandbox, synthesizes unit & integration tests, and executes the verified suite in one click.
+        </p>
+        <div className="action-group" style={{marginTop:'16px'}}>
+          <button
+            className="button"
+            disabled={running}
+            onClick={()=>void action('Preparing environment & running pipeline',async()=>{
+              const updated=await api<ExecutionProfile>('executions/profiles/'+profile.id+'/auto-pipeline',{profile_hash:profile.profile_hash})
+              completedRun(updated)
+            })}
+          >
+            Approve & Run Automated Pipeline
+          </button>
+          <button className="button secondary" disabled={running} onClick={()=>void action('Preparing approved environment',async()=>setProfile(await api<ExecutionProfile>('executions/profiles/'+profile.id+'/prepare',{profile_hash:profile.profile_hash})))}>
+            Prepare environment only
+          </button>
+        </div>
+        <details style={{marginTop:'14px'}}><summary>Review environment configuration details</summary><pre>{JSON.stringify(profile.config,null,2)}</pre></details>
+      </section>}
+      {profile.environment&&<>
         {(generating||resultId)&&<div style={{marginBottom:'16px'}}><a className="button secondary" href={'#execution/'+profile.id}>← Back to pipeline</a></div>}
         {!generating&&!resultId&&<>
           {views[profile.provider_id]?.supportsGeneration&&<section className="surface auto-pipeline-card">

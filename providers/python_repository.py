@@ -220,9 +220,15 @@ class PythonRepositoryProvider:
         return {**config,'resolved_inputs':requirements,'manifest_hashes':inputs}
 
     def _base(self):
+        code,output=command(['docker','info'],seconds=6)
+        if code!=0:
+            raise ProviderError('Docker Desktop is not running on your machine. Please open Docker Desktop from the Windows Start menu to enable container testing.')
         code,output=command(['docker','image','inspect','--format','{{.Id}}',BOOTSTRAP],seconds=12)
-        if code:
-            raise ProviderError('Build the bootstrap runner first: docker build -t tracefold-pytest:1 runner')
+        if code!=0:
+            b_code,b_out=command(['docker','build','-t',BOOTSTRAP,'runner'],seconds=180)
+            if b_code!=0:
+                raise ProviderError('Could not build the runner image: '+b_out[-1000:])
+            code,output=command(['docker','image','inspect','--format','{{.Id}}',BOOTSTRAP],seconds=12)
         return output.strip()
 
     def prepare(self,snapshot,config,policy):
