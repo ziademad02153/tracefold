@@ -41,10 +41,10 @@ export function ProjectHome({repo}:{repo:string}){
         if(profRes.status==='fulfilled'&&profRes.value.length){
           const list=profRes.value
           setProfiles([...list].reverse())
-          const latest=list[list.length-1]
-          setProfile(latest)
-          if(latest){
-            api<{targets:ModuleTarget[]}>('executions/profiles/'+latest.id+'/generation-context').then(ctx=>{
+          const activeProf=list.find(p=>p.runs.length>0)||list[list.length-1]
+          setProfile(activeProf)
+          if(activeProf){
+            api<{targets:ModuleTarget[]}>('executions/profiles/'+activeProf.id+'/generation-context').then(ctx=>{
               if(active&&ctx.targets)setTargets(ctx.targets)
             }).catch(()=>null)
           }
