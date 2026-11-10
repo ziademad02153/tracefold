@@ -204,7 +204,11 @@ def generate(snapshot,config,environment,request,key,policy):
     model=os.getenv('TRACEFOLD_TEST_MODEL','gemma4:e4b')
     packages=environment['manifest'].get('packages',[])[:60]
     messages=[{'role':'system','content':
-        'Generate 3 to 8 focused, concise pytest functions for selected modules inside a REAL installed project. '
+        'Generate 3 to 7 focused, concise pytest functions for selected modules inside a REAL installed project. '
+        'Aim for exactly 5 or 6 test functions. Under no circumstances generate more than 7 functions. '
+        'CRITICAL TOP-LEVEL SYNTAX RULE: The test file must ONLY contain import statements, an optional module docstring, and def test_...() functions. '
+        'NEVER define any class (NO class statements anywhere in the file). NEVER declare module-level variables or constants outside functions. '
+        'If a mock, dummy object, or test data is needed, define it INSIDE the test function body or use unittest.mock.MagicMock. '
         'Use the actual import paths and project APIs, never copy or replace production code. '
         'Every selected module must be imported and exercised. Cover the user-defined expected behavior; copy exact expected values verbatim. '
         'Each test MUST have a strictly UNIQUE descriptive name (e.g. test_01_initial_idle, test_02_start_runs, test_03_door_pause). NEVER reuse the same function name across multiple def statements. Use normal asserts or pytest.raises. Parametrization and existing documented fixtures are allowed. '
@@ -289,10 +293,15 @@ def generate(snapshot,config,environment,request,key,policy):
                 f"Python overwrites duplicate functions! Rename each occurrence uniquely (e.g. {dups[0]}_step1, {dups[0]}_step2)."
                 if dups else ""
             )
+            count_guidance = (
+                f" Function count violation: You produced {len(names_in_code)} functions, but the strict maximum is 8 functions! "
+                "Drop redundant functions and output exactly 5 or 6 unique test functions."
+                if len(names_in_code) > 8 else ""
+            )
             structural_feedback = (
-                f"Validation failed: {failure}.{dup_guidance} "
+                f"Validation failed: {failure}.{dup_guidance}{count_guidance} "
                 "Explicit structural requirements: "
-                "1. Generate between 3 and 8 test functions. "
+                "1. Generate exactly 5 or 6 test functions (must be between 3 and 8 total). "
                 "2. Every function must have a completely UNIQUE name starting with 'test_' (e.g. test_01_idle, test_02_run, test_03_pause). "
                 "3. Never reuse or duplicate any test function name. "
                 "4. The 'scenarios' list must have the exact same unique names in the exact same order. "
