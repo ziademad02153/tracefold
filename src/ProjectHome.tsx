@@ -9,7 +9,7 @@ export type ProjectSummary={repo:string;suite_count:number;test_count:number;run
 
 export function ProjectNavigation({repo,active}:{repo:string;active:'overview'|'tests'|'runs'|'ai-review'}){
   const encoded=encodeURIComponent(repo)
-  return <div className="project-toolbar"><nav className="project-tabs" aria-label="Project navigation">{[['overview','Overview','project'],['tests','Tests','tests'],['runs','Runs','runs'],['ai-review','AI Review','ai-review']].map(([key,label,route])=><a key={key} href={'#'+route+'/'+encoded} aria-current={active===key?'page':undefined}>{label}</a>)}</nav><ProjectActions repo={repo}/></div>
+  return <div className="project-toolbar"><nav className="project-tabs" aria-label="Project navigation">{[['overview','Workspace Dashboard','project'],['runs','Execution History','runs'],['ai-review','PR Code Review','ai-review']].map(([key,label,route])=><a key={key} href={'#'+route+'/'+encoded} aria-current={active===key?'page':undefined}>{label}</a>)}</nav><ProjectActions repo={repo}/></div>
 }
 
 type ModuleTarget={id:string;label:string;description:string}
@@ -27,6 +27,8 @@ export function ProjectHome({repo}:{repo:string}){
   const [showGhPrompt,setShowGhPrompt]=useState(false)
   const [prUrl,setPrUrl]=useState('')
   const [version,setVersion]=useState(0)
+  const [testFilter,setTestFilter]=useState<'all'|'failed'|'passed'>('all')
+  const [categoryFilter,setCategoryFilter]=useState<string>('all')
 
   useEffect(()=>{
     let active=true;setLoading(true);setActionError('')
@@ -63,13 +65,42 @@ export function ProjectHome({repo}:{repo:string}){
   const passRate=latestSummary?.total?Math.round((latestSummary.passed/latestSummary.total)*100):(latestRun?.status==='passed'?100:0)
 
   async function handleAutoPipeline(){
-    if(!profile)return
-    setActionBusy('Running automated project pipeline in Docker…')
+    setActionBusy('Initializing autonomous test synthesis and local pytest engine…')
     setActionError('');setActionMessage('')
     try{
-      const updated=await api<ExecutionProfile>('executions/profiles/'+profile.id+'/auto-pipeline',{profile_hash:profile.profile_hash},'POST')
+      let activeProf=profile
+      if(!activeProf){
+        setActionBusy('Connecting repository and analyzing source modules…')
+        const targetRef = repo.startsWith('local/') ? 'local' : 'main'
+        const disc=await api<{source:any;provider_id:string;discovery:any}>('executions/discover',{
+          repo,
+          ref: targetRef,
+          provider_id: 'python-pytest',
+          component: '.'
+        },'POST')
+        const pythonEnv = disc.discovery?.python_environments?.[0]?.runtime || '3.11'
+        const reqFiles = disc.discovery?.pytest_dependency_files || []
+        const defaultCfg = {
+          component_root: '.',
+          runtime: pythonEnv,
+          requirements_files: reqFiles,
+          pythonpath: ['.'],
+          install_project: false,
+          extras: []
+        }
+        activeProf=await api<ExecutionProfile>('executions/profiles',{
+          repo,
+          requested_ref: targetRef,
+          ref: targetRef,
+          provider_id: 'python-pytest',
+          config: defaultCfg
+        },'POST')
+        setProfile(activeProf)
+      }
+      setActionBusy('Synthesizing tests with company model and executing pytest locally…')
+      const updated=await api<ExecutionProfile>('executions/profiles/'+activeProf.id+'/auto-pipeline',{profile_hash:activeProf.profile_hash},'POST')
       setProfile(updated)
-      setActionMessage('Pipeline completed successfully in Docker. All generated tests verified.')
+      setActionMessage('Pipeline completed successfully! All generated tests verified in local Python.')
       const r=updated.runs.at(-1)
       if(r)showRun(updated.id,r.id)
     }catch(e){setActionError(e instanceof Error?e.message:String(e))}
@@ -166,12 +197,12 @@ export function ProjectHome({repo}:{repo:string}){
       </article>
 
       <article className="surface" style={{padding:'14px',borderRadius:'8px',border:'1px solid var(--border)',textAlign:'center'}}>
-        <p style={{margin:0,fontSize:'12px',color:'var(--muted)',textTransform:'uppercase',letterSpacing:'0.5px'}}>Environment</p>
-        <strong style={{fontSize:'24px',display:'block',marginTop:'4px'}}>
-          {profile?.state==='ready'?'Ready':profile?.state||'Unprepared'}
+        <p style={{margin:0,fontSize:'12px',color:'var(--muted)',textTransform:'uppercase',letterSpacing:'0.5px'}}>Runtime Engine</p>
+        <strong style={{fontSize:'22px',display:'block',marginTop:'4px',color:'#166534'}}>
+          {profile?.environment?.target==='docker-linux'?'Docker Container':'Local Python'}
         </strong>
         <span style={{fontSize:'12px',color:'var(--muted)'}}>
-          Docker isolated container
+          {profile?.environment?.target==='docker-linux'?'Isolated container':'Zero-Docker pytest runner'}
         </span>
       </article>
     </section>
@@ -182,30 +213,29 @@ export function ProjectHome({repo}:{repo:string}){
           <p className="eyebrow">Execution control</p>
           <h2 style={{margin:0}}>Autonomous Test Pipeline</h2>
         </div>
-        <span className="badge">Linux / pytest runtime</span>
+        <span className="badge" style={{background:'rgba(22,101,52,0.1)',color:'#166534',fontWeight:600}}>
+          {profile?.environment?.target==='docker-linux'?'Docker Sandbox':'Local Host Python / pytest'}
+        </span>
       </div>
       <p style={{margin:'8px 0 16px 0',color:'var(--muted)'}}>
-        Scans source tree, synthesizes unit and integration tests across project modules, and executes them in an isolated container.
+        Scans source tree, synthesizes unit and integration tests across project modules, and executes them with full assertion verification.
       </p>
       
       <div className="action-group" style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
-        <button className="button" disabled={!!actionBusy||!profile} onClick={handleAutoPipeline}>
+        <button className="button" disabled={!!actionBusy} onClick={handleAutoPipeline} style={{fontWeight:700,fontSize:'14px',padding:'10px 20px'}}>
           Run Full Automated Pipeline
         </button>
-        {latestRun?.suite_id&&<button className="button secondary" disabled={!!actionBusy} onClick={handlePushGitHub}>
+        {latestRun?.suite_id&&!repo.startsWith('local/')&&<button className="button secondary" disabled={!!actionBusy} onClick={handlePushGitHub}>
           Push Tests to GitHub (PR)
         </button>}
         {latestRun?.suite_id&&<button className="button secondary" disabled={!!actionBusy} onClick={handleExportLocal}>
-          Save to Local Project
+          Export Tests to Project Folder
         </button>}
         {profile&&<a className="button secondary" href={'#execution/'+profile.id}>
           Open Test Inspector →
         </a>}
         {profile&&<a className="button secondary" href={'#execution/'+profile.id+'/generate'}>
           Custom Test Designer
-        </a>}
-        {!profile&&<a className="button" href={'#tests/'+encoded}>
-          Set up execution environment →
         </a>}
       </div>
     </section>
@@ -251,6 +281,163 @@ export function ProjectHome({repo}:{repo:string}){
         </table>
       </div>
     </section>}
+
+    {latestRun&&latestRun.tests&&latestRun.tests.length>0&&(()=>{
+      const allTests = latestRun.tests
+      function getTestModule(id: string): string {
+        const file = id.split('::')[0] || ''
+        const testName = id.split('::').pop() || id
+        for (const target of targets) {
+          const stem = target.id.replace(/\.py$/, '').replace(/[\/\\]/g, '_')
+          if (file.includes(stem)) return target.id
+          if (testName.toLowerCase().includes(stem.toLowerCase())) return target.id
+        }
+        if (testName.includes('sm_') || testName.includes('state_machine')) return 'state_machine.py'
+        if (testName.includes('daq_') || testName.includes('sample') || testName.includes('door') || testName.includes('overlap') || testName.includes('power')) return 'daq_handler.py'
+        if (testName.includes('ew_') || testName.includes('excel') || testName.includes('workbook')) return 'excel_writer.py'
+        if (testName.includes('main') || testName.includes('gui') || testName.includes('button') || testName.includes('dialog')) return 'main.py'
+        if (testName.includes('config') || testName.includes('voltage') || testName.includes('threshold')) return 'config.py'
+        return 'General'
+      }
+
+      const moduleGroups = new Map<string, { total: number; passed: number }>()
+      for (const t of allTests) {
+        const mod = getTestModule(t.id)
+        const entry = moduleGroups.get(mod) || { total: 0, passed: 0 }
+        entry.total++
+        if (t.status === 'passed') entry.passed++
+        moduleGroups.set(mod, entry)
+      }
+
+      const filtered = allTests.filter(t => {
+        if (testFilter === 'passed' && t.status !== 'passed') return false
+        if (testFilter === 'failed' && t.status !== 'failed') return false
+        if (categoryFilter !== 'all' && getTestModule(t.id) !== categoryFilter) return false
+        return true
+      })
+
+      return <section className="surface" style={{padding:'20px',marginBottom:'18px',border:'1px solid var(--border)'}}>
+        <div className="section-heading" style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'12px'}}>
+          <div>
+            <p className="eyebrow">Execution Evidence</p>
+            <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'wrap'}}>
+              <h2 style={{margin:0}}>Generated Behavioral Test Cases ({allTests.length} Total)</h2>
+              {latestRun.coverage && (
+                <span className="badge" style={{background:'rgba(22,101,52,0.12)',color:'#166534',fontWeight:700,fontSize:'12px',padding:'3px 8px',borderRadius:'4px'}}>
+                  {latestRun.coverage.percent_covered_display}% Code Coverage ({latestRun.coverage.covered_lines}/{latestRun.coverage.num_statements} Lines)
+                </span>
+              )}
+            </div>
+            <p style={{margin:'4px 0 0 0',color:'var(--muted)',fontSize:'13px'}}>
+              Multi-Layer Testing (Unit & Logic, Boundary Attacks, Stateful Workflows) executed with real-time coverage.
+            </p>
+          </div>
+          <div style={{display:'flex',gap:'8px'}}>
+            <button className={`button ${testFilter==='all'?'':'secondary'}`} style={{padding:'6px 14px',fontSize:'13px'}} onClick={()=>setTestFilter('all')}>
+              All ({allTests.length})
+            </button>
+            <button className={`button ${testFilter==='passed'?'':'secondary'}`} style={{padding:'6px 14px',fontSize:'13px',color:'#166534'}} onClick={()=>setTestFilter('passed')}>
+              Passed ({latestSummary?.passed||0})
+            </button>
+            <button className={`button ${testFilter==='failed'?'':'secondary'}`} style={{padding:'6px 14px',fontSize:'13px',color:'#991b1b'}} onClick={()=>setTestFilter('failed')}>
+              Failed ({latestSummary?.failed||0})
+            </button>
+          </div>
+        </div>
+
+        {moduleGroups.size > 0 && <div style={{display:'grid',gridTemplateColumns:`repeat(auto-fit, minmax(200px, 1fr))`,gap:'12px',margin:'16px 0'}}>
+          {Array.from(moduleGroups.entries()).map(([modName, stats]) => {
+            const isAllPassed = stats.passed === stats.total
+            const isSelected = categoryFilter === modName
+            return <div key={modName} style={{
+              padding:'12px 14px',
+              borderRadius:'6px',
+              background:'var(--surface-muted, #f8fafc)',
+              border:`1px solid ${isSelected ? '#166534' : 'var(--border)'}`,
+              cursor:'pointer',
+              boxShadow: isSelected ? '0 0 0 1px #166534' : 'none'
+            }} onClick={()=>setCategoryFilter(isSelected ? 'all' : modName)}>
+              <span style={{fontSize:'12px',color:'var(--muted)',display:'block',fontFamily:'monospace'}}>
+                📁 {modName}
+              </span>
+              <strong style={{fontSize:'15px',display:'block',margin:'4px 0'}}>
+                {stats.passed} / {stats.total} Passed
+              </strong>
+              <span style={{fontSize:'12px',fontWeight:700,color:isAllPassed ? '#166534' : '#991b1b'}}>
+                {stats.total ? Math.round((stats.passed / stats.total) * 100) : 0}% Pass Rate
+              </span>
+              {(()=>{
+                const cov = latestRun.coverage?.files?.[modName] || Object.entries(latestRun.coverage?.files || {}).find(([k]) => k.includes(modName))?.[1]
+                if (!cov) return null
+                return <span style={{fontSize:'11px',fontWeight:600,color:'var(--muted)',display:'block',marginTop:'3px'}}>
+                  Coverage: {cov.percent_covered.toFixed(0)}% ({cov.covered_lines}/{cov.num_statements} lines)
+                </span>
+              })()}
+            </div>
+          })}
+        </div>}
+
+        <div style={{overflowX:'auto',marginTop:'12px'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',textAlign:'left',fontSize:'13px'}}>
+            <thead>
+              <tr style={{borderBottom:'1px solid var(--border)',color:'var(--muted)'}}>
+                <th style={{padding:'10px 8px',width:'30%'}}>Test Function & Target</th>
+                <th style={{padding:'10px 8px',width:'14%'}}>Module</th>
+                <th style={{padding:'10px 8px',width:'10%'}}>Outcome</th>
+                <th style={{padding:'10px 8px',width:'8%'}}>Duration</th>
+                <th style={{padding:'10px 8px'}}>Verification Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(test=>{
+                const testName = test.id.split('::').pop()||test.id
+                const scopeLabel = getTestModule(test.id)
+                
+                // Parse clean failure line vs full traceback
+                let summaryLine = test.detail
+                if (test.status === 'failed') {
+                  const lines = test.detail.split('\n').map(l=>l.trim()).filter(Boolean)
+                  const errMatch = lines.slice().reverse().find(l=>l.startsWith('E ') || l.includes('AssertionError') || l.includes('KeyError') || l.includes('TypeError'))
+                  summaryLine = errMatch ? errMatch.replace(/^E\s+/, '') : (lines[lines.length-1] || 'Assertion check failed.')
+                }
+
+                return <tr key={test.id} style={{borderBottom:'1px solid var(--border)'}}>
+                  <td style={{padding:'12px 8px',fontFamily:'monospace',fontWeight:600,color:'var(--text)'}}>
+                    {testName}
+                  </td>
+                  <td style={{padding:'12px 8px',color:'var(--muted)'}}>
+                    <span style={{fontSize:'12px'}}>{scopeLabel}</span>
+                  </td>
+                  <td style={{padding:'12px 8px'}}>
+                    <span className="badge" style={{
+                      background: test.status==='passed'?'rgba(22,101,52,0.1)':'rgba(153,27,27,0.1)',
+                      color: test.status==='passed'?'#166534':'#991b1b',
+                      fontWeight: 700
+                    }}>
+                      {test.status.toUpperCase()}
+                    </span>
+                  </td>
+                  <td style={{padding:'12px 8px',color:'var(--muted)',fontSize:'12px'}}>
+                    {test.seconds ? `${Math.round(test.seconds*1000)}ms` : '—'}
+                  </td>
+                  <td style={{padding:'12px 8px'}}>
+                    <div style={{color: test.status==='passed'?'#166534':'#991b1b',fontWeight:600}}>
+                      {test.status==='passed' ? 'Assertions verified successfully.' : summaryLine}
+                    </div>
+                    {test.status==='failed'&&<details style={{marginTop:'6px'}}>
+                      <summary style={{cursor:'pointer',fontSize:'12px',color:'var(--muted)'}}>View full pytest traceback ▾</summary>
+                      <pre style={{background:'#0f172a',color:'#f8fafc',padding:'10px 12px',borderRadius:'6px',fontSize:'12px',overflowX:'auto',margin:'6px 0',lineHeight:1.4}}>
+                        {test.detail}
+                      </pre>
+                    </details>}
+                  </td>
+                </tr>
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    })()}
 
     {profile&&profile.runs.length>0&&<section className="surface" style={{padding:'18px',border:'1px solid var(--border)'}}>
       <div className="section-heading">

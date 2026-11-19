@@ -82,7 +82,7 @@ class ProjectManagement:
         return {'deleted': repo, 'counts': preview['counts']}
 
 
-def create_project_management_router(engine):
+def create_project_management_router(engine, on_delete=None):
     manager = ProjectManagement(engine)
     router = APIRouter()
 
@@ -92,6 +92,9 @@ def create_project_management_router(engine):
 
     @router.delete('/api/projects')
     def remove(repo: str, request: DeleteProject):
-        return manager.remove(repo, request)
+        res = manager.remove(repo, request)
+        if on_delete:
+            on_delete(repo)
+        return res
 
     return router

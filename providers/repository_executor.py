@@ -64,12 +64,19 @@ class Evidence:
 
 if __name__ == '__main__':
     mode, destination = sys.argv[1:3]
-    config=json.loads(Path('/control/config.json').read_text())
-    root=Path('/tmp')/mode/'project'
-    shutil.copytree('/source',root)
+    control_dir = Path(os.environ.get('TRACEFOLD_CONTROL', '/control'))
+    source_dir = Path(os.environ.get('TRACEFOLD_SOURCE', '/source'))
+    temp_dir = Path(os.environ.get('TRACEFOLD_TMP', '/tmp'))
+    config=json.loads((control_dir/'config.json').read_text(encoding='utf-8'))
+    root=temp_dir/mode/'project'
+    if root.exists():
+        shutil.rmtree(root, ignore_errors=True)
+    root.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source_dir, root)
     component=root/config['component_root']
     generated=mode.endswith('-generated')
-    suite=json.loads(Path('/control/suite.json').read_text()) if generated else None
+    suite_file = control_dir/'suite.json'
+    suite=json.loads(suite_file.read_text(encoding='utf-8')) if (generated and suite_file.is_file()) else None
     if suite:
         for file in suite['files']:
             path=PurePosixPath(file['path'])
@@ -90,12 +97,51 @@ if __name__ == '__main__':
     for plugin in config['plugins']:
         args += ['-p',plugin]
     args += ['-q',*[file['path'] for file in suite['files']]] if generated else config['pytest_args']
+    cov_json = control_dir / f'{mode}-cov.json'
     if mode.startswith('collect'):
         args += ['--collect-only','-q']
+    else:
+        try:
+            import pytest_cov
+            args += ['-p', 'pytest_cov', f'--cov={component}', f'--cov-report=json:{cov_json}']
+        except Exception:
+            pass
     code=pytest.main(args,plugins=[evidence])
     result=evidence.result(code)
+    if cov_json.is_file():
+        try:
+            cov_data = json.loads(cov_json.read_text(encoding='utf-8'))
+            totals = cov_data.get('totals', {})
+            files_cov = {}
+            for fpath, finfo in cov_data.get('files', {}).items():
+                try:
+                    rel = str(Path(fpath).relative_to(component)).replace('\\', '/')
+                except Exception:
+                    rel = Path(fpath).name
+                files_cov[rel] = finfo.get('summary', {})
+            prod_covered = 0
+            prod_statements = 0
+            for rel, finfo in files_cov.items():
+                if not Path(rel).name.startswith('test_'):
+                    prod_covered += finfo.get('covered_lines', 0)
+                    prod_statements += finfo.get('num_statements', 0)
+            prod_pct = round((prod_covered / prod_statements * 100), 2) if prod_statements > 0 else 0.0
+            result['coverage'] = {
+                'percent_covered': prod_pct if prod_statements > 0 else round(totals.get('percent_covered', 0.0), 2),
+                'percent_covered_display': str(int(round(prod_pct))) if prod_statements > 0 else totals.get('percent_covered_display', '0'),
+                'covered_lines': prod_covered if prod_statements > 0 else totals.get('covered_lines', 0),
+                'num_statements': prod_statements if prod_statements > 0 else totals.get('num_statements', 0),
+                'missing_lines': (prod_statements - prod_covered) if prod_statements > 0 else totals.get('missing_lines', 0),
+                'files': files_cov
+            }
+        except Exception:
+            pass
     for test in result['tests']:
         test['origin']='generated' if generated else 'existing'
     result['phase']='generated' if generated else 'existing'
     Path(destination).write_text(json.dumps(result))
+    try:
+        os.chdir(Path.home())
+    except Exception:
+        pass
     sys.exit(int(code))

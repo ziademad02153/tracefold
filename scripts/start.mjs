@@ -7,7 +7,7 @@ import path from 'node:path'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const backendUrl = 'http://127.0.0.1:8001'
-const frontendUrl = 'http://127.0.0.1:5173'
+const frontendUrl = 'http://127.0.0.1:3000'
 let backend
 let frontend
 let stopping = false
@@ -78,13 +78,13 @@ try {
     if (!ready) throw new Error('Backend did not become ready. Check the Python output above.')
   }
 
-  if (await occupied(5173)) {
+  if (await occupied(3000)) {
     const response = await fetch(frontendUrl + '/@vite/client', { signal: AbortSignal.timeout(2000) })
     const html = await (await fetch(frontendUrl, { signal: AbortSignal.timeout(2000) })).text()
     if (!response.ok || !html.includes('<title>Tracefold</title>')) {
-      throw new Error('Port 5173 is used by another service. Stop it and run npm start again.')
+      throw new Error('Port 3000 is used by another service. Stop it and run npm start again.')
     }
-    console.log('Using the existing Tracefold frontend on port 5173.')
+    console.log('Using the existing Tracefold frontend on port 3000.')
   } else {
     const { createServer } = await import('vite')
     frontend = await createServer({ root, configFile: path.join(root, 'vite.config.ts') })

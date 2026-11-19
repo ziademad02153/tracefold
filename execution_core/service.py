@@ -78,12 +78,12 @@ class ExecutionService:
     def generation_context(self, profile_id):
         profile=self.get(profile_id)
         provider=self._provider_for(profile)
-        if 'generate-suites' not in provider.capabilities or not profile.get('environment'):
-            raise ProviderError('This provider requires a prepared generation-capable environment.')
+        if 'generate-suites' not in provider.capabilities:
+            raise ProviderError('This provider does not support suite generation.')
         source=self.snapshots(profile['repo'],profile['source']['revision'])
         if source.public()!=profile['source']:
             raise ProviderError('Source identity changed.')
-        return provider.generation_context(source,profile['config'],profile['environment'])
+        return provider.generation_context(source,profile['config'],profile.get('environment') or {})
 
     def _suite_definition(self, proposal):
         return {key:proposal[key] for key in ['contract_version','provider_id','provider_version','origin_profile_id','origin_source','request','files','metadata']}
@@ -295,7 +295,7 @@ class ExecutionService:
         targets = context_data.get("targets", [])
         if not targets:
             return self.run(profile_id, profile_hash)
-        selection = [t["id"] for t in targets][:4]
+        selection = [t["id"] for t in targets]
         default_dir = context_data.get("options", {}).get("default_test_directory", ".")
         intent = "Auto-generate comprehensive unit and integration tests covering core classes, functions, and state transitions."
         suite = self.generate_suite(profile_id, profile_hash, {
@@ -322,16 +322,21 @@ class ExecutionService:
         if target_dir and target_dir.strip():
             target_path = Path(target_dir.strip()).resolve()
         else:
-            repo_name = suite["repo"].split("/")[-1]
-            candidates = [
-                Path("E:/ziad-portfolio (1)/local-automation-Microwave-app"),
-                Path(f"E:/{repo_name}"),
-                Path(f"E:/Tracefold-data/exported/{suite['repo']}"),
-            ]
-            for c in candidates:
-                if c.exists() and c.is_dir():
-                    target_path = c
-                    break
+            if hasattr(self.snapshots, 'local_resolver') and self.snapshots.local_resolver:
+                local_cand = self.snapshots.local_resolver(suite['repo'])
+                if local_cand and Path(local_cand).is_dir():
+                    target_path = Path(local_cand)
+            if not target_path:
+                repo_name = suite["repo"].split("/")[-1]
+                candidates = [
+                    Path("E:/ziad-portfolio (1)/local-automation-Microwave-app"),
+                    Path(f"E:/{repo_name}"),
+                    Path(f"E:/Tracefold-data/exported/{suite['repo']}"),
+                ]
+                for c in candidates:
+                    if c.exists() and c.is_dir():
+                        target_path = c
+                        break
             if not target_path:
                 target_path = Path(f"E:/Tracefold-data/exported/{suite['repo']}")
 
@@ -340,7 +345,7 @@ class ExecutionService:
         
         saved_files = []
         for f in files:
-            file_name = "test_tracefold_suite.py" if "test_tracefold_" in f["path"] else Path(f["path"]).name
+            file_name = Path(f["path"]).name
             dest = tests_dir / file_name
             dest.write_text(f["content"], encoding="utf-8")
             saved_files.append(str(dest))

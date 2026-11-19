@@ -12,3 +12,6 @@ __pycache__/
 *.db-*
 .pytest_cache/
 .tracefold/
+
+.coverage
+super-gemini/

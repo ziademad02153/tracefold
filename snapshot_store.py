@@ -50,8 +50,9 @@ def extract_snapshot(data, destination):
 
 
 class GithubSnapshots:
-    def __init__(self, root, github, connected):
+    def __init__(self, root, github, connected, local_resolver=None):
         self.root, self.github, self.connected = Path(root).resolve(), github, connected
+        self.local_resolver = local_resolver
         self.root.mkdir(parents=True, exist_ok=True)
         self.lock = threading.RLock()
 
@@ -59,8 +60,69 @@ class GithubSnapshots:
         with self.lock:
             return self._acquire(repo, ref)
 
+    def _snapshot_local(self, repo, ref, local_dir):
+        ignored_names = {
+            '.git', '.github', '__pycache__', '.pytest_cache', '.mypy_cache',
+            '.venv', 'venv', 'env', '.env', 'node_modules', 'dist', 'build',
+            '.tracefold', '.idea', '.vscode', '.eggs'
+        }
+        items = []
+        for path in local_dir.rglob('*'):
+            if not path.is_file() or path.is_symlink():
+                continue
+            rel = path.relative_to(local_dir)
+            if any(part in ignored_names or part.endswith('.egg-info') for part in rel.parts):
+                continue
+            if path.suffix in ('.pyc', '.pyo', '.pyd', '.swp', '.tmp'):
+                continue
+            if path.stat().st_size > 8_000_000:
+                continue
+            key = rel.as_posix()
+            try:
+                content = path.read_bytes()
+            except OSError:
+                continue
+            items.append((key, hashlib.sha256(content).hexdigest(), content))
+
+        if not items:
+            raise ProviderError(f"Local project directory {local_dir} contains no readable project files.")
+
+        sorted_items = sorted(items, key=lambda x: x[0])
+        hashes = [(k, h) for k, h, _ in sorted_items]
+        content_hash = hashlib.sha256(json.dumps(hashes).encode()).hexdigest()
+
+        cache_key = hashlib.sha256((repo + ':' + content_hash).encode()).hexdigest()[:32]
+        cache = self.root / f"{cache_key}-local"
+
+        if not cache.is_dir() or len(list(cache.rglob('*'))) < len(sorted_items):
+            cache.mkdir(parents=True, exist_ok=True)
+            for key, _, content in sorted_items:
+                target = cache.joinpath(*Path(key).parts)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(content)
+
+        metadata = {
+            'directory': cache.name,
+            'content_hash': content_hash,
+            'file_count': len(sorted_items),
+            'local_source': str(local_dir)
+        }
+        pointer = self.root / f"{cache_key}.json"
+        pointer.write_text(json.dumps(metadata), encoding='utf-8')
+
+        return Snapshot(repo, ref or 'local', cache, content_hash, len(sorted_items))
+
     def _acquire(self, repo, ref):
         self.connected(repo)
+        local_path = self.local_resolver(repo) if self.local_resolver else None
+        if local_path or repo.startswith('local/'):
+            if not local_path:
+                raise ProviderError(f"Local project {repo} is not registered or directory path is missing.")
+            local_dir = Path(local_path).resolve()
+            if not local_dir.is_dir():
+                raise ProviderError(f"Local project directory not found: {local_dir}")
+            return self._snapshot_local(repo, ref or 'local', local_dir)
+
         if not re.fullmatch(r'[A-Za-z0-9-]+/[A-Za-z0-9_.-]+', repo):
             raise ProviderError("Choose a real connected GitHub repository.")
         from urllib.parse import quote

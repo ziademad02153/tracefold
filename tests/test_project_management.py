@@ -64,6 +64,24 @@ class ProjectManagementTests(unittest.TestCase):
         with self.assertRaises(HTTPException) as failure:
             self.manager.remove('owner/remove', request)
         self.assertEqual(failure.exception.status_code, 409)
+
+    def test_repository_name_local_folder_and_github(self):
+        from app import repository_name, LOCAL_PROJECTS
+        with tempfile.TemporaryDirectory() as temp_dir:
+            key = repository_name(temp_dir)
+            self.assertTrue(key.startswith('local/'))
+            self.assertEqual(LOCAL_PROJECTS[key], str(Path(temp_dir).resolve()))
+            # Idempotent return for key
+            self.assertEqual(repository_name(key), key)
+
+        # GitHub repo
+        self.assertEqual(repository_name('https://github.com/fastapi/fastapi.git'), 'fastapi/fastapi')
+        self.assertEqual(repository_name('owner/repo'), 'owner/repo')
+
+        # Non-existent local directory
+        with self.assertRaises(HTTPException) as failure:
+            repository_name('C:\\non_existent_folder_tracefold_test_123')
+        self.assertEqual(failure.exception.status_code, 422)
         self.assertEqual(self.manager.preview('owner/remove')['counts']['execution_runs'], 1)
 
     def test_unfinished_operations_block_deletion(self):

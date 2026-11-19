@@ -27,6 +27,7 @@ type Report = Pull & {id:string; repo:string; diff:string; ai_review?:AIReview; 
 
 function App() {
   const [repoInput,setRepoInput] = useState('')
+  const [connectMode, setConnectMode] = useState<'local' | 'github'>('local')
   const [hash,setHash] = useState(location.hash.slice(1))
   const [executionActivity,setExecutionActivity]=useState<ExecutionActivity[]>()
   const [repos,setRepos] = useState<Repo[]>([])
@@ -180,7 +181,7 @@ function App() {
       <div className="row hero"><h1 tabIndex={-1} ref={heading}>{invalidRoute ? "Page not found" : title}</h1>{(page === '' || page === 'projects') && <a className="button" href="#connect">Add project →</a>}</div>
       {!invalidRoute && (page==='ai-review'||page==='history') && <ProjectNavigation repo={project} active="ai-review"/>}
       {invalidRoute && <p className="error">This page address is invalid. <a href="#projects">Return to repositories</a>.</p>}
-      {!invalidRoute && (page==='projects'||page==='connect') && <div className="workspace-intro"><p className="page-help">{page==='projects'?"Run the project. Review the tests. Keep the evidence. Open a repository workspace to establish a baseline or verify a repair.":"Connect your repository to start a testing workspace. No pull request is required."}</p><p className="support-note">Available execution: Python 3.11 / Linux / pytest · Public GitHub repositories · Company-hosted AI</p></div>}
+      {!invalidRoute && (page==='projects'||page==='connect') && <div className="workspace-intro"><p className="page-help">{page==='projects'?"Universal autonomous testing platform. Scan source code, synthesize verified tests, and execute locally or in isolated containers.":"Connect your repository to start an autonomous testing workspace."}</p></div>}
       {pending && <p role="status">Working… Your repository or report is being prepared.</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {error&&['projects','report','history','ai-review'].includes(page)&&<button className="button secondary" disabled={loading||pending||reviewing} onClick={()=>setRefreshVersion(v=>v+1)}>Retry loading page</button>}
@@ -194,11 +195,34 @@ function App() {
           return projectLink(repo.name)
         })
       }}>
-        <h2>Connect a public GitHub repository</h2>
-        <p>Paste a repository URL or enter owner/repository. Private repository access is not available in this connector.</p>
-        <label htmlFor="repo-url">GitHub repository</label>
-        <div className="row"><input id="repo-url" disabled={pending} required placeholder="https://github.com/owner/repo" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
-        <button className="button" disabled={pending||!repoInput.trim()}>{pending ? 'Connecting…' : 'Add repository'}</button><a href="#projects">Cancel</a></div>
+        <div style={{display:'flex',gap:'8px',marginBottom:'18px'}}>
+          <button type="button" className={`button ${connectMode==='local'?'':'secondary'}`} onClick={()=>{setConnectMode('local');setRepoInput('')}}>
+            Local Directory Workspace
+          </button>
+          <button type="button" className={`button ${connectMode==='github'?'':'secondary'}`} onClick={()=>{setConnectMode('github');setRepoInput('')}}>
+            Public GitHub Repository
+          </button>
+        </div>
+
+        {connectMode === 'local' ? <>
+          <h2>Import a local project directory</h2>
+          <p>Provide the path to any local Python folder on your computer (e.g. <code>E:\Projects\MyApp</code>, <code>C:\Users\...\app</code>, or <code>./my_app</code>). Tracefold will scan your source modules, synthesize comprehensive multi-layer test suites, and execute them in your local Python environment.</p>
+          <label htmlFor="repo-url">Local folder path</label>
+          <div className="row">
+            <input id="repo-url" disabled={pending} required placeholder="E:\Projects\MyApp or ./path" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
+            <button className="button" disabled={pending||!repoInput.trim()}>{pending ? 'Importing…' : 'Import local workspace'}</button>
+            <a href="#projects">Cancel</a>
+          </div>
+        </> : <>
+          <h2>Connect a public GitHub repository</h2>
+          <p>Paste a repository URL or enter owner/repository. Private repository access is not available in this connector.</p>
+          <label htmlFor="repo-url">GitHub repository</label>
+          <div className="row">
+            <input id="repo-url" disabled={pending} required placeholder="https://github.com/owner/repo" value={repoInput} onChange={event => setRepoInput(event.target.value)} />
+            <button className="button" disabled={pending||!repoInput.trim()}>{pending ? 'Connecting…' : 'Add repository'}</button>
+            <a href="#projects">Cancel</a>
+          </div>
+        </>}
       </form>}
       {!invalidRoute && page==='generated'&&<ProjectGeneratedTests key={hash} repo={project} views={providerViews}/>}
       {!invalidRoute && (page === 'testing' || page === 'test-session') && <Workbench key={hash} repo={page === 'testing' ? project : undefined} sessionId={page === 'test-session' ? id : undefined} focusRunId={focusRunId}/>}

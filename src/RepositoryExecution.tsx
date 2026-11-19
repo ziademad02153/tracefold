@@ -8,7 +8,7 @@ import {StatusBadge,showRun,timeLabel} from './executionUi'
 
 export function RepositoryExecution({repo,profileId,views,focusRunId,focusSuiteId,templateId}:{repo?:string;profileId?:string;views:Record<string,ProviderView>;focusRunId?:string;focusSuiteId?:string;templateId?:string}){
   const [providers,setProviders]=useState<{id:string;version:string}[]>([]),[provider,setProvider]=useState('')
-  const [ref,setRef]=useState('main'),[component,setComponent]=useState('.')
+  const [ref,setRef]=useState(repo?.startsWith('local/')?'local':'main'),[component,setComponent]=useState('.')
   const [discovery,setDiscovery]=useState<Discovery>(),[config,setConfig]=useState<Record<string,unknown>>({})
   const [profiles,setProfiles]=useState<ExecutionProfile[]>([]),[profile,setProfile]=useState<ExecutionProfile>()
   const [historyUnavailable,setHistoryUnavailable]=useState(false)
@@ -54,7 +54,7 @@ export function RepositoryExecution({repo,profileId,views,focusRunId,focusSuiteI
       {template.current&&<p className="notice">Changing configuration creates a new saved setup. Earlier results and the original setup remain unchanged. <a href={'#execution/'+template.current.id}>Cancel configuration change →</a></p>}
       <form className="surface setup-form" onSubmit={e=>{e.preventDefault();void action('Inspecting repository',async()=>{setDiscovery(undefined);const d=await api<Discovery>('executions/discover',{repo,ref:ref.trim(),provider_id:provider,component:component.trim()});setDiscovery(d);setConfig(template.current&&template.current.provider_id===provider&&template.current.config.component_root===component.trim()?{...template.current.config}:views[provider]?.defaults(d.discovery)||{})})}}>
         <div className="section-heading"><div><p className="eyebrow">Step 1</p><h2>Inspect repository</h2></div></div>
-        <div className="form-columns"><div><label htmlFor="repository-revision">Branch, tag or commit</label><input id="repository-revision" required maxLength={200} value={ref} disabled={running} onChange={e=>{setRef(e.target.value);setDiscovery(undefined)}}/></div><div><label htmlFor="repository-component">Component root</label><input id="repository-component" required value={component} disabled={running} onChange={e=>{setComponent(e.target.value);setDiscovery(undefined)}}/><p className="field-help">Use . for the repository root, or a package directory such as services/api.</p></div></div>
+        <div className="form-columns"><div><label htmlFor="repository-revision">{activeRepo?.startsWith('local/') ? 'Local revision tag' : 'Branch, tag or commit'}</label><input id="repository-revision" required maxLength={200} value={ref} disabled={running} onChange={e=>{setRef(e.target.value);setDiscovery(undefined)}}/></div><div><label htmlFor="repository-component">Component root</label><input id="repository-component" required value={component} disabled={running} onChange={e=>{setComponent(e.target.value);setDiscovery(undefined)}}/><p className="field-help">Use . for the repository root, or a package directory such as services/api.</p></div></div>
         <label htmlFor="repository-runtime-provider">Execution provider</label><select id="repository-runtime-provider" value={provider} disabled={running} onChange={e=>{setProvider(e.target.value);setDiscovery(undefined)}}>{providers.map(p=><option key={p.id} value={p.id}>{views[p.id]?.label||p.id} · v{p.version}</option>)}</select>
         <button className="button" disabled={running||!provider||!ref.trim()||!component.trim()}>Inspect repository</button>
       </form>

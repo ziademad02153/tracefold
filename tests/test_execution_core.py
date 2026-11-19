@@ -173,6 +173,35 @@ class SnapshotTests(unittest.TestCase):
             with self.assertRaises(ProviderError):
                 store('owner/repo','main')
 
+    def test_local_directory_snapshot_and_filtering(self):
+        with tempfile.TemporaryDirectory() as store_temp, tempfile.TemporaryDirectory() as local_proj:
+            proj = Path(local_proj)
+            (proj / 'src').mkdir()
+            (proj / 'src' / 'main.py').write_text('def run(): return 42\n')
+            (proj / 'requirements.txt').write_text('pytest\n')
+            # Add files that should be ignored
+            (proj / '__pycache__').mkdir()
+            (proj / '__pycache__' / 'junk.pyc').write_bytes(b'junk')
+            (proj / '.git').mkdir()
+            (proj / '.git' / 'HEAD').write_text('ref: refs/heads/main\n')
+            (proj / '.venv').mkdir()
+            (proj / '.venv' / 'pyvenv.cfg').write_text('home = ...\n')
+
+            store = GithubSnapshots(store_temp, lambda path: None, lambda repo: None, local_resolver=lambda r: str(proj) if r == 'local/test-app' else None)
+            snap = store('local/test-app', 'local')
+            self.assertEqual(snap.repository, 'local/test-app')
+            self.assertEqual(snap.file_count, 2)
+            self.assertTrue((snap.path / 'src' / 'main.py').is_file())
+            self.assertTrue((snap.path / 'requirements.txt').is_file())
+            self.assertFalse((snap.path / '.git').exists())
+            self.assertFalse((snap.path / '__pycache__').exists())
+            self.assertFalse((snap.path / '.venv').exists())
+
+            # Replay returns identical hash and staged cache
+            replay = store('local/test-app', 'local')
+            self.assertEqual(replay.content_hash, snap.content_hash)
+            self.assertEqual(replay.path, snap.path)
+
 
 class PythonProfileTests(unittest.TestCase):
     def test_discovery_identifies_pytest_inputs_without_loading_project_code(self):

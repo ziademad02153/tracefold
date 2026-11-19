@@ -7,17 +7,17 @@ from execution_core.contracts import ProviderError
 
 class Discover(BaseModel):
     repo: str
-    ref: str = Field(min_length=1, max_length=200)
-    provider_id: str
+    ref: str | None = Field(default=None, max_length=200)
+    provider_id: str = 'python-pytest'
     component: str = '.'
 
 
 class CreateProfile(BaseModel):
     repo: str
-    ref: str = Field(min_length=1, max_length=200)
-    provider_id: str
+    ref: str | None = Field(default=None, max_length=200)
+    provider_id: str = 'python-pytest'
     config: dict
-    requested_ref: str|None = Field(default=None,min_length=1,max_length=200)
+    requested_ref: str|None = Field(default=None,max_length=200)
 
 
 class ApproveProfile(BaseModel):
@@ -135,12 +135,15 @@ def create_execution_router(service, connected):
     @router.post('/discover')
     def discover(request:Discover):
         connected(request.repo)
-        return perform(lambda:service.discover(request.repo,request.ref,request.provider_id,request.component))
+        ref = request.ref or ("local" if request.repo.startswith("local/") else "main")
+        return perform(lambda:service.discover(request.repo,ref,request.provider_id,request.component))
 
     @router.post('/profiles',status_code=201)
     def create(request:CreateProfile):
         connected(request.repo)
-        return perform(lambda:service.create(request.repo,request.ref,request.provider_id,request.config,requested_ref=request.requested_ref))
+        ref = request.ref or ("local" if request.repo.startswith("local/") else "main")
+        requested_ref = request.requested_ref or ref
+        return perform(lambda:service.create(request.repo,ref,request.provider_id,request.config,requested_ref=requested_ref))
 
     @router.get('/profiles')
     def list_profiles(repo:str):

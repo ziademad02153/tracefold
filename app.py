@@ -40,6 +40,27 @@ root = Path(__file__).resolve().parent
 from runtime_paths import runtime_directory, snapshot_directory
 data_root = runtime_directory(root, os.getenv('TRACEFOLD_DATA_DIR'))
 data_root.mkdir(parents=True, exist_ok=True)
+import hashlib
+LOCAL_PROJECTS_FILE = data_root / "local_projects.json"
+LOCAL_PROJECTS = {}
+if LOCAL_PROJECTS_FILE.is_file():
+    try:
+        LOCAL_PROJECTS = json.loads(LOCAL_PROJECTS_FILE.read_text(encoding="utf-8"))
+        for k, p in LOCAL_PROJECTS.items():
+            if Path(p).is_dir():
+                REPOSITORIES[k] = {
+                    "name": k,
+                    "description": f"Local workspace ({p})",
+                    "local_path": str(p),
+                }
+    except Exception:
+        LOCAL_PROJECTS = {}
+
+def save_local_projects():
+    try:
+        LOCAL_PROJECTS_FILE.write_text(json.dumps(LOCAL_PROJECTS, indent=2), encoding="utf-8")
+    except Exception:
+        pass
 engine = create_engine(os.getenv("DATABASE_URL") or f"sqlite:///{data_root / 'tracefold.db'}")
 metadata = MetaData()
 projects = Table("projects", metadata, Column("repo", String, primary_key=True))
@@ -108,10 +129,44 @@ def github(path, accept="application/vnd.github+json"):
 
 
 def repository_name(value):
-    value = value.strip().removeprefix("https://github.com/").rstrip("/").removesuffix(".git")
-    if not re.fullmatch(r"[A-Za-z0-9-]+/[A-Za-z0-9_.-]+", value) or value.split("/")[1] in (".", ".."):
-        raise HTTPException(422, "Enter a GitHub repository URL or owner/repository.")
-    return value
+    raw = value.strip().strip("'\"")
+    if not raw:
+        raise HTTPException(422, "Please provide a folder path or GitHub repository.")
+
+    candidate = Path(raw)
+    if candidate.is_dir():
+        folder = candidate.resolve()
+        folder_name = folder.name or "project"
+        slug = re.sub(r"[^A-Za-z0-9_.-]", "-", folder_name).strip("-") or "project"
+        repo_key = f"local/{slug}"
+        if repo_key in LOCAL_PROJECTS and LOCAL_PROJECTS[repo_key] != str(folder):
+            repo_key = f"local/{slug}-{hashlib.sha256(str(folder).encode()).hexdigest()[:6]}"
+        LOCAL_PROJECTS[repo_key] = str(folder)
+        save_local_projects()
+        REPOSITORIES[repo_key] = {
+            "name": repo_key,
+            "description": f"Local workspace ({folder})",
+            "local_path": str(folder),
+        }
+        return repo_key
+
+    if raw in LOCAL_PROJECTS:
+        return raw
+
+    if raw.startswith("local/"):
+        if re.fullmatch(r"local/[A-Za-z0-9_.-]+", raw):
+            return raw
+        raise HTTPException(422, "Invalid local repository identifier.")
+
+    is_url = raw.startswith("http://") or raw.startswith("https://")
+    if not is_url:
+        if "\\" in raw or raw.startswith("./") or raw.startswith("../") or re.match(r"^[a-zA-Z]:", raw):
+            raise HTTPException(422, f"Local directory does not exist: {raw}")
+
+    gh_val = raw.removeprefix("https://github.com/").removeprefix("http://github.com/").rstrip("/").removesuffix(".git")
+    if not re.fullmatch(r"[A-Za-z0-9-]+/[A-Za-z0-9_.-]+", gh_val) or gh_val.split("/")[1] in (".", ".."):
+        raise HTTPException(422, "Enter a valid local folder path or GitHub repository URL.")
+    return gh_val
 
 
 def pull_summary(pull):
@@ -151,6 +206,8 @@ def connect_repository(request: ConnectRepository):
 @app.get("/api/pulls")
 def list_pulls(repo: str):
     connected(repo)
+    if repo.startswith("local/"):
+        return []
     if repo not in PULL_REQUESTS:
         return [pull_summary(pull) for pull in github(repo + "/pulls?state=all&sort=updated&per_page=30")]
     return [{key: pull[key] for key in ("number", "title", "base", "head")}
@@ -266,10 +323,17 @@ from snapshot_store import GithubSnapshots
 from providers.python_repository import PythonRepositoryProvider
 
 execution_service = ExecutionService(engine, {'python-pytest': PythonRepositoryProvider()},
-    GithubSnapshots(snapshot_directory(root, data_root), github, connected))
+    GithubSnapshots(snapshot_directory(root, data_root), github, connected, local_resolver=lambda r: LOCAL_PROJECTS.get(r)))
 app.include_router(create_execution_router(execution_service, connected))
 from project_management import create_project_management_router
-app.include_router(create_project_management_router(engine))
+
+def delete_local_project(repo):
+    if repo in LOCAL_PROJECTS:
+        LOCAL_PROJECTS.pop(repo, None)
+        REPOSITORIES.pop(repo, None)
+        save_local_projects()
+
+app.include_router(create_project_management_router(engine, on_delete=delete_local_project))
 
 
 if (root / "dist").is_dir():

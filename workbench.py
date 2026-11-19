@@ -246,6 +246,8 @@ def create_router(engine, github, connected):
     def resolve(repo, ref):
         ref = ref.strip()
         connected(repo)
+        if repo.startswith("local/"):
+            return "local"
         if repo.startswith("tracefold-demo/"):
             raise HTTPException(422, "Choose a real public repository.")
         return github(repo + "/commits/" + quote(ref, safe=""))["sha"]
@@ -337,6 +339,8 @@ def create_router(engine, github, connected):
     @router.get("/branches")
     def branches(repo: str):
         connected(repo)
+        if repo.startswith("local/"):
+            return [{"name": "local", "sha": "local"}]
         return [{"name": b["name"], "sha": b["commit"]["sha"]}
                 for b in github(repo + "/branches?per_page=100")]
 

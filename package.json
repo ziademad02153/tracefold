@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/start.mjs",
-    "dev": "vite",
+    "dev": "node scripts/start.mjs",
     "build": "tsc --noEmit && vite build",
     "test:ui": "node tests/ui/run.mjs"
   },

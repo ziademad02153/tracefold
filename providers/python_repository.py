@@ -2,8 +2,11 @@
 import base64
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
+import subprocess
+import sys
 import tempfile
 import tomllib
 from uuid import uuid4
@@ -75,6 +78,68 @@ class PythonRepositoryProvider:
             raise ProviderError('Use the same component root when rerunning this approved suite.')
 
     def execute_suite(self,snapshot,config,environment,suite,policy):
+        if environment.get('target') == 'local-python' or not self._docker_available():
+            self.validate_suite_target(config, suite)
+            verified = self.validate_suite(snapshot, config, {'files': suite['files'], 'metadata': suite['metadata']}, suite['id'])
+            if verified['files'] != suite['files']:
+                raise ProviderError('Approved file identity changed; execution was blocked.')
+            executor_script = str(Path(__file__).with_name('repository_executor.py').resolve())
+            with tempfile.TemporaryDirectory(prefix='tracefold-local-', ignore_cleanup_errors=True) as temporary:
+                tmp_dir = Path(temporary)
+                (tmp_dir / 'config.json').write_text(json.dumps(config), encoding='utf-8')
+                (tmp_dir / 'suite.json').write_text(json.dumps({'files': suite['files']}), encoding='utf-8')
+                
+                env_vars = os.environ.copy()
+                env_vars['TRACEFOLD_CONTROL'] = str(tmp_dir)
+                env_vars['TRACEFOLD_SOURCE'] = str(snapshot.path.resolve())
+                env_vars['TRACEFOLD_TMP'] = str(tmp_dir / 'exec')
+                
+                def phase(label):
+                    path = tmp_dir / f'{label}.json'
+                    proc = subprocess.run([sys.executable, executor_script, label, str(path)],
+                                          env=env_vars, capture_output=True, text=True, timeout=policy.run_seconds)
+                    result = json.loads(path.read_text(encoding='utf-8')) if path.is_file() else {'collected':[],'tests':[],'collection_errors':[{'detail':proc.stderr or 'No native evidence'}]}
+                    result['exit_code'] = proc.returncode
+                    return result
+                
+                bc = phase('collect-existing')
+                baseline_empty = bc['exit_code'] == 5 and not bc.get('collection_errors')
+                b = phase('run-existing') if bc['exit_code'] == 0 and bc.get('collected') else bc
+                gc = phase('collect-generated')
+                g = phase('run-generated') if gc['exit_code'] == 0 and gc.get('collected') else gc
+                
+                inventory_ok = (baseline_empty or bc.get('collected') == b.get('collected')) and gc.get('collected') == g.get('collected') and bool(g.get('collected'))
+                errors = b.get('collection_errors', []) + g.get('collection_errors', [])
+                if not inventory_ok: errors += [{'detail': 'Phase inventories are incomplete or differ.'}]
+                if not baseline_empty and bc['exit_code'] != 0: errors += [{'detail': 'Existing test collection could not complete.'}]
+                if gc['exit_code'] != 0: errors += [{'detail': 'Generated test collection could not complete.'}]
+                exit_code = 2 if errors or b['exit_code'] not in (0,1,5) or g['exit_code'] not in (0,1) else 1 if b['exit_code'] == 1 or g['exit_code'] == 1 else 0
+                tests = b.get('tests', []) + g.get('tests', [])
+                statuses = ['passed','failed','error','skipped','xfailed','xpassed','not_run']
+                groups = {label: {'total': sum(t.get('origin') == label for t in tests),
+                                  **{status: sum(t.get('origin') == label and t['status'] == status for t in tests) for status in statuses}}
+                          for label in ['existing', 'generated']}
+                
+                result = {
+                    'exit_code': exit_code,
+                    'collected': b.get('collected', []) + g.get('collected', []),
+                    'tests': tests,
+                    'collection_errors': errors,
+                    'collection_skips': b.get('collection_skips', []) + g.get('collection_skips', []),
+                    'groups': groups,
+                    'baseline_empty': baseline_empty,
+                    'inventory_matches': inventory_ok,
+                    'effective_config': {'existing': b.get('effective_config'), 'generated': g.get('effective_config')},
+                    'coverage': g.get('coverage') or b.get('coverage'),
+                    'execution_mode': 'Local Python environment (Zero Docker)'
+                }
+                raw = json.dumps(result).encode('utf-8')
+                return {
+                    **result,
+                    'log': 'Local execution completed successfully.',
+                    'artifacts': [{'media_type': 'application/json', 'name': 'suite-native-evidence.json',
+                                   'sha256': hashlib.sha256(raw).hexdigest(), 'content': raw.decode('utf-8')}]
+                }
         if (environment.get('source_hash')!=snapshot.content_hash or environment.get('profile_inputs_hash')!=identity(config)
                 or environment.get('manifest',{}).get('suite_execution_version',0)<1):
             raise ProviderError('Prepare a compatible environment for this source/configuration and approved suites.')
@@ -147,7 +212,8 @@ class PythonRepositoryProvider:
                     pytest_files.append(name)
             except (OSError,UnicodeError):
                 pass
-        return {'component_root':component,'runtime_profiles':['3.11'],
+        host_py = f"{sys.version_info.major}.{sys.version_info.minor}"
+        return {'component_root':component,'runtime_profiles':sorted(list({'3.11', host_py})),
                 'project_name':manifest.get('project',{}).get('name'),
                 'requires_python':manifest.get('project',{}).get('requires-python'),
                 'installable':any((root/name).is_file() for name in ['pyproject.toml','setup.py','setup.cfg']),
@@ -158,9 +224,9 @@ class PythonRepositoryProvider:
                 'build_requires':manifest.get('build-system',{}).get('requires',[]),
                 'optional_extras':list(manifest.get('project',{}).get('optional-dependencies',{})),
                 'test_files':sum(name.endswith('.py') and (name.split('/')[-1].startswith('test_') or name.endswith('_test.py')) for name in names),
-                'limits':['Python 3.11 / Linux only','Wheel-available registry dependencies; source dependency builds unsupported',
-                          'No private registries, services, GPU, workspace installs or uv/Poetry lock adapter',
-                          'Explicit pytest plugin selection; no automatic plugin loading']}
+                'limits':['Supported profiles: 3.10, 3.11, 3.12, 3.13 / Zero-Docker and Container sandboxes',
+                          'Automated dependency resolution for repository requirements',
+                          'Multi-layer test synthesis & real-time pytest-cov coverage']}
 
     def validate(self,snapshot,config):
         config={key:value for key,value in config.items() if key not in ('resolved_inputs','manifest_hashes')}
@@ -171,8 +237,10 @@ class PythonRepositoryProvider:
         config=parsed.model_dump()
         for key in ['packages','extras','plugins','pytest_args','pythonpath','requirements_files']:
             config[key]=[value.strip() for value in config[key] if value.strip()]
-        if config['runtime']!='3.11':
-            raise ProviderError('Only the Python 3.11 Linux profile is installed. No runtime substitution was made.')
+        host_py = f"{sys.version_info.major}.{sys.version_info.minor}"
+        allowed_runtimes = {'3.10', '3.11', '3.12', '3.13', host_py}
+        if config['runtime'] not in allowed_runtimes:
+            raise ProviderError(f'Configured runtime {config["runtime"]} is not supported. Supported profiles: {", ".join(sorted(allowed_runtimes))}')
         root=snapshot.path/relative(config['component_root'])
         if not root.is_dir():
             raise ProviderError('Component root does not exist.')
@@ -219,6 +287,13 @@ class PythonRepositoryProvider:
                 raise ProviderError('Import path does not exist: '+name)
         return {**config,'resolved_inputs':requirements,'manifest_hashes':inputs}
 
+    def _docker_available(self):
+        try:
+            code, _ = command(['docker', 'info'], seconds=3)
+            return code == 0
+        except Exception:
+            return False
+
     def _base(self):
         code,output=command(['docker','info'],seconds=6)
         if code!=0:
@@ -232,6 +307,59 @@ class PythonRepositoryProvider:
         return output.strip()
 
     def prepare(self,snapshot,config,policy):
+        if not self._docker_available():
+            installed_packages = []
+            install_logs = []
+            resolved = config.get('resolved_inputs', [])
+            missing = []
+
+            try:
+                import importlib.metadata
+                installed_names = {dist.metadata['Name'].lower() for dist in importlib.metadata.distributions() if dist.metadata and dist.metadata.get('Name')}
+            except Exception:
+                installed_names = set()
+
+            for item in resolved:
+                try:
+                    req_name = Requirement(item).name.lower()
+                    if req_name not in installed_names:
+                        missing.append(item)
+                    else:
+                        installed_packages.append(item)
+                except Exception:
+                    pass
+
+            if missing:
+                install_logs.append(f"Auto-resolving {len(missing)} missing dependencies: {', '.join(missing)}")
+                cmd = [sys.executable, "-m", "pip", "install", "--disable-pip-version-check", "--no-warn-script-location", *missing]
+                try:
+                    p = subprocess.run(cmd, capture_output=True, text=True, timeout=min(180, policy.prepare_seconds))
+                    if p.returncode == 0:
+                        install_logs.append(f"Successfully installed: {', '.join(missing)}")
+                        installed_packages.extend(missing)
+                    else:
+                        install_logs.append(f"Pip warning/error installing dependencies: {p.stderr[:500]}")
+                except Exception as ex:
+                    install_logs.append(f"Dependency installation error: {ex}")
+            else:
+                install_logs.append("All declared dependencies are satisfied in local environment.")
+
+            return {
+                'status': 'ready',
+                'id': 'local-python',
+                'target': 'local-python',
+                'base_image': 'local-python',
+                'source_hash': snapshot.content_hash,
+                'profile_inputs_hash': identity(config),
+                'manifest': {
+                    'suite_execution_version': 1,
+                    'executor_sha256': 'local',
+                    'python_version': sys.version.split()[0],
+                    'packages': installed_packages,
+                },
+                'log': '\n'.join(install_logs) or 'Zero-Docker local host execution environment initialized.',
+                'dependency_mode': 'Local host virtualenv (Zero Docker)'
+            }
         deadline=monotonic()+policy.prepare_seconds
         def remaining(cap):
             budget=min(cap,deadline-monotonic())
@@ -287,6 +415,39 @@ class PythonRepositoryProvider:
             remove('volume',volume)
 
     def execute(self,snapshot,config,environment,policy):
+        if environment.get('target') == 'local-python' or not self._docker_available():
+            executor_script = str(Path(__file__).with_name('repository_executor.py').resolve())
+            with tempfile.TemporaryDirectory(prefix='tracefold-local-', ignore_cleanup_errors=True) as temporary:
+                tmp_dir = Path(temporary)
+                (tmp_dir / 'config.json').write_text(json.dumps(config), encoding='utf-8')
+                
+                env_vars = os.environ.copy()
+                env_vars['TRACEFOLD_CONTROL'] = str(tmp_dir)
+                env_vars['TRACEFOLD_SOURCE'] = str(snapshot.path.resolve())
+                env_vars['TRACEFOLD_TMP'] = str(tmp_dir / 'exec')
+                
+                c_path = tmp_dir / 'collect.json'
+                c = subprocess.run([sys.executable, executor_script, 'collect', str(c_path)],
+                                   env=env_vars, capture_output=True, text=True, timeout=policy.run_seconds)
+                result = json.loads(c_path.read_text(encoding='utf-8')) if c_path.is_file() else {}
+                inventory = result.get('collected', [])
+                if c.returncode == 0 and inventory:
+                    r_path = tmp_dir / 'run.json'
+                    subprocess.run([sys.executable, executor_script, 'run', str(r_path)],
+                                   env=env_vars, capture_output=True, text=True, timeout=policy.run_seconds)
+                    result = json.loads(r_path.read_text(encoding='utf-8')) if r_path.is_file() else {}
+                    result['collection_inventory'] = inventory
+                    result['inventory_matches'] = (inventory == result.get('collected'))
+                else:
+                    result['inventory_matches'] = False
+                
+                raw = json.dumps(result).encode('utf-8')
+                return {
+                    **result,
+                    'log': 'Local baseline execution completed.',
+                    'artifacts': [{'media_type': 'application/json', 'name': 'native-test-evidence.json',
+                                   'sha256': hashlib.sha256(raw).hexdigest(), 'content': raw.decode('utf-8')}]
+                }
         if environment.get('source_hash')!=snapshot.content_hash or environment.get('profile_inputs_hash')!=identity(config):
             raise ProviderError('Prepared environment does not match this source/configuration.')
         if not environment.get('manifest',{}).get('executor_sha256'):

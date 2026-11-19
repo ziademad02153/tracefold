@@ -6,6 +6,7 @@ export type NativeTest = {id:string;status:string;detail:string;seconds?:number;
 export type ExecutionRun = {id:string;status:string;started_at:string;completed_at:string;environment_id:string;profile_hash:string;
   suite_id?:string;suite_hash?:string;baseline_empty?:boolean;comparison?:{same_suite:boolean;same_environment:boolean;source_changed:boolean;complete:boolean;changes:{id:string;before:string;after:string}[];added:string[];removed:string[];existing_inventory?:{added:string[];removed:string[]}};
   summary?:Record<string,number>;tests:NativeTest[];collected:string[];log?:string;error?:string;
+  coverage?:{percent_covered:number;percent_covered_display:string;covered_lines:number;num_statements:number;missing_lines:number;files?:Record<string,{covered_lines:number;num_statements:number;percent_covered:number}>};
   effective_config?:unknown;collection_errors?:unknown[];collection_skips?:unknown[];artifacts?:{name:string;media_type:string;sha256:string;content:string}[]}
 export type ExecutionProfile = {id:string;repo:string;state:string;provider_id:string;provider_version:string;source:Source;requested_ref?:string;
   profile_hash:string;config:Record<string,unknown>;error?:string;created_at:string;
